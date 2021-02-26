@@ -11,7 +11,7 @@ int ReadParam(const char buffer[], const char keyword[], char type, const char f
         match = sscanf(buffer, "%s", optstr);
         if (strcasecmp(keyword, optstr) != 0)
         {
-            printf("Expected keyword \"%s\", detected keyword \"%s\".\n", keyword, optstr);
+            biort_printf(VL_ERROR, "Expected keyword \"%s\", detected keyword \"%s\".\n", keyword, optstr);
             success = 0;
         }
         else if (match != 1)
@@ -27,7 +27,7 @@ int ReadParam(const char buffer[], const char keyword[], char type, const char f
                 match = sscanf(buffer, "%s %lf", optstr, (double *)value);
                 if (strcasecmp(keyword, optstr) != 0)
                 {
-                    printf("Expected keyword \"%s\", detected keyword \"%s\".\n", keyword, optstr);
+                    biort_printf(VL_ERROR, "Expected keyword \"%s\", detected keyword \"%s\".\n", keyword, optstr);
                     success = 0;
                 }
                 else if (match != 2)
@@ -39,7 +39,7 @@ int ReadParam(const char buffer[], const char keyword[], char type, const char f
                 match = sscanf(buffer, "%s %d", optstr, (int *)value);
                 if (strcasecmp(keyword, optstr) != 0)
                 {
-                    printf("Expected keyword \"%s\", detected keyword \"%s\".\n", keyword, optstr);
+                    biort_printf(VL_ERROR, "Expected keyword \"%s\", detected keyword \"%s\".\n", keyword, optstr);
                     success = 0;
                 }
                 else if (match != 2)
@@ -51,7 +51,7 @@ int ReadParam(const char buffer[], const char keyword[], char type, const char f
                 match = sscanf(buffer, "%s %[^\n]", optstr, (char *)value);
                 if (strcasecmp(keyword, optstr) != 0)
                 {
-                    printf("Expected keyword \"%s\", detected keyword \"%s\".\n", keyword, optstr);
+                    biort_printf(VL_ERROR, "Expected keyword \"%s\", detected keyword \"%s\".\n", keyword, optstr);
                     success = 0;
                 }
                 else if (match != 2)
@@ -63,7 +63,7 @@ int ReadParam(const char buffer[], const char keyword[], char type, const char f
                 match = sscanf(buffer, "%s %s", optstr, (char *)value);
                 if (strcasecmp(keyword, optstr) != 0)
                 {
-                    printf("Expected keyword \"%s\", detected keyword \"%s\".\n", keyword, optstr);
+                    biort_printf(VL_ERROR, "Expected keyword \"%s\", detected keyword \"%s\".\n", keyword, optstr);
                     success = 0;
                 }
                 else if (match != 2)
@@ -72,14 +72,14 @@ int ReadParam(const char buffer[], const char keyword[], char type, const char f
                 }
                 break;
             default:
-                printf("Error: Keyword type \'%c\' is not defined.\n", type);
+                biort_printf(VL_ERROR, "Error: Keyword type \'%c\' is not defined.\n", type);
                 exit(EXIT_FAILURE);
         }
     }
 
     if (!success)
     {
-        printf("File %s format error at Line %d.\n", fn, lno);
+        biort_printf(VL_ERROR, "File %s format error at Line %d.\n", fn, lno);
         exit(EXIT_FAILURE);
     }
 

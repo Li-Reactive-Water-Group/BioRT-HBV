@@ -20,7 +20,7 @@ void Lookup(FILE *fp, const calib_struct *calib, chemtbl_struct chemtbl[], kintb
     ReadTempPoints(cmdstr, rttbl->tmp, &total_temp_points, &keq_position);
     if (keq_position == BADVAL)
     {
-        printf("Error reading temperature points in %s near Line %d", ".cdbs", lno);
+        biort_printf(VL_ERROR, "Error reading temperature points in %s near Line %d", ".cdbs", lno);
         exit(EXIT_FAILURE);
     }
 
@@ -36,7 +36,7 @@ void Lookup(FILE *fp, const calib_struct *calib, chemtbl_struct chemtbl[], kintb
     ReadDHParam(cmdstr, keq_position, &rttbl->adh);
     if (roundi(rttbl->adh) == BADVAL)
     {
-        printf("Error reading Debye Huckel parameters in %s near Line %d", ".cdbs", lno);
+        biort_printf(VL_ERROR, "Error reading Debye Huckel parameters in %s near Line %d", ".cdbs", lno);
         exit(EXIT_FAILURE);
     }
 
@@ -47,7 +47,7 @@ void Lookup(FILE *fp, const calib_struct *calib, chemtbl_struct chemtbl[], kintb
     ReadDHParam(cmdstr, keq_position, &rttbl->bdh);
     if (roundi(rttbl->bdh) == BADVAL)
     {
-        printf("Error reading Debye Huckel parameters in %s near Line %d", ".cdbs", lno);
+        biort_printf(VL_ERROR, "Error reading Debye Huckel parameters in %s near Line %d", ".cdbs", lno);
         exit(EXIT_FAILURE);
     }
 
@@ -58,11 +58,11 @@ void Lookup(FILE *fp, const calib_struct *calib, chemtbl_struct chemtbl[], kintb
     ReadDHParam(cmdstr, keq_position, &rttbl->bdt);
     if (roundi(rttbl->bdt) == BADVAL)
     {
-        printf("Error reading Debye Huckel parameters in %s near Line %d", ".cdbs", lno);
+        biort_printf(VL_ERROR, "Error reading Debye Huckel parameters in %s near Line %d", ".cdbs", lno);
         exit(EXIT_FAILURE);
     }
 
-    printf(" Debye-Huckel Parameters set to A=%6.4f; B=%6.4f; b=%6.4f\n\n",
+    biort_printf(VL_NORMAL, " Debye-Huckel Parameters set to A=%6.4f; B=%6.4f; b=%6.4f\n\n",
         rttbl->adh, rttbl->bdh, rttbl->bdt);
 
 
@@ -123,7 +123,8 @@ void Lookup(FILE *fp, const calib_struct *calib, chemtbl_struct chemtbl[], kintb
     for (i = 0; i < rttbl->num_mkr + rttbl->num_akr; i++)
     {
         ind = kintbl[i].position - rttbl->num_stc + rttbl->num_min;
-        printf(" Selecting the kinetic species %s from all possible species.\n\n", chemtbl[kintbl[i].position].name);
+        biort_printf(VL_NORMAL, " Selecting the kinetic species %s from all possible species.\n\n",
+            chemtbl[kintbl[i].position].name);
         rttbl->keq_kin[i] = keq_kin_all[ind];
         for (k = 0; k < rttbl->num_stc; k++)
         {
@@ -174,7 +175,7 @@ void Lookup(FILE *fp, const calib_struct *calib, chemtbl_struct chemtbl[], kintb
 
         if (kintbl[i].type == BADVAL)
         {
-            printf("Error finding mineral kinetic %s -label %s in the database.\n",
+            biort_printf(VL_ERROR, "Error finding mineral kinetic %s -label %s in the database.\n",
                 chemtbl[kintbl[i].position].name, kintbl[i].label);
             exit(EXIT_FAILURE);
         }
@@ -194,58 +195,58 @@ void Lookup(FILE *fp, const calib_struct *calib, chemtbl_struct chemtbl[], kintb
     }
     if (rttbl->num_ssc > 0)
     {
-        printf(" \n Dependency Matrix!\n");
+        biort_printf(VL_NORMAL, " \n Dependency Matrix!\n");
 
-        printf("%-15s", " ");
+        biort_printf(VL_NORMAL, "%-15s", " ");
         for (i = 0; i < rttbl->num_sdc; i++)
         {
-            printf("%-14s", chemtbl[i].name);
+            biort_printf(VL_NORMAL, "%-14s", chemtbl[i].name);
         }
-        printf("\n");
+        biort_printf(VL_NORMAL, "\n");
 
         for (i = 0; i < rttbl->num_ssc; i++)
         {
-            printf(" %-14s", chemtbl[i + rttbl->num_stc].name);
+            biort_printf(VL_NORMAL, " %-14s", chemtbl[i + rttbl->num_stc].name);
             for (j = 0; j < rttbl->num_sdc; j++)
             {
-                printf("%-14.2f", rttbl->dep_mtx[i][j]);
+                biort_printf(VL_NORMAL, "%-14.2f", rttbl->dep_mtx[i][j]);
             }
-            printf(" %6.2f\n", rttbl->keq[i]);
+            biort_printf(VL_NORMAL, " %6.2f\n", rttbl->keq[i]);
         }
     }
 
-    printf(" \n Total Concentration Matrix!\n");
-    printf("%-18s", " ");
+    biort_printf(VL_NORMAL, " \n Total Concentration Matrix!\n");
+    biort_printf(VL_NORMAL, "%-18s", " ");
     for (i = 0; i < rttbl->num_stc + rttbl->num_ssc; i++)
     {
-        printf("%-14s", chemtbl[i].name);
+        biort_printf(VL_NORMAL, "%-14s", chemtbl[i].name);
     }
-    printf("\n");
+    biort_printf(VL_NORMAL, "\n");
     for (i = 0; i < rttbl->num_stc; i++)
     {
-        printf(" Sum%-14s", chemtbl[i].name);
+        biort_printf(VL_NORMAL, " Sum%-14s", chemtbl[i].name);
         for (j = 0; j < rttbl->num_stc + rttbl->num_ssc; j++)
         {
-            printf("%-14.2f", rttbl->conc_contrib[i][j]);
+            biort_printf(VL_NORMAL, "%-14.2f", rttbl->conc_contrib[i][j]);
         }
-        printf("\n");
+        biort_printf(VL_NORMAL, "\n");
     }
 
-    printf(" \n Kinetic Mass Matrix!\n");
-    printf("%-15s", " ");
+    biort_printf(VL_NORMAL, " \n Kinetic Mass Matrix!\n");
+    biort_printf(VL_NORMAL, "%-15s", " ");
     for (i = 0; i < rttbl->num_stc; i++)
     {
-        printf("%-14s", chemtbl[i].name);
+        biort_printf(VL_NORMAL, "%-14s", chemtbl[i].name);
     }
-    printf("\n");
+    biort_printf(VL_NORMAL, "\n");
     for (j = 0; j < rttbl->num_mkr + rttbl->num_akr; j++)
     {
-        printf(" %-14s", chemtbl[kintbl[j].position].name);
+        biort_printf(VL_NORMAL, " %-14s", chemtbl[kintbl[j].position].name);
         for (i = 0; i < rttbl->num_stc; i++)
         {
-            printf("%-14f", rttbl->dep_kin[j][i]);
+            biort_printf(VL_NORMAL, "%-14f", rttbl->dep_kin[j][i]);
         }
-        printf(" Keq = %-6.2f\n", rttbl->keq_kin[j]);
+        biort_printf(VL_NORMAL, " Keq = %-6.2f\n", rttbl->keq_kin[j]);
     }
 
 #if NOT_YET_IMPLEMENTED
@@ -277,7 +278,7 @@ void Lookup(FILE *fp, const calib_struct *calib, chemtbl_struct chemtbl[], kintb
     printf("\n");
 #endif
 
-    printf(" \n Mass action species type determination (0: immobile, 1: mobile, 2: Mixed) \n");
+    biort_printf(VL_NORMAL, " \n Mass action species type determination (0: immobile, 1: mobile, 2: Mixed) \n");
     for (i = 0; i < rttbl->num_spc; i++)
     {
         chemtbl[i].mtype = (chemtbl[i].itype == AQUEOUS) ? MOBILE_MA : IMMOBILE_MA;
@@ -287,13 +288,14 @@ void Lookup(FILE *fp, const calib_struct *calib, chemtbl_struct chemtbl[], kintb
             chemtbl[i].mtype = (rttbl->conc_contrib[i][j] != 0 && chemtbl[j].itype != chemtbl[i].mtype) ?
                 MIXED_MA : chemtbl[i].mtype;
         }
-        printf(" %12s    %10d\n", chemtbl[i].name, chemtbl[i].mtype);
+        biort_printf(VL_NORMAL, " %12s    %10d\n", chemtbl[i].name, chemtbl[i].mtype);
     }
 
-    printf(" \n Individual species type determination (1: aqueous, 2: adsorption, 3: ion exchange, 4: solid)\n");
+    biort_printf(VL_NORMAL,
+        " \n Individual species type determination (1: aqueous, 2: adsorption, 3: ion exchange, 4: solid)\n");
     for (i = 0; i < rttbl->num_stc + rttbl->num_ssc; i++)
     {
-        printf(" %12s    %10d\n", chemtbl[i].name, chemtbl[i].itype);
+        biort_printf(VL_NORMAL, " %12s    %10d\n", chemtbl[i].name, chemtbl[i].itype);
     }
 }
 
@@ -327,7 +329,7 @@ void ReadTempPoints(const char cmdstr[], double tmp, int *total_points, int *keq
         if (fabs(val - tmp) < 1.0E-5)
         {
             *keq_position = i + 1;
-            printf("\n Temperature point %.2f found in database (Pos. %d).\n\n", val, *keq_position);
+            biort_printf(VL_NORMAL, "\n Temperature point %.2f found in database (Pos. %d).\n\n", val, *keq_position);
             return;
         }
     }
@@ -366,10 +368,10 @@ void ReadPrimary(const char cmdstr[], int num_stc, chemtbl_struct chemtbl[])
             if (sscanf(cmdstr, "'%*[^']' %lf %lf %lf",
                 &chemtbl[i].size_fac, &chemtbl[i].charge, &chemtbl[i].molar_mass) != 3)
             {
-                printf("Error reading primary species parameters for %s\n", chemtbl[i].name);
+                biort_printf(VL_ERROR, "Error reading primary species parameters for %s\n", chemtbl[i].name);
                 exit(EXIT_FAILURE);
             }
-            printf(" Primary species %s found in database.\n molar_mass = %6.4f\n\n",
+            biort_printf(VL_NORMAL, " Primary species %s found in database.\n molar_mass = %6.4f\n\n",
                 chemtbl[i].name, chemtbl[i].molar_mass);
             break;
         }
@@ -396,8 +398,8 @@ void ReadSecondary(const char cmdstr[], int npoints, int keq_position, chemtbl_s
 
         if (MatchWrappedKey(chemn, chemtbl[ind].name) == 0)
         {
-            printf(" Secondary species %s found in database!\n", chemtbl[ind].name);
-            printf(" %s", cmdstr);
+            biort_printf(VL_NORMAL, " Secondary species %s found in database!\n", chemtbl[ind].name);
+            biort_printf(VL_NORMAL, " %s", cmdstr);
             chemtbl[ind].itype = AQUEOUS;
 
             for (j = 0; j < ndep; j++)
@@ -421,7 +423,7 @@ void ReadSecondary(const char cmdstr[], int npoints, int keq_position, chemtbl_s
                 {
                     sscanf(cmdstr + bytes_consumed, "%lf%n", &rttbl->keq[i], &bytes_now);
                     bytes_consumed += bytes_now;
-                    printf(" Keq = %6.4f\n", rttbl->keq[i]);
+                    biort_printf(VL_NORMAL, " Keq = %6.4f\n", rttbl->keq[i]);
                 }
                 else
                 {
@@ -432,7 +434,7 @@ void ReadSecondary(const char cmdstr[], int npoints, int keq_position, chemtbl_s
 
             sscanf(cmdstr + bytes_consumed, "%lf %lf %lf",
                 &chemtbl[ind].size_fac, &chemtbl[ind].charge, &chemtbl[ind].molar_mass);
-            printf(" molar_mass = %6.4f, Charge = %6.4f, SizeFactor = %6.4f\n\n",
+            biort_printf(VL_NORMAL, " molar_mass = %6.4f, Charge = %6.4f, SizeFactor = %6.4f\n\n",
                 chemtbl[ind].molar_mass, chemtbl[ind].charge, chemtbl[ind].size_fac);
 
             break;
@@ -462,8 +464,8 @@ void ReadMinerals(const char cmdstr[], int npoints, int keq_position, double pot
 
         if (MatchWrappedKey(chemn, chemtbl[ind].name) == 0)
         {
-            printf(" Mineral %s found in database!\n", chemtbl[ind].name);
-            printf(" %s", cmdstr);
+            biort_printf(VL_NORMAL, " Mineral %s found in database!\n", chemtbl[ind].name);
+            biort_printf(VL_NORMAL, " %s", cmdstr);
 
             chemtbl[ind].molar_vol = mvol;
             chemtbl[ind].itype = MINERAL;
@@ -514,9 +516,9 @@ void ReadMinerals(const char cmdstr[], int npoints, int keq_position, double pot
 
             pot_dep[i][ind] = -1.0;
 
-            printf(" Keq = %6.4f\n", keq_kin_all[i]);
+            biort_printf(VL_NORMAL, " Keq = %6.4f\n", keq_kin_all[i]);
             chemtbl[ind].charge = 0;
-            printf(" molar_mass = %6.4f, molar_vol = %6.4f\n\n",
+            biort_printf(VL_NORMAL, " molar_mass = %6.4f, molar_vol = %6.4f\n\n",
                 chemtbl[ind].molar_mass, chemtbl[ind].molar_vol);
 
             break;
@@ -548,8 +550,8 @@ void ReadAdsorption(const char cmdstr[], int npoints, int keq_position, chemtbl_
 
         if (strcmp(chemtbl[ind].name, chemn) == 0)
         {
-            printf(" Secondary surface complexation %s found in database!\n", chemtbl[ind].name);
-            printf(" %s", cmdstr);
+            biort_printf(VL_NORMAL, " Secondary surface complexation %s found in database!\n", chemtbl[ind].name);
+            biort_printf(VL_NORMAL, " %s", cmdstr);
             chemtbl[ind].itype = ADSORPTION;
             for (j = 0; j < ndep; j++)
             {
@@ -573,7 +575,7 @@ void ReadAdsorption(const char cmdstr[], int npoints, int keq_position, chemtbl_
                 {
                     sscanf(cmdstr + bytes_consumed, "%lf%n", &rttbl->keq[i], &bytes_now);
                     bytes_consumed += bytes_now;
-                    printf(" Keq = %6.4f\n", rttbl->keq[i]);
+                    biort_printf(VL_NORMAL, " Keq = %6.4f\n", rttbl->keq[i]);
                 }
                 else
                 {
@@ -608,8 +610,8 @@ void ReadCationEchg(const char cmdstr[], double calval, chemtbl_struct chemtbl[]
 
         if (strcmp(chemtbl[ind].name, chemn) == 0)
         {
-            printf(" Secondary ion exchange %s found in database!\n", chemtbl[ind].name);
-            printf(" %s", cmdstr);
+            biort_printf(VL_NORMAL, " Secondary ion exchange %s found in database!\n", chemtbl[ind].name);
+            biort_printf(VL_NORMAL, " %s", cmdstr);
             chemtbl[ind].itype = CATION_ECHG;
             for (j = 0; j < ndep; j++)
             {
@@ -627,10 +629,10 @@ void ReadCationEchg(const char cmdstr[], double calval, chemtbl_struct chemtbl[]
                 }
             }
             sscanf(cmdstr + bytes_consumed, "%lf", &rttbl->keq[i]);
-            printf(" Keq = %6.4f \n", rttbl->keq[i]);
+            biort_printf(VL_NORMAL, " Keq = %6.4f \n", rttbl->keq[i]);
 
             rttbl->keq[i] += calval;
-            printf(" After calibration: Keq = %6.4f \n", rttbl->keq[i]);
+            biort_printf(VL_NORMAL, " After calibration: Keq = %6.4f \n", rttbl->keq[i]);
         }
     }
 }
@@ -655,7 +657,7 @@ void ReadMinKin(FILE *fp, int num_stc, double calval, int *lno, char cmdstr[], c
 
         if (strcmp(kintbl->label, label) == 0)
         {
-            printf(" \n Mineral kinetics %s %s found in database!\n",
+            biort_printf(VL_NORMAL, " \n Mineral kinetics %s %s found in database!\n",
                 chemtbl[kintbl->position].name, kintbl->label);
 
             // For mineral kinetics, all species have the following lines:
@@ -686,7 +688,7 @@ void ReadMinKin(FILE *fp, int num_stc, double calval, int *lno, char cmdstr[], c
             }
             else
             {
-                printf("Error: Cannot find mineral kinetics type in .cdbs near Line %d.\n", *lno);
+                biort_printf(VL_ERROR, "Error: Cannot find mineral kinetics type in .cdbs near Line %d.\n", *lno);
                 exit(EXIT_FAILURE);
             }
 
@@ -695,14 +697,14 @@ void ReadMinKin(FILE *fp, int num_stc, double calval, int *lno, char cmdstr[], c
             sscanf(cmdstr, "%s = %lf", optstr, &kintbl->rate);
             if (strcmp(optstr, "rate(25C)") == 0)
             {
-                printf(" Rate is %f\n", kintbl->rate);
+                biort_printf(VL_NORMAL, " Rate is %f\n", kintbl->rate);
 
                 kintbl->rate += calval;
-                printf(" After calibration: Rate is %f, calib->Rate = %f \n", kintbl->rate, calval);
+                biort_printf(VL_NORMAL, " After calibration: Rate is %f, calib->Rate = %f \n", kintbl->rate, calval);
             }
             else
             {
-                printf("Error: Cannot find mineral kinetics rate in .cdbs near Line %d.\n", *lno);
+                biort_printf(VL_ERROR, "Error: Cannot find mineral kinetics rate in .cdbs near Line %d.\n", *lno);
                 exit(EXIT_FAILURE);
             }
 
@@ -711,11 +713,11 @@ void ReadMinKin(FILE *fp, int num_stc, double calval, int *lno, char cmdstr[], c
             sscanf(cmdstr, "%s = %lf", optstr, &kintbl->actv);
             if (strcmp(optstr, "activation") == 0)
             {
-                printf(" Activation is %f\n", kintbl->actv);
+                biort_printf(VL_NORMAL, " Activation is %f\n", kintbl->actv);
             }
             else
             {
-                printf("Error: Cannot find mineral kinetics activation in .cdbs near Line %d.\n", *lno);
+                biort_printf(VL_ERROR, "Error: Cannot find mineral kinetics activation in .cdbs near Line %d.\n", *lno);
                 exit(EXIT_FAILURE);
             }
 
@@ -741,16 +743,16 @@ void ReadMinKin(FILE *fp, int num_stc, double calval, int *lno, char cmdstr[], c
                         kintbl->dep_index[0] = FindChem(chemn, num_stc, chemtbl);
                         if (kintbl->dep_index[0] < 0)
                         {
-                            printf("Error finding dependence in species table.\n");
+                            biort_printf(VL_ERROR, "Error finding dependence in species table.\n");
                             exit(EXIT_FAILURE);
                         }
                         kintbl->ndep = 1;
                         kintbl->dep_power[0] = temp;
-                        printf(" Dependency: %s %f\n", chemn, kintbl->dep_power[0]);
+                        biort_printf(VL_NORMAL, " Dependency: %s %f\n", chemn, kintbl->dep_power[0]);
                     }
                     else
                     {
-                        printf(" No dependency.\n");
+                        biort_printf(VL_NORMAL, " No dependency.\n");
                     }
                 }
                 else if (strcmp(optstr, "biomass") == 0)
@@ -758,10 +760,9 @@ void ReadMinKin(FILE *fp, int num_stc, double calval, int *lno, char cmdstr[], c
                     // Biomass term
                     sscanf(cmdstr, "%*s : %s", chemn);
                     Wrap(chemn);
-                    printf(" Biomass species: %s \n", chemn);
+                    biort_printf(VL_NORMAL, " Biomass species: %s \n", chemn);
                     kintbl->biomass_index = FindChem(chemn, num_stc, chemtbl);
-                    printf(" Biomass species position: %d \n",
-                        kintbl->biomass_index);
+                    biort_printf(VL_NORMAL, " Biomass species position: %d \n", kintbl->biomass_index);
                 }
                 else if (strcmp(optstr, "monod_terms") == 0)
                 {
@@ -774,11 +775,11 @@ void ReadMinKin(FILE *fp, int num_stc, double calval, int *lno, char cmdstr[], c
                         kintbl->monod_index[kintbl->nmonod] = FindChem(chemn, num_stc, chemtbl);
                         if (kintbl->monod_index[kintbl->nmonod] < 0)
                         {
-                            printf("Error finding monod_terms in species table.\n");
+                            biort_printf(VL_ERROR, "Error finding monod_terms in species table.\n");
                             exit(EXIT_FAILURE);
                         }
                         kintbl->monod_para[kintbl->nmonod] = temp;
-                        printf(" Monod term: %s %f\n", chemn, kintbl->monod_para[kintbl->nmonod]);
+                        biort_printf(VL_NORMAL, " Monod term: %s %f\n", chemn, kintbl->monod_para[kintbl->nmonod]);
                         kintbl->nmonod++;
                     }
                 }
@@ -793,11 +794,11 @@ void ReadMinKin(FILE *fp, int num_stc, double calval, int *lno, char cmdstr[], c
                         kintbl->inhib_index[kintbl->ninhib] = FindChem(chemn, num_stc, chemtbl);
                         if (kintbl->inhib_index[kintbl->ninhib] < 0)
                         {
-                            printf("Error finding inhibition term in species table.\n");
+                            biort_printf(VL_ERROR, "Error finding inhibition term in species table.\n");
                             exit(EXIT_FAILURE);
                         }
                         kintbl->inhib_para[kintbl->ninhib] = temp;
-                        printf(" Inhibition term: %s %f\n", chemn, kintbl->inhib_para[kintbl->ninhib]);
+                        biort_printf(VL_NORMAL, " Inhibition term: %s %f\n", chemn, kintbl->inhib_para[kintbl->ninhib]);
                         kintbl->ninhib++;
                     }
                 }

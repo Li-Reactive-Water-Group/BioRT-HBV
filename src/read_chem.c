@@ -18,21 +18,21 @@ void ReadChem(const char dir[], ctrl_struct *ctrl, rttbl_struct *rttbl, chemtbl_
 
     NextLine(fp, cmdstr, &lno);
     ReadParam(cmdstr, "RECYCLE", 'i', fn, lno, &ctrl->recycle);
-    printf("  Forcing recycle %d time(s). \n", ctrl->recycle);
+    biort_printf(VL_NORMAL, "  Forcing recycle %d time(s). \n", ctrl->recycle);
 
     NextLine(fp, cmdstr, &lno);
     ReadParam(cmdstr, "ACTIVITY", 'i', fn, lno, &ctrl->actv_mode);
-    printf("  Activity correction is set to %d. \n", ctrl->actv_mode);
+    biort_printf(VL_NORMAL, "  Activity correction is set to %d. \n", ctrl->actv_mode);
 
     NextLine(fp, cmdstr, &lno);
     ReadParam(cmdstr, "RELMIN", 'i', fn, lno, &ctrl->rel_min);
     switch (ctrl->rel_min)
     {
         case 0:
-            printf("  Using absolute mineral volume fraction. \n");
+            biort_printf(VL_NORMAL, "  Using absolute mineral volume fraction. \n");
             break;
         case 1:
-            printf("  Using relative mineral volume fraction. \n");
+            biort_printf(VL_NORMAL, "  Using relative mineral volume fraction. \n");
             break;
         default:
             break;
@@ -43,10 +43,10 @@ void ReadChem(const char dir[], ctrl_struct *ctrl, rttbl_struct *rttbl, chemtbl_
     switch (ctrl->transpt)
     {
         case KIN_REACTION:
-            printf("  Transport only mode disabled.\n");
+            biort_printf(VL_NORMAL, "  Transport only mode disabled.\n");
             break;
         case TRANSPORT_ONLY:
-            printf("  Transport only mode enabled. \n");
+            biort_printf(VL_NORMAL, "  Transport only mode enabled. \n");
             break;
             // under construction.
         default:
@@ -55,19 +55,19 @@ void ReadChem(const char dir[], ctrl_struct *ctrl, rttbl_struct *rttbl, chemtbl_
 
     NextLine(fp, cmdstr, &lno);
     ReadParam(cmdstr, "CEMENTATION", 'd', fn, lno, &rttbl->cementation);
-    printf("  Cementation factor = %2.1f \n", rttbl->cementation);
+    biort_printf(VL_NORMAL, "  Cementation factor = %2.1f \n", rttbl->cementation);
 
     NextLine(fp, cmdstr, &lno);
     ReadParam(cmdstr, "TEMPERATURE", 'd', fn, lno, &rttbl->tmp);
-    printf("  Temperature = %3.1f \n", rttbl->tmp);
+    biort_printf(VL_NORMAL, "  Temperature = %3.1f \n", rttbl->tmp);
 
     NextLine(fp, cmdstr, &lno);
     ReadParam(cmdstr, "SW_THRESHOLD", 'd', fn, lno, &rttbl->sw_thld);
-    printf("  SW threshold = %.2f\n", rttbl->sw_thld);
+    biort_printf(VL_NORMAL, "  SW threshold = %.2f\n", rttbl->sw_thld);
 
     NextLine(fp, cmdstr, &lno);
     ReadParam(cmdstr, "SW_EXP", 'd', fn, lno, &rttbl->sw_exp);
-    printf("  SW exponent = %.2f\n", rttbl->sw_exp);
+    biort_printf(VL_NORMAL, "  SW exponent = %.2f\n", rttbl->sw_exp);
 
     // Count numbers of species and reactions
     FindLine(fp, "PRIMARY_SPECIES", &lno, fn);
@@ -77,8 +77,8 @@ void ReadChem(const char dir[], ctrl_struct *ctrl, rttbl_struct *rttbl, chemtbl_
     rttbl->num_akr = 0;     // Not implemented yet
 
     // Primary species block
-    printf("\n Primary species block\n");
-    printf("  %d chemical species specified. \n", rttbl->num_stc);
+    biort_printf(VL_NORMAL, "\n Primary species block\n");
+    biort_printf(VL_NORMAL, "  %d chemical species specified. \n", rttbl->num_stc);
     FindLine(fp, "BOF", &lno, fn);
     FindLine(fp, "PRIMARY_SPECIES", &lno, fn);
 
@@ -92,14 +92,14 @@ void ReadChem(const char dir[], ctrl_struct *ctrl, rttbl_struct *rttbl, chemtbl_
         NextLine(fp, cmdstr, &lno);
         if (sscanf(cmdstr, "%s", chemn[i]) != 1)
         {
-            printf("Error reading primary_species in %s near Line %d.\n", fn, lno);
+            biort_printf(VL_ERROR, "Error reading primary_species in %s near Line %d.\n", fn, lno);
         }
         p_type[i] = SpeciesType(dir, chemn[i]);
 
         switch (p_type[i])
         {
             case 0:     // Species type is 0 when it is not found in the database.
-                printf("Error finding primary species %s in the database.\n", chemn[i]);
+                biort_printf(VL_ERROR, "Error finding primary species %s in the database.\n", chemn[i]);
                 exit(EXIT_FAILURE);
             case AQUEOUS:
                 rttbl->num_spc++;
@@ -114,7 +114,7 @@ void ReadChem(const char dir[], ctrl_struct *ctrl, rttbl_struct *rttbl, chemtbl_
                 rttbl->num_min++;
                 break;
             case SECONDARY:
-                printf("%s is a secondary species, but is listed as a primary species.\n"
+                biort_printf(VL_ERROR, "%s is a secondary species, but is listed as a primary species.\n"
                     "Error at Line %d in %s.\n", chemn[i], lno, fn);
                 exit(EXIT_FAILURE);
                 break;
@@ -123,10 +123,10 @@ void ReadChem(const char dir[], ctrl_struct *ctrl, rttbl_struct *rttbl, chemtbl_
         }
     }
 
-    printf("  %d aqueous species specified. \n", rttbl->num_spc);
-    printf("  %d surface complexation specified. \n", rttbl->num_ads);
-    printf("  %d cation exchange specified. \n", rttbl->num_cex);
-    printf("  %d minerals specified. \n", rttbl->num_min);
+    biort_printf(VL_NORMAL, "  %d aqueous species specified. \n", rttbl->num_spc);
+    biort_printf(VL_NORMAL, "  %d surface complexation specified. \n", rttbl->num_ads);
+    biort_printf(VL_NORMAL, "  %d cation exchange specified. \n", rttbl->num_cex);
+    biort_printf(VL_NORMAL, "  %d minerals specified. \n", rttbl->num_min);
 
     SortChem(chemn, p_type, rttbl->num_stc, chemtbl);
 
@@ -134,28 +134,28 @@ void ReadChem(const char dir[], ctrl_struct *ctrl, rttbl_struct *rttbl, chemtbl_
     rttbl->num_sdc = rttbl->num_stc - rttbl->num_min;
 
     // Secondary_species block
-    printf("\n Secondary species block\n");
-    printf("  %d secondary species specified. \n", rttbl->num_ssc);
+    biort_printf(VL_NORMAL, "\n Secondary species block\n");
+    biort_printf(VL_NORMAL, "  %d secondary species specified. \n", rttbl->num_ssc);
     FindLine(fp, "SECONDARY_SPECIES", &lno, fn);
     for (i = 0; i < rttbl->num_ssc; i++)
     {
         NextLine(fp, cmdstr, &lno);
         if (sscanf(cmdstr, "%s", chemtbl[rttbl->num_stc + i].name) != 1)
         {
-            printf("Error reading secondary_species in %s near Line %d.\n", fn, lno);
+            biort_printf(VL_ERROR, "Error reading secondary_species in %s near Line %d.\n", fn, lno);
         }
 
         if (SpeciesType(dir, chemtbl[rttbl->num_stc + i].name) == 0)
         {
-            printf("Error finding secondary species %s in the database.\n",
+            biort_printf(VL_ERROR, "Error finding secondary species %s in the database.\n",
                 chemtbl[rttbl->num_stc + i].name);
             exit(EXIT_FAILURE);
         }
     }
 
     // Minerals block
-    printf("\n Minerals block\n");
-    printf("  %d mineral kinetic reaction(s) specified. \n", rttbl->num_mkr);
+    biort_printf(VL_NORMAL, "\n Minerals block\n");
+    biort_printf(VL_NORMAL, "  %d mineral kinetic reaction(s) specified. \n", rttbl->num_mkr);
     FindLine(fp, "MINERAL_KINETICS", &lno, fn);
 
     for (i = 0; i < rttbl->num_mkr; i++)
@@ -163,22 +163,22 @@ void ReadChem(const char dir[], ctrl_struct *ctrl, rttbl_struct *rttbl, chemtbl_
         NextLine(fp, cmdstr, &lno);
         if (sscanf(cmdstr, "%s %*s %s", temp_str, kintbl[i].label) != 2)
         {
-            printf("Error reading mineral information in %s near Line %d.\n", fn, lno);
+            biort_printf(VL_ERROR, "Error reading mineral information in %s near Line %d.\n", fn, lno);
             exit(EXIT_FAILURE);
         }
 
-        printf("  Kinetic reaction on '%s' is specified, label '%s'.\n", temp_str, kintbl[i].label);
+        biort_printf(VL_NORMAL, "  Kinetic reaction on '%s' is specified, label '%s'.\n", temp_str, kintbl[i].label);
 
         kintbl[i].position = FindChem(temp_str, rttbl->num_stc, chemtbl);
 
         if (kintbl[i].position < 0)
         {
-            printf("Error finding mineral %s in species table.\n", temp_str);
+            biort_printf(VL_ERROR, "Error finding mineral %s in species table.\n", temp_str);
             exit(EXIT_FAILURE);
         }
         else
         {
-            printf("  Position_check (num_mkr[i] vs num_stc[j]) (%d, %d)\n", i, kintbl[i].position);
+            biort_printf(VL_NORMAL, "  Position_check (num_mkr[i] vs num_stc[j]) (%d, %d)\n", i, kintbl[i].position);
         }
     }
 

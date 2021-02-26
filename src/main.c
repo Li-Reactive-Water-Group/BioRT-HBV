@@ -1,5 +1,7 @@
 #include "biort.h"
 
+int             verbose_mode;
+
 int main(int argc, char *argv[])
 {
     char            dir[MAXSTRING];         // name of input directory
@@ -17,13 +19,8 @@ int main(int argc, char *argv[])
     ctrl_struct     ctrl;
     FILE           *fp;
 
-    // Get name of directory from command line
-    if (argc != 2)
-    {
-        printf("Please specify name of directory for your simulation.\n");
-        return EXIT_FAILURE;
-    }
-    strcpy(dir, argv[1]);
+    // Read command line arguments
+    ParseCmdLineParam(argc, argv, dir);
 
     // Allocate
     subcatch = (subcatch_struct *)malloc(nsub * sizeof(subcatch_struct));
@@ -59,6 +56,7 @@ int main(int argc, char *argv[])
         // Loop through model steps to calculate reactive transport
         for (kstep = 0; kstep < nsteps; kstep++)
         {
+            biort_printf(VL_VERBOSE, "%d\n", steps[kstep]);
             // Transport and routing
             Transpt(kstep, nsub, &rttbl, subcatch);
 

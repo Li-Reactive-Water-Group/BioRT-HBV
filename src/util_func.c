@@ -1,4 +1,5 @@
 #include "biort.h"
+#include "optparse.h"
 
 int roundi(double x)
 {
@@ -43,4 +44,67 @@ void FreeStruct(int nsub, int *steps[], subcatch_struct subcatch[])
 
     free(subcatch[ksub].ws);
     free(subcatch[ksub].q);
+}
+
+void ParseCmdLineParam(int argc, char *argv[], char dir[])
+{
+    int             option;
+    struct optparse options;
+    struct optparse_long longopts[] = {
+        {"brief",      'b', OPTPARSE_NONE},
+        {"silent",     's', OPTPARSE_NONE},
+        {"version",    'V', OPTPARSE_NONE},
+        {"verbose",    'v', OPTPARSE_NONE},
+        {0, 0, 0}
+    };
+
+    optparse_init(&options, argv);
+
+    while ((option = optparse_long(&options, longopts, NULL)) != -1)
+    {
+        switch (option)
+        {
+            case 'v':
+                // Verbose mode
+                verbose_mode = VL_VERBOSE;
+                break;
+            case 'b':
+                // Brief mode
+                verbose_mode = VL_BRIEF;
+                break;
+            case 's':
+                // Silent mode
+                verbose_mode = VL_SILENT;
+                break;
+            case 'V':
+                // Print version number
+                printf("HBV-BioRT Version %s\n", VERSION);
+                exit(EXIT_SUCCESS);
+                break;
+            case '?':
+                biort_printf(VL_ERROR, "Option not recognizable %s\n", options.errmsg);
+                exit(EXIT_FAILURE);
+                break;
+            default:
+                break;
+        }
+
+        fflush(stdout);
+    }
+
+    if (options.optind >= argc)
+    {
+        biort_printf(VL_ERROR, "Error:You must specify the name of input directory!\n"
+            "Usage: ./biort [-b] [-v] [-V]"
+            " <project name>\n"
+            "    -b Brief mode\n"
+            "    -V Version number\n"
+            "    -v Verbose mode\n");
+        exit(EXIT_FAILURE);
+    }
+    else
+    {
+        // Parse remaining arguments
+        strcpy(dir, optparse_arg(&options));
+    }
 }

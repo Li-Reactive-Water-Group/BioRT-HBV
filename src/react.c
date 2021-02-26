@@ -459,11 +459,11 @@ void ReactControl(const chemtbl_struct chemtbl[], const kintbl_struct kintbl[], 
     {
         if (roundi(substep) != roundi(stepsize))
         {
-            printf(" Reaction passed with minimum step of %f s.\n", substep);
+            biort_printf(VL_VERBOSE, " Reaction passed with minimum step of %f s.\n", substep);
         }
     }
     else
     {
-        printf(" Reaction failed.\n");
+        biort_printf(VL_VERBOSE, " Reaction failed.\n");
     }
 }

@@ -95,17 +95,17 @@ void ReadHbvParam(const char dir[], int nsub, subcatch_struct subcatch[])
             if (strcmp(tag, "PERC") == 0)
             {
                 subcatch[ksub].perc = value;
-                printf("  Percolation rate is %.2lf mm day-1\n", subcatch[ksub].perc);
+                biort_printf(VL_NORMAL, "  Percolation rate is %.2lf mm day-1\n", subcatch[ksub].perc);
             }
             else if (strcmp(tag, "K2") == 0)
             {
                 subcatch[ksub].k2 = value;
-                printf("  K2 is %.2lf day-1\n", subcatch[ksub].k2);
+                biort_printf(VL_NORMAL, "  K2 is %.2lf day-1\n", subcatch[ksub].k2);
             }
             else if (strcmp(tag, "MAXBAS") == 0)
             {
                 subcatch[ksub].maxbas = value;
-                printf("  Routing parameter is %.2lf\n", subcatch[ksub].maxbas);
+                biort_printf(VL_NORMAL, "  Routing parameter is %.2lf\n", subcatch[ksub].maxbas);
                 break;
             }
         }

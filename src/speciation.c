@@ -164,7 +164,7 @@ int Speciation(const chemtbl_struct chemtbl[], const ctrl_struct *ctrl, const rt
 
         if (denseGETRF(jcb, jcb_dim, jcb_dim, p) != 0)
         {
-            printf("Speciation error.\n");
+            biort_printf(VL_ERROR, "Speciation error.\n");
             exit(EXIT_FAILURE);
         }
 

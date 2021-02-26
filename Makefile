@@ -42,6 +42,7 @@ SRCS_ = main.c\
 	custom_io.c\
 	init.c\
 	lookup.c\
+	optparse.c\
 	print.c\
 	react.c\
 	read_chem.c\
@@ -104,4 +105,3 @@ clean:			## Clean executables and objects
 	@echo "... Cleaning ..."
 	@echo
 	@$(RM) $(SRCDIR)/*.o *~ $(EXICUTABLE)
-

@@ -47,7 +47,7 @@ void ReadConc(FILE *fp, int num_stc, const chemtbl_struct chemtbl[], int *lno, d
         ind = FindChem(temp_str, num_stc, chemtbl);
         if (ind < 0)
         {
-            printf("Error finding chemical %s.\n", temp_str);
+            biort_printf(VL_ERROR, "Error finding chemical %s.\n", temp_str);
             exit(EXIT_FAILURE);
         }
 
@@ -55,14 +55,14 @@ void ReadConc(FILE *fp, int num_stc, const chemtbl_struct chemtbl[], int *lno, d
         {
             if (sscanf(cmdstr, "%*s %lf %*s %lf", &tot_conc[ind], &ssa[ind]) !=2)
             {
-                printf("Error reading initial condition in %s at Line %d.\n", "cini.txt", *lno);
+                biort_printf(VL_ERROR, "Error reading initial condition in %s at Line %d.\n", "cini.txt", *lno);
             }
         }
         else
         {
             if (sscanf(cmdstr, "%*s %lf", &tot_conc[ind]) != 1)
             {
-                printf("Error reading initial condition in %s at Line %d.\n", "cini.txt", *lno);
+                biort_printf(VL_ERROR, "Error reading initial condition in %s at Line %d.\n", "cini.txt", *lno);
             }
         }
 

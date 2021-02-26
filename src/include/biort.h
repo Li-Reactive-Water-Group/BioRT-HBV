@@ -65,6 +65,8 @@
 #define DISS_ONLY               3
 #define MONOD                   4
 
+extern int     verbose_mode;
+
 typedef struct ctrl_struct
 {
     int             recycle;                // number of times to recycle forcing
@@ -176,6 +178,7 @@ typedef struct subcatch_struct
 #define MAX(x, y)               (((x) > (y)) ? (x) : (y))
 
 #define fopen                   _custom_fopen
+#define biort_printf(...)       _custom_printf(verbose_mode, __VA_ARGS__)
 
 int             CountLeapYears(int, int);
 int             FindChem(const char [], int, const chemtbl_struct[]);
@@ -187,6 +190,7 @@ void            InitChemState(double, double, const chemtbl_struct [], const rtt
     chmstate_struct *);
 void            Lookup(FILE *, const calib_struct *, chemtbl_struct [], kintbl_struct [], rttbl_struct *);
 int             MatchWrappedKey(const char [], const char []);
+void            ParseCmdLineParam(int, char *[], char []);
 void            ParseLine(const char [], char [], double *);
 void            PrintDailyResults(FILE *, int, int, const rttbl_struct *, const subcatch_struct []);
 void            PrintHeader(FILE *, const rttbl_struct *, const chemtbl_struct chemtbl[]);
