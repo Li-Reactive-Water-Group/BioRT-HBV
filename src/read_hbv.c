@@ -84,6 +84,8 @@ void ReadHbvParam(const char dir[], int nsub, subcatch_struct subcatch[])
     sprintf(fn, "input/%s/Parameter.xml", dir);
     fp = fopen(fn, "r");
 
+    biort_printf(VL_NORMAL, "\nHBV MODEL PARAMETERS\n");
+
     for (ksub = 0; ksub < nsub; ksub++)
     {
         FindLine(fp, "<SubCatchmentParameters>", &lno, cmdstr);

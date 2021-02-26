@@ -50,6 +50,8 @@ int main(int argc, char *argv[])
     fp = fopen(fn, "w");
     PrintHeader(fp, &rttbl, chemtbl);
 
+    biort_printf(VL_NORMAL, "\nHBV-BioRT %s simulation started.\n", dir);
+
     // Loop through forcing cycles
     for (kcycle = 0; kcycle <= ctrl.recycle; kcycle++)
     {
@@ -75,6 +77,8 @@ int main(int argc, char *argv[])
             PrintDailyResults(fp, steps[kstep], nsub, &rttbl, subcatch);
         }
     }
+
+    biort_printf(VL_NORMAL, "\nHBV-BioRT %s simulation succeeded.\n", dir);
 
     fclose(fp);
     FreeStruct(nsub, &steps, subcatch);

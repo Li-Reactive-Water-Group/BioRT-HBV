@@ -16,6 +16,8 @@ void ReadChem(const char dir[], ctrl_struct *ctrl, rttbl_struct *rttbl, chemtbl_
     sprintf(fn, "input/%s/chem.txt", dir);
     fp = fopen(fn, "r");
 
+    biort_printf(VL_NORMAL, "\nBIORT CONTROL PARAMETERS\n");
+
     NextLine(fp, cmdstr, &lno);
     ReadParam(cmdstr, "RECYCLE", 'i', fn, lno, &ctrl->recycle);
     biort_printf(VL_NORMAL, "  Forcing recycle %d time(s). \n", ctrl->recycle);
@@ -77,7 +79,7 @@ void ReadChem(const char dir[], ctrl_struct *ctrl, rttbl_struct *rttbl, chemtbl_
     rttbl->num_akr = 0;     // Not implemented yet
 
     // Primary species block
-    biort_printf(VL_NORMAL, "\n Primary species block\n");
+    biort_printf(VL_NORMAL, "\nPRIMARY SPECIES\n");
     biort_printf(VL_NORMAL, "  %d chemical species specified. \n", rttbl->num_stc);
     FindLine(fp, "BOF", &lno, fn);
     FindLine(fp, "PRIMARY_SPECIES", &lno, fn);
@@ -134,7 +136,7 @@ void ReadChem(const char dir[], ctrl_struct *ctrl, rttbl_struct *rttbl, chemtbl_
     rttbl->num_sdc = rttbl->num_stc - rttbl->num_min;
 
     // Secondary_species block
-    biort_printf(VL_NORMAL, "\n Secondary species block\n");
+    biort_printf(VL_NORMAL, "\nSECONDARY SPECIES\n");
     biort_printf(VL_NORMAL, "  %d secondary species specified. \n", rttbl->num_ssc);
     FindLine(fp, "SECONDARY_SPECIES", &lno, fn);
     for (i = 0; i < rttbl->num_ssc; i++)
@@ -154,7 +156,7 @@ void ReadChem(const char dir[], ctrl_struct *ctrl, rttbl_struct *rttbl, chemtbl_
     }
 
     // Minerals block
-    biort_printf(VL_NORMAL, "\n Minerals block\n");
+    biort_printf(VL_NORMAL, "\nMINERAL KINETIC REACTIONS\n");
     biort_printf(VL_NORMAL, "  %d mineral kinetic reaction(s) specified. \n", rttbl->num_mkr);
     FindLine(fp, "MINERAL_KINETICS", &lno, fn);
 

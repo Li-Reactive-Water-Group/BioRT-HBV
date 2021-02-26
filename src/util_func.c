@@ -96,7 +96,7 @@ void ParseCmdLineParam(int argc, char *argv[], char dir[])
     {
         biort_printf(VL_ERROR, "Error:You must specify the name of input directory!\n"
             "Usage: ./biort [-b] [-v] [-V]"
-            " <project name>\n"
+            " <project directory>\n"
             "    -b Brief mode\n"
             "    -V Version number\n"
             "    -v Verbose mode\n");

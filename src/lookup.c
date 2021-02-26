@@ -11,6 +11,8 @@ void Lookup(FILE *fp, const calib_struct *calib, chemtbl_struct chemtbl[], kintb
     double          pot_dep[MAXSPS][MAXSPS];// dependency of all possible kinetic species on primary species
     double          keq_kin_all[MAXSPS];    // Keq's of all possible kinetic species
 
+    biort_printf(VL_NORMAL, "\nDATABASE\n");
+
     // Find temperature point in database
     NextLine(fp, cmdstr, &lno);
     while(MatchWrappedKey(cmdstr, "'temperature points'") != 0)
