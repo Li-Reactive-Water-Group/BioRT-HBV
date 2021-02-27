@@ -217,8 +217,9 @@ void            ReadTempPoints(const char [], double, int *, int *);
 int             roundi(double);
 int             SolveReact(double, const chemtbl_struct [], const kintbl_struct [], const rttbl_struct *, double,
     chmstate_struct *);
+int             SolveSpeciation(const chemtbl_struct [], const ctrl_struct *, const rttbl_struct *, int, chmstate_struct *);
 void            SortChem(char [MAXSPS][MAXSTRING], const int [], int, chemtbl_struct []);
-int             Speciation(const chemtbl_struct [], const ctrl_struct *, const rttbl_struct *, int, chmstate_struct *);
+void            Speciation(int, const chemtbl_struct [], const ctrl_struct *, const rttbl_struct *, subcatch_struct []);
 int             SpeciesType(const char [], const char []);
 void            StreamSpeciation(int, const chemtbl_struct [], const ctrl_struct *, const rttbl_struct *,
     subcatch_struct []);

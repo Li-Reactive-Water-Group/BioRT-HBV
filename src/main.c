@@ -70,9 +70,13 @@ int main(int argc, char *argv[])
             {
                 // In reaction mode, simulate reaction for soil, and speciation for stream
                 Reaction(kstep, nsub, 86400.0, chemtbl, kintbl, &rttbl, subcatch);
-
-                StreamSpeciation(nsub, chemtbl, &ctrl, &rttbl, subcatch);
             }
+            else
+            {
+                Speciation(nsub, chemtbl, &ctrl, &rttbl, subcatch);
+            }
+
+            StreamSpeciation(nsub, chemtbl, &ctrl, &rttbl, subcatch);
 
             PrintDailyResults(fp, steps[kstep], nsub, &rttbl, subcatch);
         }

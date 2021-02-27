@@ -1,6 +1,6 @@
 #include "biort.h"
 
-int Speciation(const chemtbl_struct chemtbl[], const ctrl_struct *ctrl, const rttbl_struct *rttbl, int speciation_flg,
+int SolveSpeciation(const chemtbl_struct chemtbl[], const ctrl_struct *ctrl, const rttbl_struct *rttbl, int speciation_flg,
     chmstate_struct *chms)
 {
     int             i, j, k;
@@ -233,6 +233,18 @@ int Speciation(const chemtbl_struct chemtbl[], const ctrl_struct *ctrl, const rt
     return 0;
 }
 
+void Speciation(int nsub, const chemtbl_struct chemtbl[], const ctrl_struct *ctrl, const rttbl_struct *rttbl,
+    subcatch_struct subcatch[])
+{
+    int             ksub;
+
+    for (ksub = 0; ksub < nsub; ksub++)
+    {
+        SolveSpeciation(chemtbl, ctrl, rttbl, 0, &subcatch[ksub].chms[UZ]);
+        SolveSpeciation(chemtbl, ctrl, rttbl, 0, &subcatch[ksub].chms[LZ]);
+    }
+}
+
 void StreamSpeciation(int nsub, const chemtbl_struct chemtbl[], const ctrl_struct *ctrl,
     const rttbl_struct *rttbl, subcatch_struct subcatch[])
 {
@@ -273,6 +285,6 @@ void StreamSpeciation(int nsub, const chemtbl_struct chemtbl[], const ctrl_struc
 
     for (ksub = 0; ksub < nsub; ksub++)
     {
-        Speciation(chemtbl, ctrl, rttbl, 0, &subcatch[ksub].chms[STREAM]);
+        SolveSpeciation(chemtbl, ctrl, rttbl, 0, &subcatch[ksub].chms[STREAM]);
     }
 }

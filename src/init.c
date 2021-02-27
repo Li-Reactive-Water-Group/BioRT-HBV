@@ -82,10 +82,7 @@ void InitChemState(double smcmax, double vol, const chemtbl_struct chemtbl[], co
     }
 
     // Speciation
-    if (ctrl->transpt == KIN_REACTION)
-    {
-        Speciation(chemtbl, ctrl, rttbl, 1, chms);
-    }
+    SolveSpeciation(chemtbl, ctrl, rttbl, 1, chms);
 
     // Total moles should be calculated after speciation
     for (kspc = 0; kspc < rttbl->num_stc; kspc++)
