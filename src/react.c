@@ -351,6 +351,7 @@ int SolveReact(double stepsize, const chemtbl_struct chemtbl[], const kintbl_str
         pivot_flg = denseGETRF(jcb, rttbl->num_stc - rttbl->num_min, rttbl->num_stc - rttbl->num_min, p);
         if (pivot_flg != 0)
         {
+            destroyMat(jcb);
             return 1;
         }
 
@@ -374,6 +375,7 @@ int SolveReact(double stepsize, const chemtbl_struct chemtbl[], const kintbl_str
         control++;
         if (control > 10)
         {
+            destroyMat(jcb);
             return 1;
         }
     } while (max_error > TOLERANCE);
