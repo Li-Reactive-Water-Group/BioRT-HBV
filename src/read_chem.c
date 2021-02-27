@@ -206,6 +206,7 @@ int SpeciesType(const char dir[], const char chemn[])
 
     if (strcmp(chemn, "pH") == 0)
     {
+        fclose(fp);
         return AQUEOUS;
     }
 
@@ -218,6 +219,7 @@ int SpeciesType(const char dir[], const char chemn[])
     {
         if (MatchWrappedKey(cmdstr, tempn) == 0)
         {
+            fclose(fp);
             return AQUEOUS;
         }
         NextLine(fp, cmdstr, &lno);
@@ -227,6 +229,7 @@ int SpeciesType(const char dir[], const char chemn[])
     {
         if (MatchWrappedKey(cmdstr, tempn) == 0)
         {
+            fclose(fp);
             return 5;
         }
         NextLine(fp, cmdstr, &lno);
@@ -236,6 +239,7 @@ int SpeciesType(const char dir[], const char chemn[])
     {
         if (MatchWrappedKey(cmdstr, tempn) == 0)
         {
+            fclose(fp);
             return MINERAL;
         }
         NextLine(fp, cmdstr, &lno);
@@ -248,6 +252,7 @@ int SpeciesType(const char dir[], const char chemn[])
         // blocking keywords
         if (MatchWrappedKey(cmdstr, tempn) == 0)
         {
+            fclose(fp);
             return ADSORPTION;
         }
         NextLine(fp, cmdstr, &lno);
@@ -257,6 +262,7 @@ int SpeciesType(const char dir[], const char chemn[])
     {
         if (MatchWrappedKey(cmdstr, tempn) == 0)
         {
+            fclose(fp);
             return CATION_ECHG;
         }
         NextLine(fp, cmdstr, &lno);
