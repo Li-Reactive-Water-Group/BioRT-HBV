@@ -33,11 +33,11 @@ void ReadSoil(const char dir[], int nsub, subcatch_struct sub[])
 
     NextLine(fp, cmdstr, &lno);
     ReadParam(cmdstr, "D_UZ", 'd', fn, lno, &sub[0].d_uz);
-    biort_printf(VL_NORMAL, "  Upper zone depth is %.2f m.\n", sub[0].d_uz);
+    biort_printf(VL_NORMAL, "  Upper zone depth is %.2f mm.\n", sub[0].d_uz);
 
     NextLine(fp, cmdstr, &lno);
     ReadParam(cmdstr, "D_LZ", 'd', fn, lno, &sub[0].d_lz);
-    biort_printf(VL_NORMAL, "  Lower zone depth is %.2f m.\n", sub[0].d_lz);
+    biort_printf(VL_NORMAL, "  Lower zone depth is %.2f mm.\n", sub[0].d_lz);
 
     fclose(fp);
 }
