@@ -30,20 +30,25 @@ void Unwrap(const char wrapped_str[], char str[])
     str[j] = '\0';
 }
 
-void FreeStruct(int nsub, int *steps[], subcatch_struct subcatch[])
+void FreeStruct(int nsub, int nsteps, int *steps[], subcatch_struct subcatch[])
 {
     int             ksub;
+    int             kstep;
 
     free(*steps);
 
     for (ksub = 0; ksub < nsub; ksub++)
     {
-        free(subcatch[ksub].ws[ksub]);
-        free(subcatch[ksub].q[ksub]);
-    }
+        for (kstep = 0; kstep < nsteps; kstep++)
+        {
+            free(subcatch[ksub].ws[kstep]);
+            free(subcatch[ksub].q[kstep]);
 
-    free(subcatch[ksub].ws);
-    free(subcatch[ksub].q);
+        }
+
+        free(subcatch[ksub].ws);
+        free(subcatch[ksub].q);
+    }
 }
 
 void ParseCmdLineParam(int argc, char *argv[], char dir[])

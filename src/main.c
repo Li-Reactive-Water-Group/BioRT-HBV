@@ -81,6 +81,6 @@ int main(int argc, char *argv[])
     biort_printf(VL_NORMAL, "\nHBV-BioRT %s simulation succeeded.\n", dir);
 
     fclose(fp);
-    FreeStruct(nsub, &steps, subcatch);
+    FreeStruct(nsub, nsteps, &steps, subcatch);
     free(subcatch);
 }

@@ -182,7 +182,7 @@ typedef struct subcatch_struct
 
 int             CountLeapYears(int, int);
 int             FindChem(const char [], int, const chemtbl_struct[]);
-void            FreeStruct(int, int *[], subcatch_struct []);
+void            FreeStruct(int, int, int *[], subcatch_struct []);
 int             GetDifference(int, int);
 void            InitChem(const char [], int, const calib_struct *, const ctrl_struct *, chemtbl_struct [],
     kintbl_struct [], rttbl_struct *, subcatch_struct []);
