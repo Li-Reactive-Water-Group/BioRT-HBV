@@ -23,12 +23,12 @@ void ReadSoil(const char dir[], int nsub, subcatch_struct sub[])
 
     NextLine(fp, cmdstr, &lno);
     ReadParam(cmdstr, "RES_UZ", 'd', fn, lno, &sub[0].res_uz);
-    sub[0].res_uz = MAX(sub[0].res_uz, 1.0);
+    sub[0].res_uz = MAX(sub[0].res_uz, STORAGE_MIN);
     biort_printf(VL_NORMAL, "  Upper zone residual moisture is %.2f mm.\n", sub[0].res_uz);
 
     NextLine(fp, cmdstr, &lno);
     ReadParam(cmdstr, "RES_LZ", 'd', fn, lno, &sub[0].res_lz);
-    sub[0].res_lz = MAX(sub[0].res_lz, 1.0);
+    sub[0].res_lz = MAX(sub[0].res_lz, STORAGE_MIN);
     biort_printf(VL_NORMAL, "  Lower zone residual moisture is %.2f mm.\n", sub[0].res_lz);
 
     NextLine(fp, cmdstr, &lno);

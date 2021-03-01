@@ -22,6 +22,7 @@
 #define NWS                     4           // number of water storages
 #define NQ                      6           // number of water fluxes
 
+#define STORAGE_MIN             1.0         // minimum water storage (mm)
 #define ZERO_CONC               1.0E-20     // minimum concentration
 
 #define TOLERANCE               1E-7        // tolerance for reaction calculation

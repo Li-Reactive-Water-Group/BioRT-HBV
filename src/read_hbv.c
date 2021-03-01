@@ -51,7 +51,7 @@ void ReadHbvResults(const char dir[], int nsub, int *nsteps, int *steps[], subca
             fscanf(fp, "%lf", &subcatch[ksub].q[kstep][PRECIP]);     // Read precipitation
             fscanf(fp, "%*lf %*lf %*lf");   // Skip "Temperature", "AET", and "PET"
             fscanf(fp, "%lf %*lf %lf", &snow, &sm);     // Read snow and soil moisture
-            subcatch[ksub].ws[kstep][SNSM] = snow + sm;
+            subcatch[ksub].ws[kstep][SNSM] = snow + sm + STORAGE_MIN;
             fscanf(fp, "%lf", &subcatch[ksub].q[kstep][RECHG]);  // Read recharge
             fscanf(fp, "%lf %*lf", &subcatch[ksub].ws[kstep][UZ]);   // Read upper zone storages
             fscanf(fp, "%lf %lf %lf", &subcatch[ksub].q[kstep][Q0],
