@@ -223,7 +223,7 @@ int             SolveSpeciation(const chemtbl_struct [], const ctrl_struct *, co
 void            SortChem(char [MAXSPS][MAXSTRING], const int [], int, chemtbl_struct []);
 void            Speciation(int, const chemtbl_struct [], const ctrl_struct *, const rttbl_struct *, subcatch_struct []);
 int             SpeciesType(const char [], const char []);
-void            StreamSpeciation(int, const chemtbl_struct [], const ctrl_struct *, const rttbl_struct *,
+void            StreamSpeciation(int, int, const chemtbl_struct [], const ctrl_struct *, const rttbl_struct *,
     subcatch_struct []);
 void            Transpt(int, int, rttbl_struct *, subcatch_struct []);
 void            Wrap(char []);

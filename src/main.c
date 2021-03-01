@@ -76,7 +76,7 @@ int main(int argc, char *argv[])
                 Speciation(nsub, chemtbl, &ctrl, &rttbl, subcatch);
             }
 
-            StreamSpeciation(nsub, chemtbl, &ctrl, &rttbl, subcatch);
+            StreamSpeciation(kstep, nsub, chemtbl, &ctrl, &rttbl, subcatch);
 
             PrintDailyResults(fp, steps[kstep], nsub, &rttbl, subcatch);
         }
