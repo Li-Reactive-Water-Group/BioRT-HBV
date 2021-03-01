@@ -6,6 +6,7 @@ void Transpt(int step, int nsub, rttbl_struct *rttbl, subcatch_struct subcatch[]
     int             ksub;
     int             kspc;
     double          perc;
+    double          perc1;
     double          conc_rechg;
 
     for (ksub = 0; ksub < nsub; ksub++)
@@ -18,6 +19,15 @@ void Transpt(int step, int nsub, rttbl_struct *rttbl, subcatch_struct subcatch[]
 
             perc = MIN(perc, subcatch[ksub].perc);
             perc = MAX(perc, 0.0);
+
+            if (subcatch[ksub].ws[step][UZ] - 5.0 > 0.0)
+            {
+                perc1 = subcatch[ksub].perc;
+            }
+            else
+            {
+                perc1 = subcatch[ksub].q[step][Q1] / subcatch[ksub].k1 - subcatch[ksub].q[step][Q1];
+            }
         }
 
         // Transport for primary species
