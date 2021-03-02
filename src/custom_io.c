@@ -59,17 +59,19 @@ int CountLines(FILE *fp, char *cmdstr, int num_arg, ...)
     va_list         valist;
     char            optstr[MAXSTRING];
     char            token[MAXSTRING];
-    int             count;
+    int             count = 0;
     int             success = 0;
     int             i;
 
     // Access all the arguments assigned to valist
-    // Initialize cmdstr
-    strcpy(cmdstr, "\0");
-    count = 0;
 
-    while (!feof(fp))
+    while (1)
     {
+        if (fgets(cmdstr, MAXSTRING, fp) == NULL)
+        {
+            break;
+        }
+
         if (Readable(cmdstr))
         {
             sscanf(cmdstr, "%s", optstr);
@@ -96,8 +98,6 @@ int CountLines(FILE *fp, char *cmdstr, int num_arg, ...)
                 count++;
             }
         }
-
-        fgets(cmdstr, MAXSTRING, fp);
     }
 
     return count;
@@ -108,14 +108,15 @@ int CountOccurr(FILE *fp, const char *token)
 {
     char            cmdstr[MAXSTRING];
     char            optstr[MAXSTRING];
-    int             count;
+    int             count = 0;
 
-    // Initialize cmdstr
-    strcpy(cmdstr, "\0");
-    count = 0;
-
-    while (!feof(fp))
+    while (1)
     {
+        if (fgets(cmdstr, MAXSTRING, fp) == NULL)
+        {
+            break;
+        }
+
         if (Readable(cmdstr))
         {
             sscanf(cmdstr, "%s", optstr);
@@ -125,7 +126,6 @@ int CountOccurr(FILE *fp, const char *token)
             }
         }
 
-        fgets(cmdstr, MAXSTRING, fp);
     }
 
     return count;
@@ -148,8 +148,14 @@ void FindLine(FILE *fp, const char *token, int *lno, const char *filename)
         // Initialize cmdstr
         strcpy(cmdstr, "\0");
 
-        while (!feof(fp))
+        while (1)
         {
+            if (fgets(cmdstr, MAXSTRING, fp) == NULL)
+            {
+                break;
+            }
+
+            (*lno)++;
             if (Readable(cmdstr))
             {
                 sscanf(cmdstr, "%s", optstr);
@@ -159,9 +165,6 @@ void FindLine(FILE *fp, const char *token, int *lno, const char *filename)
                     break;
                 }
             }
-
-            fgets(cmdstr, MAXSTRING, fp);
-            (*lno)++;
         }
     }
 
