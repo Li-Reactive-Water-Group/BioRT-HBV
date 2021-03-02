@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
         // Loop through model steps to calculate reactive transport
         for (kstep = 0; kstep < nsteps; kstep++)
         {
-            biort_printf(VL_VERBOSE, "%d\n", steps[kstep]);
+            biort_printf(VL_NORMAL, "%d\n", steps[kstep]);
             // Transport and routing
             Transpt(kstep, nsub, &rttbl, subcatch);
 

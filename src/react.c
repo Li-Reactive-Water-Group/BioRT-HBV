@@ -466,6 +466,6 @@ void ReactControl(const chemtbl_struct chemtbl[], const kintbl_struct kintbl[], 
     }
     else
     {
-        biort_printf(VL_VERBOSE, " Reaction failed.\n");
+        biort_printf(VL_NORMAL, " Reaction failed.\n");
     }
 }
