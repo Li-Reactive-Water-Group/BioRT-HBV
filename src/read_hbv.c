@@ -22,6 +22,7 @@ void ReadHbvResults(const char dir[], int nsub, int *nsteps, int *steps[], subca
     {
         subcatch[ksub].ws = (double **)malloc(*nsteps * sizeof(double *));
         subcatch[ksub].q = (double **)malloc(*nsteps * sizeof(double *));
+        subcatch[ksub].tmp = (double *)malloc(*nsteps * sizeof(double));
 
         for (kstep = 0; kstep < *nsteps; kstep++)
         {
@@ -48,8 +49,9 @@ void ReadHbvResults(const char dir[], int nsub, int *nsteps, int *steps[], subca
             }
 
             fscanf(fp, "%*f %*f");  // Skip "Qsim" and "Qobs"
-            fscanf(fp, "%lf", &subcatch[ksub].q[kstep][PRECIP]);     // Read precipitation
-            fscanf(fp, "%*lf %*lf %*lf");   // Skip "Temperature", "AET", and "PET"
+            fscanf(fp, "%lf %lf", &subcatch[ksub].q[kstep][PRECIP], &subcatch[ksub].tmp[kstep]);    // Read precip. and
+                                                                                                    // air temperature
+            fscanf(fp, "%*lf %*lf");   // Skip "AET" and "PET"
             fscanf(fp, "%lf %*lf %lf", &snow, &sm);     // Read snow and soil moisture
             subcatch[ksub].ws[kstep][SNSM] = snow + sm;
             fscanf(fp, "%lf", &subcatch[ksub].q[kstep][RECHG]);  // Read recharge

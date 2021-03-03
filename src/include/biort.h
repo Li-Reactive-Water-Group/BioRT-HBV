@@ -161,6 +161,7 @@ typedef struct subcatch_struct
 {
     double        **ws;                     // water storages (mm)
     double        **q;                      // water fluxes (mm day-1)
+    double         *tmp;                    // air temperature (degree C)
     double          prcp_conc[MAXSPS];      // concentration in precipitation (mol kgH2O-1)
     double          k1;                     // recession coefficient for upper zone (day -1)
     double          k2;                     // recession coefficient for lower zone (day -1)

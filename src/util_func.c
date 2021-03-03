@@ -43,11 +43,11 @@ void FreeStruct(int nsub, int nsteps, int *steps[], subcatch_struct subcatch[])
         {
             free(subcatch[ksub].ws[kstep]);
             free(subcatch[ksub].q[kstep]);
-
         }
 
         free(subcatch[ksub].ws);
         free(subcatch[ksub].q);
+        free(subcatch[ksub].tmp);
     }
 }
 
