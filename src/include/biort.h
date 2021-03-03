@@ -101,6 +101,7 @@ typedef struct rttbl_struct
     double          bdt;                    // Debye Huckel parameter
     double          sw_thld;                // threshold in soil moisture function (-)
     double          sw_exp;                 // exponent in soil moisture function (-)
+    double          q10;                    // Q10 factor (-)
 } rttbl_struct;
 
 typedef struct chemtbl_struct

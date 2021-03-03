@@ -71,6 +71,10 @@ void ReadChem(const char dir[], ctrl_struct *ctrl, rttbl_struct *rttbl, chemtbl_
     ReadParam(cmdstr, "SW_EXP", 'd', fn, lno, &rttbl->sw_exp);
     biort_printf(VL_NORMAL, "  SW exponent = %.2f\n", rttbl->sw_exp);
 
+    NextLine(fp, cmdstr, &lno);
+    ReadParam(cmdstr, "Q10", 'd', fn, lno, &rttbl->q10);
+    biort_printf(VL_NORMAL, "  Q10 factor = %.2f\n", rttbl->q10);
+
     // Count numbers of species and reactions
     FindLine(fp, "PRIMARY_SPECIES", &lno, fn);
     rttbl->num_stc = CountLines(fp, cmdstr, 1, "SECONDARY_SPECIES");
