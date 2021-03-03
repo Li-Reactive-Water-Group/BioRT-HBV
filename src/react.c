@@ -142,7 +142,7 @@ int SolveReact(double stepsize, const chemtbl_struct chemtbl[], const kintbl_str
             }
 
             // Based on CrunchTope
-            rate_pre[i] = area[min_pos] * pow(10, kintbl[i].rate) * monodterm * ftemp;
+            rate_pre[i] = area[min_pos] * pow(10, kintbl[i].rate) * monodterm * inhibterm * ftemp;
         }
 
         for (j = 0; j < rttbl->num_stc; j++)
@@ -290,7 +290,7 @@ int SolveReact(double stepsize, const chemtbl_struct chemtbl[], const kintbl_str
                 }
 
                 // Based on CrunchTope
-                rate_pre[i] = area[min_pos] * pow(10, kintbl[i].rate) * monodterm * ftemp;
+                rate_pre[i] = area[min_pos] * pow(10, kintbl[i].rate) * monodterm * inhibterm * ftemp;
             }
 
             for (j = 0; j < rttbl->num_stc; j++)
