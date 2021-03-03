@@ -6,11 +6,14 @@ int main(int argc, char *argv[])
 {
     char            dir[MAXSTRING];         // name of input directory
     char            fn[MAXSTRING];          // name of output file
+    char            timestr[MAXSTRING];     // time stamp
     int             nsub = 1;               // number of sub-catchments
     int             nsteps;                 // number of simulation steps
     int            *steps;                  // simulation steps
     int             kstep;                  // loop index
     int             kcycle;                 // loop index
+    time_t          rawtime;
+    struct tm      *timestamp;
     rttbl_struct    rttbl;
     chemtbl_struct  chemtbl[MAXSPS];
     kintbl_struct   kintbl[MAXSPS];
@@ -45,8 +48,16 @@ int main(int argc, char *argv[])
     // Initialize RT structures
     InitChem(dir, nsub, &calib, &ctrl, chemtbl, kintbl, &rttbl, subcatch);
 
+    // Create output directory when necessary
+    mkdir("output");
+
+    //
+    time(&rawtime);
+    timestamp = localtime(&rawtime);
+    strftime(timestr, 11, "%y%m%d%H%M", timestamp);
+
     // Open output file
-    sprintf(fn, "%s_results.txt", dir);
+    sprintf(fn, "output/%s_results_%s.txt", dir, timestr);
     fp = fopen(fn, "w");
     PrintHeader(fp, &rttbl, chemtbl);
 

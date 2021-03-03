@@ -183,6 +183,11 @@ typedef struct subcatch_struct
 
 #define fopen                   _custom_fopen
 #define biort_printf(...)       _custom_printf(verbose_mode, __VA_ARGS__)
+#if defined(_WIN32) || defined(_WIN64)
+# define mkdir(path)            _mkdir((path))
+#else
+# define mkdir(path)            mkdir(path, 0755)
+#endif
 
 int             CountLeapYears(int, int);
 int             FindChem(const char [], int, const chemtbl_struct[]);
