@@ -199,7 +199,7 @@ void            ParseLine(const char [], char [], double *);
 void            PrintDailyResults(FILE *, int, int, const rttbl_struct *, const subcatch_struct []);
 void            PrintHeader(FILE *, const rttbl_struct *, const chemtbl_struct chemtbl[]);
 void            ReactControl(const chemtbl_struct [], const kintbl_struct [], const rttbl_struct *, double, double,
-    chmstate_struct *);
+    double, chmstate_struct *);
 void            Reaction(int, int, double, const chemtbl_struct [], const kintbl_struct [], const rttbl_struct *,
     subcatch_struct []);
 void            ReadAdsorption(const char [], int, int, chemtbl_struct [], rttbl_struct *);
@@ -219,8 +219,9 @@ void            ReadSecondary(const char [], int, int, chemtbl_struct [], rttbl_
 void            ReadSoil(const char [], int, subcatch_struct []);
 void            ReadTempPoints(const char [], double, int *, int *);
 int             roundi(double);
+double          SoilTempFactor(double, double);
 int             SolveReact(double, const chemtbl_struct [], const kintbl_struct [], const rttbl_struct *, double,
-    chmstate_struct *);
+    double, chmstate_struct *);
 int             SolveSpeciation(const chemtbl_struct [], const ctrl_struct *, const rttbl_struct *, int, chmstate_struct *);
 void            SortChem(char [MAXSPS][MAXSTRING], const int [], int, chemtbl_struct []);
 void            Speciation(int, const chemtbl_struct [], const ctrl_struct *, const rttbl_struct *, subcatch_struct []);

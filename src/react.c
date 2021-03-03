@@ -5,15 +5,18 @@ void Reaction(int kstep, int nsub, double stepsize, const chemtbl_struct chemtbl
 {
     int             ksub;
     double          satn;
+    double          ftemp;
 
     for (ksub = 0; ksub < nsub; ksub++)
     {
         satn = subcatch[ksub].ws[kstep][UZ] / subcatch[ksub].d_uz;
         satn = MIN(satn, 1.0);
 
+        ftemp = SoilTempFactor(rttbl->q10, subcatch[ksub].tmp[kstep]);
+
         if (satn > 1.0E-2)
         {
-            ReactControl(chemtbl, kintbl, rttbl, stepsize, satn, &subcatch[ksub].chms[UZ]);
+            ReactControl(chemtbl, kintbl, rttbl, stepsize, satn, ftemp, &subcatch[ksub].chms[UZ]);
         }
 
         satn = subcatch[ksub].ws[kstep][LZ] / subcatch[ksub].d_lz;
@@ -21,13 +24,13 @@ void Reaction(int kstep, int nsub, double stepsize, const chemtbl_struct chemtbl
 
         if (satn > 1.0E-2)
         {
-            ReactControl(chemtbl, kintbl, rttbl, stepsize, satn, &subcatch[ksub].chms[LZ]);
+            ReactControl(chemtbl, kintbl, rttbl, stepsize, satn, ftemp, &subcatch[ksub].chms[LZ]);
         }
     }
 }
 
 int SolveReact(double stepsize, const chemtbl_struct chemtbl[], const kintbl_struct kintbl[], const rttbl_struct *rttbl,
-    double satn, chmstate_struct *chms)
+    double satn, double ftemp, chmstate_struct *chms)
 {
     int             i, j, k;
     int             kmonod, kinhib;
@@ -139,7 +142,7 @@ int SolveReact(double stepsize, const chemtbl_struct chemtbl[], const kintbl_str
             }
 
             // Based on CrunchTope
-            rate_pre[i] = area[min_pos] * pow(10, kintbl[i].rate) * monodterm;
+            rate_pre[i] = area[min_pos] * pow(10, kintbl[i].rate) * monodterm * ftemp;
         }
 
         for (j = 0; j < rttbl->num_stc; j++)
@@ -287,7 +290,7 @@ int SolveReact(double stepsize, const chemtbl_struct chemtbl[], const kintbl_str
                 }
 
                 // Based on CrunchTope
-                rate_pre[i] = area[min_pos] * pow(10, kintbl[i].rate) * monodterm;
+                rate_pre[i] = area[min_pos] * pow(10, kintbl[i].rate) * monodterm * ftemp;
             }
 
             for (j = 0; j < rttbl->num_stc; j++)
@@ -434,7 +437,7 @@ int SolveReact(double stepsize, const chemtbl_struct chemtbl[], const kintbl_str
 }
 
 void ReactControl(const chemtbl_struct chemtbl[], const kintbl_struct kintbl[], const rttbl_struct *rttbl,
-    double stepsize, double satn, chmstate_struct *chms)
+    double stepsize, double satn, double ftemp, chmstate_struct *chms)
 {
     double          substep;
     double          step_counter = 0.0;
@@ -444,7 +447,7 @@ void ReactControl(const chemtbl_struct chemtbl[], const kintbl_struct kintbl[], 
 
     while (1.0 - step_counter / stepsize > 1.0E-10 && substep > 30.0)
     {
-        flag = SolveReact(substep, chemtbl, kintbl, rttbl, satn, chms);
+        flag = SolveReact(substep, chemtbl, kintbl, rttbl, satn, ftemp, chms);
 
         if (flag == 0)
         {
@@ -468,4 +471,9 @@ void ReactControl(const chemtbl_struct chemtbl[], const kintbl_struct kintbl[], 
     {
         biort_printf(VL_NORMAL, " Reaction failed.\n");
     }
+}
+
+double SoilTempFactor(double q10, double stc)
+{
+    return pow(q10, (stc - 20.0) / 10.0);
 }
