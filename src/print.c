@@ -43,6 +43,20 @@ void PrintHeader(FILE *fp, int transpt, const rttbl_struct *rttbl, const chemtbl
             fprintf(fp, "\t%-15s", tempstr);
 
         }
+        for (kspc = 0; kspc < rttbl->num_min; kspc++)
+        {
+            Unwrap(chemtbl[kspc + rttbl->num_stc - rttbl->num_min].name, chemn);
+
+            sprintf(tempstr, "%s_rate_UZ", chemn);
+            fprintf(fp, "\t%-23s", tempstr);
+        }
+        for (kspc = 0; kspc < rttbl->num_min; kspc++)
+        {
+            Unwrap(chemtbl[kspc + rttbl->num_stc - rttbl->num_min].name, chemn);
+
+            sprintf(tempstr, "%s_rate_LZ", chemn);
+            fprintf(fp, "\t%-23s", tempstr);
+        }
     }
     else    // In transport mode, only print primary species
     {
@@ -116,6 +130,14 @@ void PrintDailyResults(FILE *fp, int transpt, int step, int nsub, const rttbl_st
             for (kspc = 0; kspc < rttbl->num_ssc; kspc++)
             {
                 fprintf(fp, "\t%-15lg", subcatch[ksub].chms[STREAM].sec_conc[kspc]);
+            }
+            for (kspc = 0; kspc < rttbl->num_min; kspc++)
+            {
+                fprintf(fp, "\t%-23lg", subcatch[ksub].react_rate[UZ][kspc]);
+            }
+            for (kspc = 0; kspc < rttbl->num_min; kspc++)
+            {
+                fprintf(fp, "\t%-23lg", subcatch[ksub].react_rate[LZ][kspc]);
             }
         }
         else    // In transport mode, only print primary species
