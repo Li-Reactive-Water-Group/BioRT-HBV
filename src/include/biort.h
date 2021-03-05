@@ -201,8 +201,8 @@ void            Lookup(FILE *, const calib_struct *, chemtbl_struct [], kintbl_s
 int             MatchWrappedKey(const char [], const char []);
 void            ParseCmdLineParam(int, char *[], char []);
 void            ParseLine(const char [], char [], double *);
-void            PrintDailyResults(FILE *, int, int, const rttbl_struct *, const subcatch_struct []);
-void            PrintHeader(FILE *, const rttbl_struct *, const chemtbl_struct chemtbl[]);
+void            PrintDailyResults(FILE *, int, int, int, const rttbl_struct *, const subcatch_struct []);
+void            PrintHeader(FILE *, int, const rttbl_struct *, const chemtbl_struct chemtbl[]);
 double          ReactControl(const chemtbl_struct [], const kintbl_struct [], const rttbl_struct *, double, double,
     double, chmstate_struct *);
 void            Reaction(int, int, double, const int [], const chemtbl_struct [], const kintbl_struct [],

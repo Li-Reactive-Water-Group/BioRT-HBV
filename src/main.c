@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
     // Open output file
     sprintf(fn, "output/%s_results_%s.txt", dir, timestr);
     fp = fopen(fn, "w");
-    PrintHeader(fp, &rttbl, chemtbl);
+    PrintHeader(fp, ctrl.transpt, &rttbl, chemtbl);
 
     biort_printf(VL_NORMAL, "\nHBV-BioRT %s simulation started.\n", dir);
 
@@ -88,7 +88,7 @@ int main(int argc, char *argv[])
 
             StreamSpeciation(kstep, nsub, chemtbl, &ctrl, &rttbl, subcatch);
 
-            PrintDailyResults(fp, steps[kstep], nsub, &rttbl, subcatch);
+            PrintDailyResults(fp, ctrl.transpt, steps[kstep], nsub, &rttbl, subcatch);
         }
     }
 
