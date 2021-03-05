@@ -16,7 +16,7 @@
 
 #include "custom_io.h"
 
-#define VERSION    "0.0.0-alpha"
+#define VERSION    "0.1.0-alpha"
 
 #define BADVAL                  -999
 #define NWS                     4           // number of water storages
