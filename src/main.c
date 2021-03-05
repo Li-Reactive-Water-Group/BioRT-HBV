@@ -69,7 +69,6 @@ int main(int argc, char *argv[])
         // Loop through model steps to calculate reactive transport
         for (kstep = 0; kstep < nsteps; kstep++)
         {
-            biort_printf(VL_NORMAL, "%d\n", steps[kstep]);
             // Transport and routing
             Transpt(kstep, nsub, &rttbl, subcatch);
 
@@ -80,7 +79,7 @@ int main(int argc, char *argv[])
             if (ctrl.transpt == KIN_REACTION)
             {
                 // In reaction mode, simulate reaction for soil, and speciation for stream
-                Reaction(kstep, nsub, 86400.0, chemtbl, kintbl, &rttbl, subcatch);
+                Reaction(kstep, nsub, 86400.0, steps, chemtbl, kintbl, &rttbl, subcatch);
             }
             else
             {
