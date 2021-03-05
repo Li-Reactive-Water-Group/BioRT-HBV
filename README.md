@@ -22,7 +22,7 @@ make all
 
 to install CVODE library (required by HBV-BioRT) and compile HBV-BioRT executable.
 
-If you already have CVODE v2.9.0 installed, you can edit the Makefile and point `CVODE_PATH` to your CVODE directory, and use
+If you already have CVODE v2.9.0 installed, you can edit the Makefile and point `CVODE_PATH` to your `CVODE` directory, and use
 
 ```shell
 make biort
@@ -86,6 +86,9 @@ Field temperature in degree celsius.
 Threshold and exponent parameters in soil moisture control function.
 Set `SW_THRESHOLD` to 1 to use increase behavior.
 
+`Q10`:
+*Q*<sub>10</sub> parameter for reactions.
+
 The `PRIMARY_SPECIES` block lists all primary species to be simulated.
 The `SECONDARY_SPECIES` block lists all secondary species the users would like to track.
 The `MINERAL_KINETICS` block lists all kinetic mineral reactions.
@@ -133,18 +136,24 @@ No simulation will be performed when using the `-V` parameter.
 
 ### Output file
 
-After running the simulation, an output file containing the concentrations of all species at each time step is generated in your `hbv-biort` directory named `<input directory>_results.txt`.
+After running the simulation, an output file containing the concentrations of all species and reaction rates of minerals at each time step is generated in your `hbv-biort/output` directory named `<input directory>_results_<simulation_time>.txt`.
 
-The headerline shows the names of all species, followed by a suffix indicating locations.
+The header line shows the names of all species, followed by a suffix indicating locations (and rates).
 
 `_inf`:
-Infiltration concentrations.
+Infiltration concentrations (mol L<sup>-1</sup>).
 
 `_UZ`:
-Upper zone concentrations.
+Upper zone concentrations (mol L<sup>-1</sup>).
 
 `_LZ`:
-Lower zone concentrations.
+Lower zone concentrations (mol L<sup>-1</sup>).
 
 `_riv`:
-Stream concentrations.
+Stream concentrations (mol L<sup>-1</sup>).
+
+`_rate_UZ`:
+Upper zone mineral reaction rates (mol m<sup>-2</sup> day<sup>-1</sup>)
+
+`_rate_LZ`:
+Lower zone mineral reaction rates (mol m<sup>-2</sup> day<sup>-1</sup>)
