@@ -174,6 +174,7 @@ typedef struct subcatch_struct
     double          res_lz;                 // lower zone residual moisture (mm)
     double          d_uz;                   // upper zone depth (m)
     double          d_lz;                   // lower zone depth (m)
+    double          react_rate[NWS][MAXSPS];// reaction rate (mol m-2 day-1)
     chmstate_struct chms[NWS];
     chmstate_struct river_chms;
 } subcatch_struct;
@@ -204,7 +205,7 @@ void            ParseLine(const char [], char [], double *);
 void            PrintDailyResults(FILE *, int, int, int, const rttbl_struct *, const subcatch_struct []);
 void            PrintHeader(FILE *, int, const rttbl_struct *, const chemtbl_struct chemtbl[]);
 double          ReactControl(const chemtbl_struct [], const kintbl_struct [], const rttbl_struct *, double, double,
-    double, chmstate_struct *);
+    double, double, double, double [], chmstate_struct *);
 void            Reaction(int, int, double, const int [], const chemtbl_struct [], const kintbl_struct [],
     const rttbl_struct *, subcatch_struct []);
 void            ReadAdsorption(const char [], int, int, chemtbl_struct [], rttbl_struct *);

@@ -5,9 +5,12 @@ void Reaction(int kstep, int nsub, double stepsize, const int steps[], const che
 {
     int             ksub;
     int             kzone;
+    int             kspc;
     double          satn;
     double          ftemp;
     double          substep;
+    double          depth;
+    double          porosity;
     const int       NZONES = 2;
 
     for (ksub = 0; ksub < nsub; ksub++)
@@ -16,12 +19,31 @@ void Reaction(int kstep, int nsub, double stepsize, const int steps[], const che
 
         for (kzone = UZ; kzone < UZ + NZONES; kzone++)
         {
-            satn = subcatch[ksub].ws[kstep][kzone] / ((kzone == UZ) ? subcatch[ksub].d_uz : subcatch[ksub].d_lz);
+            switch (kzone)
+            {
+                case UZ:
+                    depth = subcatch[ksub].d_uz;
+                    porosity = subcatch[ksub].porosity_uz;
+                    break;
+                case LZ:
+                    depth = subcatch[ksub].d_lz;
+                    porosity = subcatch[ksub].porosity_lz;
+                    break;
+            }
+
+            for (kspc = 0; kspc < MAXSPS; kspc++)
+            {
+                subcatch[ksub].react_rate[kzone][kspc] = BADVAL;   // Set reaction rate to -999
+            }
+
+
+            satn = subcatch[ksub].ws[kstep][kzone] / depth;
             satn = MIN(satn, 1.0);
 
             if (satn > 1.0E-2)
             {
-                substep = ReactControl(chemtbl, kintbl, rttbl, stepsize, satn, ftemp, &subcatch[ksub].chms[kzone]);
+                substep = ReactControl(chemtbl, kintbl, rttbl, stepsize, porosity, depth, satn, ftemp,
+                    subcatch[ksub].react_rate[kzone], &subcatch[ksub].chms[kzone]);
 
                 if (substep < 0.0)
                 {
@@ -446,11 +468,20 @@ int SolveReact(double stepsize, const chemtbl_struct chemtbl[], const kintbl_str
 }
 
 double ReactControl(const chemtbl_struct chemtbl[], const kintbl_struct kintbl[], const rttbl_struct *rttbl,
-    double stepsize, double satn, double ftemp, chmstate_struct *chms)
+    double stepsize, double porosity, double depth, double satn, double ftemp, double react_rate[],
+    chmstate_struct *chms)
 {
+    int             flag;
+    int             kspc;
     double          substep;
     double          step_counter = 0.0;
-    int             flag;
+    double          conc0[MAXSPS];
+
+    // Copy initial mineral concentration to array
+    for (kspc = 0; kspc < rttbl->num_min; kspc++)
+    {
+        conc0[kspc] = chms->tot_conc[kspc + rttbl->num_stc - rttbl->num_min];
+    }
 
     substep = stepsize;
 
@@ -469,17 +500,27 @@ double ReactControl(const chemtbl_struct chemtbl[], const kintbl_struct kintbl[]
         }
     }
 
-    if (roundi(step_counter) != roundi(stepsize))   // Reaction failed
+    if (roundi(step_counter) != roundi(stepsize))   // Reactions fail
     {
         return -substep;
     }
-    else if (roundi(substep) != roundi(stepsize))   // Reaction success with substepping
+    else    // Reactions succeed
     {
-        return substep;
-    }
-    else
-    {
-        return 0;
+        for (kspc = 0; kspc < rttbl->num_min; kspc++)
+        {
+            // Calculate reaction rate
+            react_rate[kspc] =
+                (chms->tot_conc[kspc + rttbl->num_stc - rttbl->num_min] - conc0[kspc]) * depth * porosity;
+        }
+
+        if (roundi(substep) != roundi(stepsize))
+        {
+            return substep;
+        }
+        else
+        {
+            return 0;
+        }
     }
 }
 
