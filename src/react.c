@@ -4,49 +4,35 @@ void Reaction(int kstep, int nsub, double stepsize, const int steps[], const che
     const kintbl_struct kintbl[], const rttbl_struct *rttbl, subcatch_struct subcatch[])
 {
     int             ksub;
+    int             kzone;
     double          satn;
     double          ftemp;
     double          substep;
+    const int       NZONES = 2;
 
     for (ksub = 0; ksub < nsub; ksub++)
     {
-        satn = subcatch[ksub].ws[kstep][UZ] / subcatch[ksub].d_uz;
-        satn = MIN(satn, 1.0);
-
         ftemp = SoilTempFactor(rttbl->q10, subcatch[ksub].tmp[kstep]);
 
-        if (satn > 1.0E-2)
+        for (kzone = UZ; kzone < UZ + NZONES; kzone++)
         {
-            substep = ReactControl(chemtbl, kintbl, rttbl, stepsize, satn, ftemp, &subcatch[ksub].chms[UZ]);
+            satn = subcatch[ksub].ws[kstep][kzone] / ((kzone == UZ) ? subcatch[ksub].d_uz : subcatch[ksub].d_lz);
+            satn = MIN(satn, 1.0);
 
-            if (substep < 0.0)
+            if (satn > 1.0E-2)
             {
-                biort_printf(VL_NORMAL, "%d Upper zone reaction failed with a substep of %.1lf s.\n",
-                    steps[kstep], -substep);
-            }
-            if (substep > 0.0)
-            {
-                biort_printf(VL_VERBOSE, "%d Upper zone reaction passed with a minimum step of %.1lf s.\n",
-                    steps[kstep], substep);
-            }
-        }
+                substep = ReactControl(chemtbl, kintbl, rttbl, stepsize, satn, ftemp, &subcatch[ksub].chms[kzone]);
 
-        satn = subcatch[ksub].ws[kstep][LZ] / subcatch[ksub].d_lz;
-        satn = MIN(satn, 1.0);
-
-        if (satn > 1.0E-2)
-        {
-            substep = ReactControl(chemtbl, kintbl, rttbl, stepsize, satn, ftemp, &subcatch[ksub].chms[LZ]);
-
-            if (substep < 0.0)
-            {
-                biort_printf(VL_NORMAL, "%d Lower zone reaction failed with a substep of %.1lf s.\n",
-                    steps[kstep], -substep);
-            }
-            if (substep > 0.0)
-            {
-                biort_printf(VL_VERBOSE, "%d Lower zone reaction passed with a minimum step of %.1lf s.\n",
-                    steps[kstep], substep);
+                if (substep < 0.0)
+                {
+                    biort_printf(VL_NORMAL, "%d %s zone reaction failed with a substep of %.1lf s.\n",
+                        steps[kstep], (kzone == UZ) ? "Upper" : "Lower", -substep);
+                }
+                if (substep > 0.0)
+                {
+                    biort_printf(VL_VERBOSE, "%d %s zone reaction passed with a minimum step of %.1lf s.\n",
+                        steps[kstep], (kzone == UZ) ? "Upper" : "Lower", substep);
+                }
             }
         }
     }
@@ -483,18 +469,17 @@ double ReactControl(const chemtbl_struct chemtbl[], const kintbl_struct kintbl[]
         }
     }
 
-    if (roundi(step_counter) == roundi(stepsize))
+    if (roundi(step_counter) != roundi(stepsize))   // Reaction failed
     {
-        if (roundi(substep) != roundi(stepsize))
-        {
-            return substep;
-        }
-
-        return 0;
+        return -substep;
+    }
+    else if (roundi(substep) != roundi(stepsize))   // Reaction success with substepping
+    {
+        return substep;
     }
     else
     {
-        return -substep;
+        return 0;
     }
 }
 
