@@ -87,6 +87,32 @@ void PrintHeader(FILE *fp, int transpt, const rttbl_struct *rttbl, const chemtbl
     }
     fprintf(fp, "\n");
 
+    // UNITS
+    fprintf(fp, "%-15s",  "YYYYMMDD");
+    for (kspc = 0; kspc < rttbl->num_spc; kspc++)
+    {
+        fprintf(fp, "\t%-15s", "mol/L");
+    }
+    if (transpt == KIN_REACTION)
+    {
+        for (kspc = 0; kspc < 3 * (rttbl->num_stc + rttbl->num_ssc); kspc++)
+        {
+            fprintf(fp, "\t%-15s", "mol/L");
+        }
+        for (kspc = 0; kspc < 2 * rttbl->num_min; kspc++)
+        {
+            fprintf(fp, "\t%-23s", "mol/m2/day");
+        }
+    }
+    else    // In transport mode, only print primary species
+    {
+        for (kspc = 0; kspc < 3 * rttbl->num_spc; kspc++)
+        {
+            fprintf(fp, "\t%-15s", "mol/L");
+        }
+    }
+    fprintf(fp, "\n");
+
     fflush(fp);
 }
 
