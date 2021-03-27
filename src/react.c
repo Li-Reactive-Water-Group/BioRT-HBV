@@ -463,6 +463,12 @@ int SolveReact(double stepsize, const chemtbl_struct chemtbl[], const kintbl_str
 #endif
         }
     }
+    
+    // fix bug, 2021-03-26
+    for (i = 0; i < rttbl->num_spc; i++)
+    {
+        chms->tot_mol[i] += (rate_spe[i] + rate_spet[i]) * stepsize * 0.5;
+    }
 
     return 0;
 }

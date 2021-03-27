@@ -62,10 +62,14 @@ void Transpt(int step, int nsub, rttbl_struct *rttbl, subcatch_struct subcatch[]
             subcatch[ksub].chms[LZ].tot_conc[kspc] =
                 subcatch[ksub].chms[LZ].tot_mol[kspc] / subcatch[ksub].ws[step][LZ];
 
-            subcatch[ksub].chms[STREAM].tot_conc[kspc] =
+            //subcatch[ksub].chms[STREAM].tot_conc[kspc] =
+                //(subcatch[ksub].q[step][Q0] + subcatch[ksub].q[step][Q1] + subcatch[ksub].q[step][Q2] > 0.0) ?
+                //subcatch[ksub].chms[STREAM].tot_mol[kspc] /
+                //(subcatch[ksub].q[step][Q0] + subcatch[ksub].q[step][Q1] + subcatch[ksub].q[step][Q2]) : ZERO_CONC;
+                
+            subcatch[ksub].chms[STREAM].tot_conc[kspc] = 
                 (subcatch[ksub].q[step][Q0] + subcatch[ksub].q[step][Q1] + subcatch[ksub].q[step][Q2] > 0.0) ?
-                subcatch[ksub].chms[STREAM].tot_mol[kspc] /
-                (subcatch[ksub].q[step][Q0] + subcatch[ksub].q[step][Q1] + subcatch[ksub].q[step][Q2]) : ZERO_CONC;
+                (subcatch[ksub].chms[SNSM].prim_conc[kspc] * subcatch[ksub].q[step][Q0] +  subcatch[ksub].chms[UZ].prim_conc[kspc] * subcatch[ksub].q[step][Q1] + subcatch[ksub].chms[LZ].prim_conc[kspc] * subcatch[ksub].q[step][Q2]) / (subcatch[ksub].q[step][Q0] + subcatch[ksub].q[step][Q1] + subcatch[ksub].q[step][Q2]) : ZERO_CONC;
 
         }
     }
