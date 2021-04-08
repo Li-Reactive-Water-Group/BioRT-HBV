@@ -37,7 +37,7 @@ void Reaction(int kstep, int nsub, double stepsize, const int steps[], const che
             }
 
 
-            satn = subcatch[ksub].ws[kstep][kzone] / depth;
+            satn = subcatch[ksub].ws[kstep][kzone] / (depth * porosity);  // add porosity for saturation calculation
             satn = MIN(satn, 1.0);
 
             if (satn > 1.0E-2)
