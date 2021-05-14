@@ -11,16 +11,20 @@ void Reaction(int kstep, int nsub, double stepsize, const int steps[], const che
     double          substep;
     double          depth;
     double          porosity;
-    const int       NZONES = 2;
+    const int       NZONES = 3;   // 2021-05-14
 
     for (ksub = 0; ksub < nsub; ksub++)
     {
         ftemp = SoilTempFactor(rttbl->q10, subcatch[ksub].tmp[kstep]);
 
-        for (kzone = UZ; kzone < UZ + NZONES; kzone++)
+        for (kzone = SURFACE; kzone < SURFACE + NZONES; kzone++)   // 2021-05-14
         {
             switch (kzone)
             {
+                case SURFACE:   // 2021-05-14
+                    depth = subcatch[ksub].d_surface;
+                    porosity = subcatch[ksub].porosity_surface;
+                    break;
                 case UZ:
                     depth = subcatch[ksub].d_uz;
                     porosity = subcatch[ksub].porosity_uz;
@@ -47,13 +51,25 @@ void Reaction(int kstep, int nsub, double stepsize, const int steps[], const che
 
                 if (substep < 0.0)
                 {
-                    biort_printf(VL_NORMAL, "%d %s zone reaction failed with a substep of %.1lf s.\n",
-                        steps[kstep], (kzone == UZ) ? "Upper" : "Lower", -substep);
+                   if (kzone == SURFACE)   // 2021-05-14
+                    {
+                        biort_printf(VL_NORMAL, "%d %s zone reaction failed with a substep of %.1lf s.\n",
+                          steps[kstep], "SURFACE", -substep);
+                    } else {
+                        biort_printf(VL_NORMAL, "%d %s zone reaction failed with a substep of %.1lf s.\n",
+                          steps[kstep], (kzone == UZ) ? "Upper" : "Lower", -substep);
+                    }
                 }
                 if (substep > 0.0)
                 {
-                    biort_printf(VL_VERBOSE, "%d %s zone reaction passed with a minimum step of %.1lf s.\n",
+                    if (kzone == SURFACE)   // 2021-05-14
+                    {
+                      biort_printf(VL_VERBOSE, "%d %s zone reaction passed with a minimum step of %.1lf s.\n",
+                        steps[kstep], "SURFACE", substep);
+                    } else {
+                      biort_printf(VL_VERBOSE, "%d %s zone reaction passed with a minimum step of %.1lf s.\n",
                         steps[kstep], (kzone == UZ) ? "Upper" : "Lower", substep);
+                    }
                 }
             }
         }

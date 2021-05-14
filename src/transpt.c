@@ -19,15 +19,15 @@ void Transpt(int step, int nsub, rttbl_struct *rttbl, subcatch_struct subcatch[]
         for (kspc = 0; kspc < rttbl->num_spc; kspc++)
         {
             // Precipitation
-            subcatch[ksub].chms[SNSM].tot_mol[kspc] +=
+            subcatch[ksub].chms[SURFACE].tot_mol[kspc] +=
                 subcatch[ksub].prcp_conc[kspc] * subcatch[ksub].q[step][PRECIP];
 
             // Temperary concentration in snow/soil
-            conc_temp = subcatch[ksub].chms[SNSM].tot_mol[kspc] /
-                (subcatch[ksub].ws[step][SNSM] + subcatch[ksub].q[step][RECHG]);
+            conc_temp = subcatch[ksub].chms[SURFACE].tot_mol[kspc] /
+                (subcatch[ksub].ws[step][SURFACE] + subcatch[ksub].q[step][RECHG]);
 
             // Recharge
-            subcatch[ksub].chms[SNSM].tot_mol[kspc] -= conc_temp * subcatch[ksub].q[step][RECHG];
+            subcatch[ksub].chms[SURFACE].tot_mol[kspc] -= conc_temp * subcatch[ksub].q[step][RECHG];
             subcatch[ksub].chms[UZ].tot_mol[kspc] += conc_temp * subcatch[ksub].q[step][RECHG];
 
             // Q0
@@ -55,8 +55,8 @@ void Transpt(int step, int nsub, rttbl_struct *rttbl, subcatch_struct subcatch[]
             subcatch[ksub].chms[STREAM].tot_mol[kspc] += conc_temp * subcatch[ksub].q[step][Q2];
 
             // UPDATE CONCENTRATIONS
-            subcatch[ksub].chms[SNSM].tot_conc[kspc] =
-                subcatch[ksub].chms[SNSM].tot_mol[kspc] / subcatch[ksub].ws[step][SNSM];
+            subcatch[ksub].chms[SURFACE].tot_conc[kspc] =
+                subcatch[ksub].chms[SURFACE].tot_mol[kspc] / subcatch[ksub].ws[step][SURFACE];
             subcatch[ksub].chms[UZ].tot_conc[kspc] =
                 subcatch[ksub].chms[UZ].tot_mol[kspc] / subcatch[ksub].ws[step][UZ];
             subcatch[ksub].chms[LZ].tot_conc[kspc] =
@@ -69,7 +69,7 @@ void Transpt(int step, int nsub, rttbl_struct *rttbl, subcatch_struct subcatch[]
                 
             subcatch[ksub].chms[STREAM].tot_conc[kspc] = 
                 (subcatch[ksub].q[step][Q0] + subcatch[ksub].q[step][Q1] + subcatch[ksub].q[step][Q2] > 0.0) ?
-                (subcatch[ksub].chms[SNSM].prim_conc[kspc] * subcatch[ksub].q[step][Q0] +  subcatch[ksub].chms[UZ].prim_conc[kspc] * subcatch[ksub].q[step][Q1] + subcatch[ksub].chms[LZ].prim_conc[kspc] * subcatch[ksub].q[step][Q2]) / (subcatch[ksub].q[step][Q0] + subcatch[ksub].q[step][Q1] + subcatch[ksub].q[step][Q2]) : ZERO_CONC;
+                (subcatch[ksub].chms[SURFACE].prim_conc[kspc] * subcatch[ksub].q[step][Q0] +  subcatch[ksub].chms[UZ].prim_conc[kspc] * subcatch[ksub].q[step][Q1] + subcatch[ksub].chms[LZ].prim_conc[kspc] * subcatch[ksub].q[step][Q2]) / (subcatch[ksub].q[step][Q0] + subcatch[ksub].q[step][Q1] + subcatch[ksub].q[step][Q2]) : ZERO_CONC;
 
         }
     }
@@ -84,7 +84,7 @@ void UpdatePrimConc(int nsub, const rttbl_struct *rttbl, const ctrl_struct *ctrl
     {
         for (kspc = 0; kspc < rttbl->num_spc; kspc++)
         {
-            subcatch[ksub].chms[SNSM].prim_conc[kspc] = subcatch[ksub].chms[SNSM].tot_conc[kspc];
+            subcatch[ksub].chms[SURFACE].prim_conc[kspc] = subcatch[ksub].chms[SURFACE].tot_conc[kspc];
 
             if (ctrl->transpt == TRANSPORT_ONLY)
             {

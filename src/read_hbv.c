@@ -53,7 +53,7 @@ void ReadHbvResults(const char dir[], int nsub, int *nsteps, int *steps[], subca
                                                                                                     // air temperature
             fscanf(fp, "%*lf %*lf");   // Skip "AET" and "PET"
             fscanf(fp, "%lf %*lf %lf", &snow, &sm);     // Read snow and soil moisture
-            subcatch[ksub].ws[kstep][SNSM] = snow + sm;
+            subcatch[ksub].ws[kstep][SURFACE] = snow + sm;  // 2021-05-14
             fscanf(fp, "%lf", &subcatch[ksub].q[kstep][RECHG]);  // Read recharge
             fscanf(fp, "%*lf %*lf");   // Skip upper and lower zone storages
             fscanf(fp, "%lf %lf %lf", &subcatch[ksub].q[kstep][Q0],
@@ -88,7 +88,7 @@ void ReadHbvResults(const char dir[], int nsub, int *nsteps, int *steps[], subca
         // Add residual moisture
         for (kstep = 0; kstep < *nsteps; kstep++)
         {
-            subcatch[ksub].ws[kstep][SNSM] += STORAGE_MIN;
+            subcatch[ksub].ws[kstep][SURFACE] += STORAGE_MIN;   // 2021-05-14
             subcatch[ksub].ws[kstep][UZ] += subcatch[ksub].res_uz;
             subcatch[ksub].ws[kstep][LZ] += subcatch[ksub].res_lz;
         }

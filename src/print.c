@@ -9,11 +9,11 @@ void PrintHeader(FILE *fp, int transpt, const rttbl_struct *rttbl, const chemtbl
     // Soil concentration file header
     fprintf(fp, "%-15s",  "TIME");
 
-    for (kspc = 0; kspc < rttbl->num_spc; kspc++)
+    for (kspc = 0; kspc < rttbl->num_stc + rttbl->num_ssc; kspc++)  // 2021-05-14
     {
         Unwrap(chemtbl[kspc].name, chemn);
 
-        sprintf(tempstr, "%s_inf", chemn);
+        sprintf(tempstr, "%s_SURFACE", chemn);
         fprintf(fp, "\t%-15s", tempstr);
 
     }
@@ -42,6 +42,13 @@ void PrintHeader(FILE *fp, int transpt, const rttbl_struct *rttbl, const chemtbl
             sprintf(tempstr, "%s_riv", chemn);
             fprintf(fp, "\t%-15s", tempstr);
 
+        }
+        for (kspc = 0; kspc < rttbl->num_min; kspc++)  // 2021-05-14
+        {
+            Unwrap(chemtbl[kspc + rttbl->num_stc - rttbl->num_min].name, chemn);
+
+            sprintf(tempstr, "%s_rate_SURFACE", chemn);
+            fprintf(fp, "\t%-23s", tempstr);
         }
         for (kspc = 0; kspc < rttbl->num_min; kspc++)
         {
@@ -89,17 +96,14 @@ void PrintHeader(FILE *fp, int transpt, const rttbl_struct *rttbl, const chemtbl
 
     // UNITS
     fprintf(fp, "%-15s",  "YYYYMMDD");
-    for (kspc = 0; kspc < rttbl->num_spc; kspc++)
-    {
-        fprintf(fp, "\t%-15s", "mol/L");
-    }
+
     if (transpt == KIN_REACTION)
     {
-        for (kspc = 0; kspc < 3 * (rttbl->num_stc + rttbl->num_ssc); kspc++)
+        for (kspc = 0; kspc < 4 * (rttbl->num_stc + rttbl->num_ssc); kspc++)   // 2021-05-14, SURFACE + UZ + LZ + STREAM
         {
             fprintf(fp, "\t%-15s", "mol/L");
         }
-        for (kspc = 0; kspc < 2 * rttbl->num_min; kspc++)
+        for (kspc = 0; kspc < 3 * rttbl->num_min; kspc++)  // 2021-05-14
         {
             fprintf(fp, "\t%-23s", "mol/m2/day");
         }
@@ -127,10 +131,16 @@ void PrintDailyResults(FILE *fp, int transpt, int step, int nsub, const rttbl_st
 
     for (ksub = 0; ksub < nsub; ksub++)
     {
-        for (kspc = 0; kspc < rttbl->num_spc; kspc++)
+        for (kspc = 0; kspc < rttbl->num_stc; kspc++)   // 2021-05-14
         {
-            fprintf(fp, "\t%-15lg", subcatch[ksub].chms[SNSM].prim_conc[kspc]);
+            fprintf(fp, "\t%-15lg", subcatch[ksub].chms[SURFACE].prim_conc[kspc]);
         }
+        
+        for (kspc = 0; kspc < rttbl->num_ssc; kspc++)   // 2021-05-14
+        {
+            fprintf(fp, "\t%-15lg", subcatch[ksub].chms[SURFACE].sec_conc[kspc]);
+        }  
+        
         if (transpt == KIN_REACTION)
         {
             for (kspc = 0; kspc < rttbl->num_stc; kspc++)
@@ -156,6 +166,10 @@ void PrintDailyResults(FILE *fp, int transpt, int step, int nsub, const rttbl_st
             for (kspc = 0; kspc < rttbl->num_ssc; kspc++)
             {
                 fprintf(fp, "\t%-15lg", subcatch[ksub].chms[STREAM].sec_conc[kspc]);
+            }
+            for (kspc = 0; kspc < rttbl->num_min; kspc++)  // 2021-05-14
+            {
+                fprintf(fp, "\t%-23lg", subcatch[ksub].react_rate[SURFACE][kspc]);
             }
             for (kspc = 0; kspc < rttbl->num_min; kspc++)
             {
