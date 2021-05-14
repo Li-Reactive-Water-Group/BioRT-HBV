@@ -34,7 +34,7 @@
 #define Q1                      4
 #define Q2                      5
 
-#define SNSM                    0
+#define SURFACE                 0          // add surface Q0 reaction, 2021-05-14
 #define UZ                      1
 #define LZ                      2
 #define STREAM                  3
