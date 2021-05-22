@@ -7,7 +7,7 @@
 //   C * V - C_0 * V_0 = C_in * Q_in - C * Q_out + F.
 // Thus,
 //   C = (C_in * Qin + F + C0 * V0) / (V + Q_out).
-void Transpt(int step, int nsub, rttbl_struct *rttbl, subcatch_struct subcatch[])
+void Transpt(int step, int nsub, rttbl_struct *rttbl, const ctrl_struct *ctrl, subcatch_struct subcatch[])
 {
     int             ksub;
     int             kspc;
@@ -19,8 +19,13 @@ void Transpt(int step, int nsub, rttbl_struct *rttbl, subcatch_struct subcatch[]
         for (kspc = 0; kspc < rttbl->num_spc; kspc++)
         {
             // Precipitation
-            subcatch[ksub].chms[SURFACE].tot_mol[kspc] +=
-                subcatch[ksub].prcp_conc[kspc] * subcatch[ksub].q[step][PRECIP];
+            if (ctrl->precipchem == 0)  // constant precipitation chemistry mode
+            {
+                subcatch[ksub].chms[SURFACE].tot_mol[kspc] += subcatch[ksub].prcp_conc[kspc] * subcatch[ksub].q[step][PRECIP];
+            } else if (ctrl->precipchem == 1)   // time-series precipitation chemistry mode
+            {
+                subcatch[ksub].chms[SURFACE].tot_mol[kspc] += subcatch[ksub].prcp_conc_time[step][kspc] * subcatch[ksub].q[step][PRECIP];
+            }
 
             // Temperary concentration in snow/soil
             conc_temp = subcatch[ksub].chms[SURFACE].tot_mol[kspc] /

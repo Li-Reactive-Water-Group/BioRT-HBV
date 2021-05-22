@@ -75,6 +75,7 @@ typedef struct ctrl_struct
     int             actv_mode;              // activity coefficient mode: 0 = unity coefficient, 1 = DH equation
     int             rel_min;                // relative mineral flag: 1 = total solid volume, 0 = total pore volume
     int             transpt;                // transport only flag: 0 = simulate kinetic reaction, 1 = transport only
+    int             precipchem;             // precipitation chemistry mode: 0 = constant precipitation chemistry, 1 = time-series precipitation chemistry   2021-05-20
     double         *steps;                  // model steps
 } ctrl_struct;
 
@@ -162,6 +163,7 @@ typedef struct subcatch_struct
 {
     double        **ws;                     // water storages (mm)
     double        **q;                      // water fluxes (mm day-1)
+    double        **prcp_conc_time;         // time-series precipitation concentration (mol L-1)  2021-05-20
     double         *tmp;                    // air temperature (degree C)
     double          prcp_conc[MAXSPS];      // concentration in precipitation (mol kgH2O-1)
     double          k1;                     // recession coefficient for upper zone (day -1)
@@ -219,6 +221,7 @@ void            ReadConc(FILE *, int, const chemtbl_struct [], int *, double [],
 void            ReadDHParam(const char [], int, double *);
 void            ReadHbvParam(const char [], int, subcatch_struct []);
 void            ReadHbvResults(const char [], int, int *, int **, subcatch_struct []);
+void            ReadPrecipChem(const char [], int, int *, int **, subcatch_struct [], int);
 void            ReadMinerals(const char [], int, int, double [MAXSPS][MAXSPS], double [], chemtbl_struct [],
     rttbl_struct *);
 void            ReadMinKin(FILE *, int, double, int *, char [], chemtbl_struct [], kintbl_struct *);
@@ -237,7 +240,7 @@ void            Speciation(int, const chemtbl_struct [], const ctrl_struct *, co
 int             SpeciesType(const char [], const char []);
 void            StreamSpeciation(int, int, const chemtbl_struct [], const ctrl_struct *, const rttbl_struct *,
     subcatch_struct []);
-void            Transpt(int, int, rttbl_struct *, subcatch_struct []);
+void            Transpt(int, int, rttbl_struct *, const ctrl_struct *, subcatch_struct []);   // 2021-05-21
 void            Wrap(char []);
 void            Unwrap(const char [], char []);
 void            UpdatePrimConc(int, const rttbl_struct *, const ctrl_struct *, subcatch_struct []);

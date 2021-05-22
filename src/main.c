@@ -44,6 +44,13 @@ int main(int argc, char *argv[])
 
     // Read chemistry initial conditions
     ReadCini(dir, nsub, chemtbl, &rttbl, subcatch);
+    
+    // Read time-series precipitation chemistry if defined in chem.txt  2021-05-20
+    if (ctrl.precipchem == 1) {
+        //printf("read in time-series precipitation %d", ctrl.precipchem);
+        ReadPrecipChem(dir, nsub, &nsteps, &steps, subcatch, rttbl.num_stc);
+    }
+
 
     // Initialize RT structures
     InitChem(dir, nsub, &calib, &ctrl, chemtbl, kintbl, &rttbl, subcatch);
@@ -70,7 +77,7 @@ int main(int argc, char *argv[])
         for (kstep = 0; kstep < nsteps; kstep++)
         {
             // Transport and routing
-            Transpt(kstep, nsub, &rttbl, subcatch);
+            Transpt(kstep, nsub, &rttbl, &ctrl, subcatch); // 2021-05-20
 
             // Transport changes total concentrations. Primary concentrations needs to be updated using total
             // concentrations

@@ -47,6 +47,7 @@ SRCS_ = main.c\
 	react.c\
 	read_chem.c\
 	read_cini.c\
+  read_precipchem.c\
 	read_hbv.c\
 	read_param.c\
 	read_soil.c\
