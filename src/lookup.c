@@ -494,7 +494,7 @@ void ReadMinerals(const char cmdstr[], int npoints, int keq_position, double pot
                                 pot_dep[i][l] += dep * rttbl->dep_mtx[k - rttbl->num_stc][l];
                             }
                             //keq_kin_all[i] += dep * rttbl->keq[k - rttbl->num_stc];
-			    keq_sec += dep * rttbl->keq[k - rttbl->num_stc];//temporarily stores Keq corrections
+			                      keq_sec += dep * rttbl->keq[k - rttbl->num_stc];//temporarily stores Keq corrections
                         }
 
                         break;
@@ -508,7 +508,7 @@ void ReadMinerals(const char cmdstr[], int npoints, int keq_position, double pot
                 {
                     sscanf(cmdstr + bytes_consumed, "%lf%n", &keq_kin_all[i], &bytes_now);
                     bytes_consumed += bytes_now;
-		    if (keq_sec != 0)//added
+		                if (keq_sec != 0)//added
                     {
                         keq_kin_all[i] += keq_sec;
                     }
