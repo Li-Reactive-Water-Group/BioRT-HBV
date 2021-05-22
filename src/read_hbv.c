@@ -87,8 +87,8 @@ void ReadHbvResults(const char dir[], int nsub, int *nsteps, int *steps[], subca
         for (kstep = 0; kstep < *nsteps; kstep++)
         {
             subcatch[ksub].ws[kstep][SNSM] += STORAGE_MIN;
-            subcatch[ksub].ws[kstep][UZ] += subcatch[ksub].res_uz;
-            subcatch[ksub].ws[kstep][LZ] += subcatch[ksub].res_lz;
+            subcatch[ksub].ws[kstep][UZ] += subcatch[ksub].ws_immobile_uz;
+            subcatch[ksub].ws[kstep][LZ] += subcatch[ksub].ws_immobile_lz;
         }
 
         fclose(fp);
