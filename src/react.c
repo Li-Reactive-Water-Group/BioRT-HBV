@@ -8,7 +8,7 @@ void Reaction(int kstep, int nsub, double stepsize, const chemtbl_struct chemtbl
 
     for (ksub = 0; ksub < nsub; ksub++)
     {
-        satn = subcatch[ksub].ws[kstep][UZ] / subcatch[ksub].d_uz;
+        satn = subcatch[ksub].ws[kstep][UZ] / subcatch[ksub].ws_max_uz;
         satn = MIN(satn, 1.0);
 
         if (satn > 1.0E-2)
@@ -16,7 +16,7 @@ void Reaction(int kstep, int nsub, double stepsize, const chemtbl_struct chemtbl
             ReactControl(chemtbl, kintbl, rttbl, stepsize, satn, &subcatch[ksub].chms[UZ]);
         }
 
-        satn = subcatch[ksub].ws[kstep][LZ] / subcatch[ksub].d_lz;
+        satn = subcatch[ksub].ws[kstep][LZ] / subcatch[ksub].ws_max_lz;
         satn = MIN(satn, 1.0);
 
         if (satn > 1.0E-2)

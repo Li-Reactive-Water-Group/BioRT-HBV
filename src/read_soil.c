@@ -22,22 +22,22 @@ void ReadSoil(const char dir[], int nsub, subcatch_struct sub[])
     biort_printf(VL_NORMAL, "  Lower zone porosity is %.2f m3 m-3.\n", sub[0].porosity_lz);
 
     NextLine(fp, cmdstr, &lno);
-    ReadParam(cmdstr, "RES_UZ", 'd', fn, lno, &sub[0].res_uz);
-    sub[0].res_uz = MAX(sub[0].res_uz, STORAGE_MIN);
-    biort_printf(VL_NORMAL, "  Upper zone residual moisture is %.2f mm.\n", sub[0].res_uz);
+    ReadParam(cmdstr, "WS_IMMOBILE_UZ", 'd', fn, lno, &sub[0].ws_immobile_uz);
+    sub[0].ws_immobile_uz = MAX(sub[0].ws_immobile_uz, STORAGE_MIN);
+    biort_printf(VL_NORMAL, "  Upper zone immobile water storage is %.2f mm.\n", sub[0].ws_immobile_uz);
 
     NextLine(fp, cmdstr, &lno);
-    ReadParam(cmdstr, "RES_LZ", 'd', fn, lno, &sub[0].res_lz);
-    sub[0].res_lz = MAX(sub[0].res_lz, STORAGE_MIN);
-    biort_printf(VL_NORMAL, "  Lower zone residual moisture is %.2f mm.\n", sub[0].res_lz);
+    ReadParam(cmdstr, "WS_IMMOBILE_LZ", 'd', fn, lno, &sub[0].ws_immobile_lz);
+    sub[0].ws_immobile_lz = MAX(sub[0].ws_immobile_lz, STORAGE_MIN);
+    biort_printf(VL_NORMAL, "  Lower zone immobile water storage is %.2f mm.\n", sub[0].ws_immobile_lz);
 
     NextLine(fp, cmdstr, &lno);
-    ReadParam(cmdstr, "D_UZ", 'd', fn, lno, &sub[0].d_uz);
-    biort_printf(VL_NORMAL, "  Upper zone depth is %.2f mm.\n", sub[0].d_uz);
+    ReadParam(cmdstr, "WS_MAX_UZ", 'd', fn, lno, &sub[0].ws_max_uz);
+    biort_printf(VL_NORMAL, "  Upper zone maximum water storage capacity is %.2f mm.\n", sub[0].ws_max_uz);
 
     NextLine(fp, cmdstr, &lno);
-    ReadParam(cmdstr, "D_LZ", 'd', fn, lno, &sub[0].d_lz);
-    biort_printf(VL_NORMAL, "  Lower zone depth is %.2f mm.\n", sub[0].d_lz);
+    ReadParam(cmdstr, "WS_MAX_LZ", 'd', fn, lno, &sub[0].ws_max_lz);
+    biort_printf(VL_NORMAL, "  Lower zone maximum water storage capacity is %.2f mm.\n", sub[0].ws_max_lz);
 
     fclose(fp);
 }

@@ -168,10 +168,10 @@ typedef struct subcatch_struct
     double          perc;                   // percolation rate (mm day-1)
     double          porosity_uz;            // upper zone porosity (m3 m-3)
     double          porosity_lz;            // lower zone porosity (m3 m-3)
-    double          res_uz;                 // upper zone residual moisture (mm)
-    double          res_lz;                 // lower zone residual moisture (mm)
-    double          d_uz;                   // upper zone depth (m)
-    double          d_lz;                   // lower zone depth (m)
+    double          ws_max_uz;            // upper zone maximum water storage possible (m3 m-3)
+    double          ws_max_lz;            // lower zone maximum water storage possible (m3 m-3)
+    double          ws_immobile_uz;                 // upper zone immobile water storage (mm)
+    double          ws_immobile_lz;                 // lower zone immobile water storage (mm)
     chmstate_struct chms[NWS];
     chmstate_struct river_chms;
 } subcatch_struct;
