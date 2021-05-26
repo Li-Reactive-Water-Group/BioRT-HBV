@@ -454,6 +454,7 @@ void ReadMinerals(const char cmdstr[], int npoints, int keq_position, double pot
     int             ndep;
     double          dep;
     double          mvol;
+    double          keq_sec = 0.0;   // fix by Kayal, 2021-05-26
     char            chemn[MAXSTRING];
 
     sscanf(cmdstr + bytes_consumed, "'%[^']' %lf %d%n", chemn, &mvol, &ndep, &bytes_now);
@@ -492,7 +493,8 @@ void ReadMinerals(const char cmdstr[], int npoints, int keq_position, double pot
                             {
                                 pot_dep[i][l] += dep * rttbl->dep_mtx[k - rttbl->num_stc][l];
                             }
-                            keq_kin_all[i] += dep * rttbl->keq[k - rttbl->num_stc];
+                            //keq_kin_all[i] += dep * rttbl->keq[k - rttbl->num_stc];
+                            keq_sec += dep * rttbl->keq[k - rttbl->num_stc];  // fix by Kayal, 2021-05-26
                         }
 
                         break;
@@ -506,6 +508,11 @@ void ReadMinerals(const char cmdstr[], int npoints, int keq_position, double pot
                 {
                     sscanf(cmdstr + bytes_consumed, "%lf%n", &keq_kin_all[i], &bytes_now);
                     bytes_consumed += bytes_now;
+                    if (keq_sec != 0)   // fix by Kayal, 2021-05-26
+                    {
+                        keq_kin_all[i] += keq_sec;
+                    }
+                    keq_sec = 0;
                 }
                 else
                 {

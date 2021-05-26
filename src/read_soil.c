@@ -26,30 +26,30 @@ void ReadSoil(const char dir[], int nsub, subcatch_struct sub[])
     biort_printf(VL_NORMAL, "  Lower zone porosity is %.2f m3 m-3.\n", sub[0].porosity_lz);
     
     NextLine(fp, cmdstr, &lno);  // 2021-05-14
-    ReadParam(cmdstr, "RES_SURFACE", 'd', fn, lno, &sub[0].res_surface);
+    ReadParam(cmdstr, "WS_IMMOBILE_SURFACE", 'd', fn, lno, &sub[0].res_surface);
     sub[0].res_surface = MAX(sub[0].res_surface, STORAGE_MIN);
     biort_printf(VL_NORMAL, "  Surface residual moisture is %.2f mm.\n", sub[0].res_surface);
 
     NextLine(fp, cmdstr, &lno);
-    ReadParam(cmdstr, "RES_UZ", 'd', fn, lno, &sub[0].res_uz);
+    ReadParam(cmdstr, "WS_IMMOBILE_UZ", 'd', fn, lno, &sub[0].res_uz);
     sub[0].res_uz = MAX(sub[0].res_uz, STORAGE_MIN);
     biort_printf(VL_NORMAL, "  Upper zone residual moisture is %.2f mm.\n", sub[0].res_uz);
 
     NextLine(fp, cmdstr, &lno);
-    ReadParam(cmdstr, "RES_LZ", 'd', fn, lno, &sub[0].res_lz);
+    ReadParam(cmdstr, "WS_IMMOBILE_LZ", 'd', fn, lno, &sub[0].res_lz);
     sub[0].res_lz = MAX(sub[0].res_lz, STORAGE_MIN);
     biort_printf(VL_NORMAL, "  Lower zone residual moisture is %.2f mm.\n", sub[0].res_lz);
     
     NextLine(fp, cmdstr, &lno);  // 2021-05-14
-    ReadParam(cmdstr, "D_surface", 'd', fn, lno, &sub[0].d_surface);
+    ReadParam(cmdstr, "WS_MAX_SURFACE", 'd', fn, lno, &sub[0].d_surface);
     biort_printf(VL_NORMAL, "  Surface depth is %.2f mm.\n", sub[0].d_surface);
 
     NextLine(fp, cmdstr, &lno);
-    ReadParam(cmdstr, "D_UZ", 'd', fn, lno, &sub[0].d_uz);
+    ReadParam(cmdstr, "WS_MAX_UZ", 'd', fn, lno, &sub[0].d_uz);
     biort_printf(VL_NORMAL, "  Upper zone depth is %.2f mm.\n", sub[0].d_uz);
 
     NextLine(fp, cmdstr, &lno);
-    ReadParam(cmdstr, "D_LZ", 'd', fn, lno, &sub[0].d_lz);
+    ReadParam(cmdstr, "WS_MAX_LZ", 'd', fn, lno, &sub[0].d_lz);
     biort_printf(VL_NORMAL, "  Lower zone depth is %.2f mm.\n", sub[0].d_lz);
 
     fclose(fp);
