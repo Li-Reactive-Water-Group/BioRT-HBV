@@ -22,6 +22,9 @@ int main(int argc, char *argv[])
     ctrl_struct     ctrl;
     FILE           *fp;
 
+    //Remove previous errormessage textfile that might be present
+    remove("errormessage.txt");
+    
     // Read command line arguments
     ParseCmdLineParam(argc, argv, dir);
 
@@ -44,7 +47,7 @@ int main(int argc, char *argv[])
 
     // Read chemistry initial conditions
     ReadCini(dir, nsub, chemtbl, &rttbl, subcatch);
-    
+
     // Read time-series precipitation chemistry if defined in chem.txt  2021-05-20
     if (ctrl.precipchem == 1) {
         //printf("read in time-series precipitation %d", ctrl.precipchem);
