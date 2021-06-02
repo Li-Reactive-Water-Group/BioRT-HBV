@@ -3,7 +3,6 @@ ACTIVITY        1       # correction of activity: 0 = no correction, 1 = Debye-H
 RELMIN          1       # mineral volume fraction: 0 = absolute, 1 = relative
 TRANSPORT_ONLY  0       # transport only mode: 0 = turn on reactions, 1 = transport only, suitable for stable tracer transport problems
 PRECIPCHEM      1       # precipitation chemistry mode: 0 = constant precipitation chemistry defined in cini.txt, 1 = time-series precipitation chemistry defined in precipchem.txt
-CEMENTATION     1       # cementation factor
 TEMPERATURE     25      # assumed temperature for thermal decoupled mode
 SW_THRESHOLD    0.7     # threshold in soil moisture function. Set to 1.0 for increase behavior
 SW_EXP          1.5     # exponent in soil moisture function
