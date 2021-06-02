@@ -20,6 +20,7 @@ void _custom_exit(const char *fn, int lno, const char *func, int debug, int erro
 void _custom_printf(int model_verbosity, int verbosity, const char *fmt, ...)
 {
     va_list         va;
+    FILE           *fp;
 
     va_start(va, fmt);
 
@@ -27,6 +28,10 @@ void _custom_printf(int model_verbosity, int verbosity, const char *fmt, ...)
     {
         vfprintf(stderr, fmt, va);
         fflush(stderr);
+        va_start(va, fmt);
+        fp = fopen("errormessage.txt", "w");
+        vfprintf(fp, fmt, va);
+        fclose(fp);
     }
     else if (verbosity <= model_verbosity)
     {
