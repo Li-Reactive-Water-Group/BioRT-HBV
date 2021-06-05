@@ -70,10 +70,6 @@ void ReadChem(const char dir[], ctrl_struct *ctrl, rttbl_struct *rttbl, chemtbl_
     }
 
     NextLine(fp, cmdstr, &lno);
-    ReadParam(cmdstr, "CEMENTATION", 'd', fn, lno, &rttbl->cementation);
-    biort_printf(VL_NORMAL, "  Cementation factor = %2.1f \n", rttbl->cementation);
-
-    NextLine(fp, cmdstr, &lno);
     ReadParam(cmdstr, "TEMPERATURE", 'd', fn, lno, &rttbl->tmp);
     biort_printf(VL_NORMAL, "  Temperature = %3.1f \n", rttbl->tmp);
 

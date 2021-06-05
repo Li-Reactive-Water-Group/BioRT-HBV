@@ -90,7 +90,6 @@ typedef struct rttbl_struct
     int             num_cex;                // number of cation exchange
     int             num_mkr;                // number of mineral kinetic reactions
     int             num_akr;                // number of aqueous kinetic reactions
-    double          cementation;            // cementation factor that represents connectivity of pores
     double          tmp;                    // temperature of the moment
     double          dep_mtx[MAXSPS][MAXSPS];// dependency of secondary species on primary species
     double          dep_kin[MAXSPS][MAXSPS];// dependency of kinetic species on primary species
