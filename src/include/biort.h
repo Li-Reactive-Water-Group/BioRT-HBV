@@ -220,7 +220,7 @@ void            ReadConc(FILE *, int, const chemtbl_struct [], int *, double [],
 void            ReadDHParam(const char [], int, double *);
 void            ReadHbvParam(const char [], int, subcatch_struct []);
 void            ReadHbvResults(const char [], int, int *, int **, subcatch_struct []);
-void            ReadPrecipChem(const char [], int, int *, int **, subcatch_struct [], int);
+void            ReadPrecipChem(const char [], int, int *, int **, subcatch_struct [], int, const chemtbl_struct []);
 void            ReadMinerals(const char [], int, int, double [MAXSPS][MAXSPS], double [], chemtbl_struct [],
     rttbl_struct *);
 void            ReadMinKin(FILE *, int, double, int *, char [], chemtbl_struct [], kintbl_struct *);

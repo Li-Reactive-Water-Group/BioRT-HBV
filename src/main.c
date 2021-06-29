@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
     // Read time-series precipitation chemistry if defined in chem.txt  2021-05-20
     if (ctrl.precipchem == 1) {
         //printf("read in time-series precipitation %d", ctrl.precipchem);
-        ReadPrecipChem(dir, nsub, &nsteps, &steps, subcatch, rttbl.num_stc);
+        ReadPrecipChem(dir, nsub, &nsteps, &steps, subcatch, rttbl.num_stc, chemtbl);
     }
 
 

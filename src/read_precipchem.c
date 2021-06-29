@@ -1,6 +1,6 @@
 #include "biort.h"
 
-void ReadPrecipChem(const char dir[], int nsub, int *nsteps, int *steps[], subcatch_struct subcatch[], int num_stc)
+void ReadPrecipChem(const char dir[], int nsub, int *nsteps, int *steps[], subcatch_struct subcatch[], int num_stc, const chemtbl_struct chemtbl[])
 {
     FILE           *fp;
     char            fn[MAXSTRING];
@@ -11,7 +11,10 @@ void ReadPrecipChem(const char dir[], int nsub, int *nsteps, int *steps[], subca
     int             kspc;       
     int             pH_index = 0; 
     int             pH_convert = 0; 
-
+    int             ind;
+    
+    biort_printf(VL_NORMAL, "\nREADING TIME-SERIES PRECIPITATION CHEMISTRY\n");
+    
     sprintf(fn, "input/%s/precipchem.txt", dir);
     fp = fopen(fn, "r");
 
@@ -34,7 +37,7 @@ void ReadPrecipChem(const char dir[], int nsub, int *nsteps, int *steps[], subca
     for (ksub = 0; ksub < nsub; ksub++)
     {
       
-        // read header to locate pH position
+        // read header to locate pH position 
         for (kspc = 0; kspc < num_stc + 1; kspc++)  // add one more column of date
         {
             fscanf(fp, "%s", temp_str);
@@ -44,6 +47,18 @@ void ReadPrecipChem(const char dir[], int nsub, int *nsteps, int *steps[], subca
                 pH_convert = 1;
                 pH_index = kspc - 1;
             }  
+            
+            // also check chemical species, 0629
+            if (kspc > 0)
+            {
+                ind = FindChem(temp_str, num_stc, chemtbl);
+                if (ind < 0)
+                {
+                    biort_printf(VL_ERROR, "Error finding chemical %s.\n", temp_str);
+                    exit(EXIT_FAILURE);
+                }
+            }
+            
         }
 
         for (kstep = 0; kstep < *nsteps; kstep++)

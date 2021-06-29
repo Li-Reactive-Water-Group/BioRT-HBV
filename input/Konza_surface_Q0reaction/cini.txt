@@ -5,7 +5,7 @@
 
 PRECIPITATION
 pH          4.30
-Cl-         1.93E-5
+Cl-         1.00E-5
 DOC	        1.00E-7
 SOC         1.00E-10    -ssa    5.0
 X-          1.00E-10

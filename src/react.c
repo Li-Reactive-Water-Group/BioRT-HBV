@@ -116,6 +116,7 @@ int SolveReact(double stepsize, const chemtbl_struct chemtbl[], const kintbl_str
 
     inv_sat = 1.0 / satn;
 
+
     for (i = 0; i < rttbl->num_min; i++)
     {
         area[i] = chms->ssa[i + rttbl->num_stc - rttbl->num_min] *
