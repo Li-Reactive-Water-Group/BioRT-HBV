@@ -172,12 +172,12 @@ typedef struct subcatch_struct
     double          porosity_surface;       // surface zone porosity (m3 m-3), 2021-05-14
     double          porosity_uz;            // upper zone porosity (m3 m-3)
     double          porosity_lz;            // lower zone porosity (m3 m-3)
-    double          res_surface;            // surface zone immobile water storage (mm), 2021-05-14
-    double          res_uz;                 // upper zone immobile water storage (mm)
-    double          res_lz;                 // lower zone immobile water storage (mm)
-    double          d_surface;              // surface zone maximum water (immobile + mobile) storage capacity (mm)
-    double          d_uz;                   // upper zone maximum water (immobile + mobile) storage capacity (mm)
-    double          d_lz;                   // lower zone maximum water (immobile + mobile) storage capacity (mm)
+    double          res_surface;            // surface zone passive water storage (mm), 2021-05-14
+    double          res_uz;                 // upper zone passive water storage (mm)
+    double          res_lz;                 // lower zone passive water storage (mm)
+    double          d_surface;              // surface zone maximum water (passive + dynamic) storage capacity (mm)
+    double          d_uz;                   // upper zone maximum water (passive + dynamic) storage capacity (mm)
+    double          d_lz;                   // lower zone maximum water (passive + dynamic) storage capacity (mm)
     double          react_rate[NWS][MAXSPS];// reaction rate (mol m-2 day-1)
     chmstate_struct chms[NWS];
     chmstate_struct river_chms;
