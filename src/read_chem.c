@@ -27,20 +27,6 @@ void ReadChem(const char dir[], ctrl_struct *ctrl, rttbl_struct *rttbl, chemtbl_
     biort_printf(VL_NORMAL, "  Activity correction is set to %d. \n", ctrl->actv_mode);
 
     NextLine(fp, cmdstr, &lno);
-    ReadParam(cmdstr, "RELMIN", 'i', fn, lno, &ctrl->rel_min);
-    switch (ctrl->rel_min)
-    {
-        case 0:
-            biort_printf(VL_NORMAL, "  Using absolute mineral volume fraction. \n");
-            break;
-        case 1:
-            biort_printf(VL_NORMAL, "  Using relative mineral volume fraction. \n");
-            break;
-        default:
-            break;
-    }
-
-    NextLine(fp, cmdstr, &lno);
     ReadParam(cmdstr, "TRANSPORT_ONLY", 'i', fn, lno, &ctrl->transpt);
     switch (ctrl->transpt)
     {
@@ -54,7 +40,7 @@ void ReadChem(const char dir[], ctrl_struct *ctrl, rttbl_struct *rttbl, chemtbl_
         default:
             break;
     }
-    
+
     NextLine(fp, cmdstr, &lno);  // 2021-05-20
     ReadParam(cmdstr, "PRECIPCHEM", 'i', fn, lno, &ctrl->precipchem);
     switch (ctrl->precipchem)

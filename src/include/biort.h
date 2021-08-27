@@ -73,7 +73,6 @@ typedef struct ctrl_struct
     int             recycle;                // number of times to recycle forcing
     int             read_restart;           // flag to read rt restart file
     int             actv_mode;              // activity coefficient mode: 0 = unity coefficient, 1 = DH equation
-    int             rel_min;                // relative mineral flag: 1 = total solid volume, 0 = total pore volume
     int             transpt;                // transport only flag: 0 = simulate kinetic reaction, 1 = transport only
     int             precipchem;             // precipitation chemistry mode: 0 = constant precipitation chemistry, 1 = time-series precipitation chemistry   2021-05-20
     double         *steps;                  // model steps
