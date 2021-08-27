@@ -57,7 +57,7 @@ void ReadChem(const char dir[], ctrl_struct *ctrl, rttbl_struct *rttbl, chemtbl_
     
     NextLine(fp, cmdstr, &lno);  // 2021-05-20
     ReadParam(cmdstr, "PRECIPCHEM", 'i', fn, lno, &ctrl->precipchem);
-    switch (ctrl->rel_min)
+    switch (ctrl->precipchem)
     {
         case 0:
             biort_printf(VL_NORMAL, "  Using constant precipitation chemistry in cini.txt. \n");
