@@ -58,9 +58,7 @@ void InitChemState(double smcmax, double vol, const chemtbl_struct chemtbl[], co
         else if (chemtbl[kspc].itype == MINERAL)
         {
             // Update the concentration of mineral using molar volume
-            chms->tot_conc[kspc] *= (ctrl->rel_min == 0) ?
-                1000.0 / chemtbl[kspc].molar_vol / smcmax :     // Absolute mineral volume fraction
-                (1.0 - smcmax) * 1000.0 / chemtbl[kspc].molar_vol / smcmax;     // Relative mineral volume fraction
+            chms->tot_conc[kspc] *= 1000.0 / chemtbl[kspc].molar_vol / smcmax :     // Absolute mineral volume fraction
             chms->prim_actv[kspc] = 1.0;
             chms->prim_conc[kspc] = chms->tot_conc[kspc];
         }
