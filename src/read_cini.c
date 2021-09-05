@@ -15,22 +15,18 @@ void ReadCini(const char dir[], int nsub, const chemtbl_struct *chemtbl, rttbl_s
     // Read precipitation concentration
     FindLine(fp, "PRECIPITATION", &lno, cmdstr);
     ReadConc(fp, rttbl->num_stc, chemtbl, &lno, subcatch[0].prcp_conc, dummy);
-    
+
     // Read surface concentration  2021-05-07
     FindLine(fp, "SURFACE", &lno, cmdstr);
     ReadConc(fp, rttbl->num_stc, chemtbl, &lno, subcatch[0].chms[SURFACE].tot_conc, subcatch[0].chms[SURFACE].ssa);
-    printf("\n");
-    biort_printf(VL_NORMAL, "  Surface SOC volume fraction = %e, SSA = %.4f \n", subcatch[0].chms[SURFACE].tot_conc[5], subcatch[0].chms[SURFACE].ssa[5]);
 
     // Read upper zone concentration
     FindLine(fp, "UZ", &lno, cmdstr);
     ReadConc(fp, rttbl->num_stc, chemtbl, &lno, subcatch[0].chms[UZ].tot_conc, subcatch[0].chms[UZ].ssa);
-    biort_printf(VL_NORMAL, "  Upper zone SOC volume fraction = %e, SSA = %.4f \n", subcatch[0].chms[UZ].tot_conc[5], subcatch[0].chms[UZ].ssa[5]);
 
     // Read lower zone concentration
     FindLine(fp, "LZ", &lno, cmdstr);
     ReadConc(fp, rttbl->num_stc, chemtbl, &lno, subcatch[0].chms[LZ].tot_conc, subcatch[0].chms[LZ].ssa);
-    biort_printf(VL_NORMAL, "  Lower zone SOC volume fraction = %e, SSA = %.4f \n", subcatch[0].chms[LZ].tot_conc[5], subcatch[0].chms[LZ].ssa[5]);
 
     fclose(fp);
 }

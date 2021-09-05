@@ -41,16 +41,16 @@ void ReadSoil(const char dir[], int nsub, subcatch_struct sub[])
     biort_printf(VL_NORMAL, "  Lower zone passive water storage is %.2f mm.\n", sub[0].res_lz);
 
     NextLine(fp, cmdstr, &lno);  // 2021-05-14
-    ReadParam(cmdstr, "WS_MAX_SURFACE", 'd', fn, lno, &sub[0].d_surface);
-    biort_printf(VL_NORMAL, "  Surface maximum total water storage is %.2f mm.\n", sub[0].d_surface);
+    ReadParam(cmdstr, "DEPTH_SURFACE", 'd', fn, lno, &sub[0].d_surface);
+    biort_printf(VL_NORMAL, "  Depth of surface zone is %.2f mm.\n", sub[0].d_surface);
 
     NextLine(fp, cmdstr, &lno);
-    ReadParam(cmdstr, "WS_MAX_UZ", 'd', fn, lno, &sub[0].d_uz);
-    biort_printf(VL_NORMAL, "  Upper zone maximum total water storage is %.2f mm.\n", sub[0].d_uz);
+    ReadParam(cmdstr, "DEPTH_UZ", 'd', fn, lno, &sub[0].d_uz);
+    biort_printf(VL_NORMAL, "  Depth of upper zone is %.2f mm.\n", sub[0].d_uz);
 
     NextLine(fp, cmdstr, &lno);
-    ReadParam(cmdstr, "WS_MAX_LZ", 'd', fn, lno, &sub[0].d_lz);
-    biort_printf(VL_NORMAL, "  Lower zone maximum total water storage is %.2f mm.\n", sub[0].d_lz);
+    ReadParam(cmdstr, "DEPTH_LZ", 'd', fn, lno, &sub[0].d_lz);
+    biort_printf(VL_NORMAL, "  Depth of lower zone is %.2f mm.\n", sub[0].d_lz);
 
     fclose(fp);
 }
