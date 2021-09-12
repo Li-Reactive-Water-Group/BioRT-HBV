@@ -12,18 +12,21 @@ void ReadPrecipChem(const char dir[], int nsub, int *nsteps, int *steps[], subca
     int             pH_index = 0;
     int             pH_convert = 0;
     int             ind;
+    int             ntime;
 
-    biort_printf(VL_NORMAL, "\nREADING TIME-SERIES PRECIPITATION CHEMISTRY\n");
+    ntime = *nsteps;
 
     if (mode == 0)
     {
         sprintf(fn, "input/%s/precipchem.txt", dir);
+        biort_printf(VL_NORMAL, "\nREADING TIME-SERIES PRECIPITATION CHEMISTRY from \"precipchem.txt\"\n");
     }
 
     else if (mode == 1)
 
     {
         sprintf(fn, "input/%s/Numexp_precipchem.txt", dir);
+        biort_printf(VL_NORMAL, "\nREADING TIME-SERIES PRECIPITATION CHEMISTRY from \"Numexp_precipchem.txt\"\n");
     }
 
     fp = fopen(fn, "r");
@@ -32,6 +35,10 @@ void ReadPrecipChem(const char dir[], int nsub, int *nsteps, int *steps[], subca
 
     rewind(fp);
 
+    if (ntime != *nsteps & mode == 1){
+        biort_printf(VL_ERROR,"\nNumber of time steps in \"Numexp_precipchem.txt\" should be same as in \"Numexp_Results.txt\" file.\n");
+        exit(EXIT_FAILURE);
+    }
     *steps = (int *)malloc(*nsteps * sizeof(int));
 
     for (ksub = 0; ksub < nsub; ksub++)

@@ -46,6 +46,10 @@ void ReadHbvResults(const char dir[], int nsub, int *nsteps, int *steps[], subca
 
     if (mode == 1 & numexp_file_flag == 0)
     {
+      if (len_numexp % *nsteps != 0){
+          biort_printf(VL_ERROR,"\nNumber of time steps in \"Numexp_precipchem.txt\" should be a multiple of time steps in \"Results.txt\" file, if \"Numexp_precipchem.txt\" file is not provided.\n");
+          exit(EXIT_FAILURE);
+    }
         len_numexp /= *nsteps;
     }
 
@@ -168,6 +172,7 @@ void ReadHbvResults(const char dir[], int nsub, int *nsteps, int *steps[], subca
             }
         }
     }
+    *nsteps *= len_numexp;
 }
 
 void ReadHbvParam(const char dir[], int nsub, subcatch_struct subcatch[])
