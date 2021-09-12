@@ -1,6 +1,6 @@
 #include "biort.h"
 
-void ReadHbvResults(const char dir[], int nsub, int *nsteps, int *steps[], subcatch_struct subcatch[])
+void ReadHbvResults(const char dir[], int nsub, int *nsteps, int *steps[], subcatch_struct subcatch[], int mode)
 {
     FILE           *fp;
     char            fn[MAXSTRING];
@@ -8,9 +8,35 @@ void ReadHbvResults(const char dir[], int nsub, int *nsteps, int *steps[], subca
     int             ksub;
     int             kstep;
     int             lno = 0;
+    int             i;
+    int             len_numexp=1;
+    int             numexp_file_flag=0;
 
-    sprintf(fn, "input/%s/Results.txt", dir);
-    fp = fopen(fn, "r");
+    if (mode==0)
+    {
+        sprintf(fn, "input/%s/Results.txt", dir);
+        fp = fopen(fn, "r");
+    } else if (mode == 1)
+    {
+        sprintf(fn, "input/%s/Numexp_Results.txt", dir);
+        if (access(fn , F_OK ) != -1)
+        {
+            fp = fopen(fn, "r");
+            numexp_file_flag = 1;
+            biort_printf(VL_NORMAL, "\nHydrology in %s will be used for numerical experiment.\n", fn);
+        } else
+        {
+            sprintf(fn, "input/%s/Numexp_precipchem.txt", dir);
+            fp = fopen(fn, "r");
+            len_numexp = CountLines(fp, cmdstr, 0) - 1;
+            fclose(fp);
+            sprintf(fn, "input/%s/Results.txt", dir);
+            fp = fopen(fn, "r");
+            numexp_file_flag = 0;
+            biort_printf(VL_NORMAL, "\nHydrology in %s will be used for numerical experiment.\n", fn);
+        }
+    }
+
 
     *nsteps = CountLines(fp, cmdstr, 0) - 1;
 
@@ -18,13 +44,18 @@ void ReadHbvResults(const char dir[], int nsub, int *nsteps, int *steps[], subca
 
     *steps = (int *)malloc(*nsteps * sizeof(int));
 
+    if (mode == 1 & numexp_file_flag == 0)
+    {
+        len_numexp /= *nsteps;
+    }
+
     for (ksub = 0; ksub < nsub; ksub++)
     {
-        subcatch[ksub].ws = (double **)malloc(*nsteps * sizeof(double *));
-        subcatch[ksub].q = (double **)malloc(*nsteps * sizeof(double *));
-        subcatch[ksub].tmp = (double *)malloc(*nsteps * sizeof(double));
+        subcatch[ksub].ws = (double **)malloc(len_numexp * *nsteps * sizeof(double *));
+        subcatch[ksub].q = (double **)malloc(len_numexp * *nsteps * sizeof(double *));
+        subcatch[ksub].tmp = (double *)malloc(len_numexp * *nsteps * sizeof(double));
 
-        for (kstep = 0; kstep < *nsteps; kstep++)
+        for (kstep = 0; kstep < len_numexp * *nsteps; kstep++)
         {
             subcatch[ksub].ws[kstep] = (double *)malloc(NWS * sizeof(double));
             subcatch[ksub].q[kstep] = (double *)malloc(NQ * sizeof(double));
@@ -92,8 +123,50 @@ void ReadHbvResults(const char dir[], int nsub, int *nsteps, int *steps[], subca
             subcatch[ksub].ws[kstep][UZ] += subcatch[ksub].res_uz;
             subcatch[ksub].ws[kstep][LZ] += subcatch[ksub].res_lz;
         }
+        for (kstep = 0; kstep < *nsteps; kstep++)
+        {
+            if (subcatch[ksub].ws[kstep][SURFACE] > (subcatch[ksub].d_surface * subcatch[ksub].porosity_surface))
+            {
+                //biort_printf(VL_NORMAL, "\nWater storage in SURFACE exceeds maximum water storage capacity at line %d.\n", kstep);
+            }
+            if (subcatch[ksub].ws[kstep][UZ] > (subcatch[ksub].d_uz * subcatch[ksub].porosity_uz))
+            {
+                biort_printf(VL_NORMAL, "\nWater storage in UZ exceeds maximum water storage capacity at line %d.\n", kstep);
+            }
+            if (subcatch[ksub].ws[kstep][LZ] > (subcatch[ksub].d_lz * subcatch[ksub].porosity_lz))
+            {
+                biort_printf(VL_NORMAL, "\nWater storage in LZ exceeds maximum water storage capacity at line %d.\n", kstep);
+            }
+        }
 
         fclose(fp);
+    }
+
+    if (mode == 1 & numexp_file_flag == 0)
+    {
+        if (len_numexp > 1)
+        {
+            for (i = 1; i < len_numexp; i++)
+            {
+                for (ksub = 0; ksub < nsub; ksub++)
+                {
+                    for (kstep = 0; kstep < *nsteps; kstep++)
+                    {
+                        subcatch[ksub].ws[(i * *nsteps)+kstep][SURFACE] = subcatch[ksub].ws[kstep][SURFACE];
+                        subcatch[ksub].ws[(i * *nsteps)+kstep][UZ] = subcatch[ksub].ws[kstep][UZ];
+                        subcatch[ksub].ws[(i * *nsteps)+kstep][LZ] = subcatch[ksub].ws[kstep][LZ];
+                        subcatch[ksub].q[(i * *nsteps)+kstep][PRECIP] = subcatch[ksub].q[kstep][PRECIP];
+                        subcatch[ksub].q[(i * *nsteps)+kstep][RECHG] = subcatch[ksub].q[kstep][RECHG];
+                        subcatch[ksub].q[(i * *nsteps)+kstep][PERC] = subcatch[ksub].q[kstep][PERC];
+                        subcatch[ksub].q[(i * *nsteps)+kstep][Q0] = subcatch[ksub].q[kstep][Q0];
+                        subcatch[ksub].q[(i * *nsteps)+kstep][Q1] = subcatch[ksub].q[kstep][Q1];
+                        subcatch[ksub].q[(i * *nsteps)+kstep][Q2] = subcatch[ksub].q[kstep][Q2];
+                        subcatch[ksub].tmp[(i * *nsteps)+kstep] = subcatch[ksub].tmp[kstep];
+                        //biort_printf(VL_NORMAL, "\n%d kstep: PERC%d\n", kstep, subcatch[ksub].q[kstep][PERC]);
+                    }
+                }
+            }
+        }
     }
 }
 

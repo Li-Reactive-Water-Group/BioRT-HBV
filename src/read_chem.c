@@ -55,6 +55,20 @@ void ReadChem(const char dir[], ctrl_struct *ctrl, rttbl_struct *rttbl, chemtbl_
             break;
     }
 
+    NextLine(fp, cmdstr, &lno);  // 2021-09-09
+    ReadParam(cmdstr, "NUMEXP", 'i', fn, lno, &ctrl->precipchem_numexp);
+    switch (ctrl->precipchem_numexp)
+    {
+        case 0:
+            biort_printf(VL_NORMAL, "  Using same precipitation chemistry during warmup and simulation run. \n");
+            break;
+        case 1:
+            biort_printf(VL_NORMAL, "  Using different precipitation chemistry during warmup and simulation run. \n");
+            break;
+        default:
+            break;
+    }
+
     NextLine(fp, cmdstr, &lno);
     ReadParam(cmdstr, "TEMPERATURE", 'd', fn, lno, &rttbl->tmp);
     biort_printf(VL_NORMAL, "  Temperature = %3.1f \n", rttbl->tmp);
