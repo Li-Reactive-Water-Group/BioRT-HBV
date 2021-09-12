@@ -51,6 +51,7 @@ SRCS_ = main.c\
 	read_hbv.c\
 	read_param.c\
 	read_soil.c\
+	set_numexp.c\
 	speciation.c\
 	time_func.c\
 	transpt.c\

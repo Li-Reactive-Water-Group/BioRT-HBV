@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <math.h>
 #include <string.h>
 #include <time.h>
@@ -75,6 +76,8 @@ typedef struct ctrl_struct
     int             actv_mode;              // activity coefficient mode: 0 = unity coefficient, 1 = DH equation
     int             transpt;                // transport only flag: 0 = simulate kinetic reaction, 1 = transport only
     int             precipchem;             // precipitation chemistry mode: 0 = constant precipitation chemistry, 1 = time-series precipitation chemistry   2021-05-20
+    int             precipchem_numexp;      // Numerical experiment mode: 0 = same precipitation chemistry during warm-up and simulation
+                                            // 1 = different precipitation chemistry during warm-up and simulation useful for numerical experiment  2021-09-09
     double         *steps;                  // model steps
 } ctrl_struct;
 
@@ -193,6 +196,8 @@ typedef struct subcatch_struct
 # define mkdir(path)            mkdir(path, 0755)
 #endif
 
+void            CopyConstSubcatchProp(int, const subcatch_struct [], subcatch_struct []);
+void            CopyInitChemSubcatch(int, rttbl_struct *, const subcatch_struct [], subcatch_struct []);
 int             CountLeapYears(int, int);
 int             FindChem(const char [], int, const chemtbl_struct[]);
 void            FreeStruct(int, int, int *[], subcatch_struct []);
@@ -218,8 +223,8 @@ void            ReadCini(const char [], int, const chemtbl_struct *, rttbl_struc
 void            ReadConc(FILE *, int, const chemtbl_struct [], int *, double [], double []);
 void            ReadDHParam(const char [], int, double *);
 void            ReadHbvParam(const char [], int, subcatch_struct []);
-void            ReadHbvResults(const char [], int, int *, int **, subcatch_struct []);
-void            ReadPrecipChem(const char [], int, int *, int **, subcatch_struct [], int, const chemtbl_struct []);
+void            ReadHbvResults(const char [], int, int *, int **, subcatch_struct [], int);
+void            ReadPrecipChem(const char [], int, int *, int **, subcatch_struct [], int, const chemtbl_struct [], int);
 void            ReadMinerals(const char [], int, int, double [MAXSPS][MAXSPS], double [], chemtbl_struct [],
     rttbl_struct *);
 void            ReadMinKin(FILE *, int, double, int *, char [], chemtbl_struct [], kintbl_struct *);
@@ -229,6 +234,8 @@ void            ReadSecondary(const char [], int, int, chemtbl_struct [], rttbl_
 void            ReadSoil(const char [], int, subcatch_struct []);
 void            ReadTempPoints(const char [], double, int *, int *);
 int             roundi(double);
+//void            RunNumExp(int, int, const chemtbl_struct [], const kintbl_struct [], rttbl_struct *, const ctrl_struct *,
+//    subcatch_struct [], FILE *);//2021-09-09
 double          SoilTempFactor(double, double);
 int             SolveReact(double, const chemtbl_struct [], const kintbl_struct [], const rttbl_struct *, double,
     double, chmstate_struct *);
