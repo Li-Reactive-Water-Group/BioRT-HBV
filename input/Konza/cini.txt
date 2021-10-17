@@ -10,14 +10,6 @@ DOC	        1.00E-7
 SOC         1.00E-10    -ssa    5.0
 X-          1.00E-10
 
-SURFACE
-pH          4.56
-Cl-         2.0E-5
-DOC         2.0E-5
-SOC         0.02        -ssa    50
-X-          1.0E-5
-
-
 UZ
 pH          4.56
 Cl-         3.69E-5

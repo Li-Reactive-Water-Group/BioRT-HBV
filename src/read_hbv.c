@@ -86,15 +86,32 @@ void ReadHbvResults(const char dir[], int nsub, int *nsteps, int *steps[], subca
             fscanf(fp, "%*f %*f");  // Skip "Qsim" and "Qobs"
             fscanf(fp, "%lf %lf", &subcatch[ksub].q[kstep][PRECIP], &subcatch[ksub].tmp[kstep]);    // Read precip. and
                                                                                                     // air temperature
-            fscanf(fp, "%*lf %*lf");   // Skip "AET" and "PET"
+            fscanf(fp, "%*f %*f");   // Skip "AET" and PET"
             fscanf(fp, "%lf %*lf %lf", &snow, &sm);     // Read snow and soil moisture
-            subcatch[ksub].ws[kstep][SURFACE] = snow + sm;  // 2021-05-14
+            subcatch[ksub].ws[kstep][SNOW] = snow;  // 2021-05-14
+            subcatch[ksub].ws[kstep][SM] = sm;
             fscanf(fp, "%lf", &subcatch[ksub].q[kstep][RECHG]);  // Read recharge
             fscanf(fp, "%*lf %*lf");   // Skip upper and lower zone storages
             fscanf(fp, "%lf %lf %lf", &subcatch[ksub].q[kstep][Q0],
                 &subcatch[ksub].q[kstep][Q1], &subcatch[ksub].q[kstep][Q2]);  // Read Q0, Q1, and Q2
             fscanf(fp, "%*lf %*lf");   // Skip "Qsim_rain" and "Qsim_snow"
 
+            //Incoming precipitation might become snow or enter the soil zone directly.
+            //  Psnow = PRECIP * SFCF (if temp < TT)
+            //  Prain = PRECIP (if temp >=TT)
+            //  Psnow + snow0 = snowmelt + snow
+            //
+            // Solving the above equations,
+            //
+            subcatch[ksub].q[kstep][Prain] = (subcatch[ksub].tmp[kstep] < subcatch[ksub].tt) ?
+                0.0 : subcatch[ksub].q[kstep][PRECIP];
+            
+            subcatch[ksub].q[kstep][Psnow] = (subcatch[ksub].tmp[kstep] < subcatch[ksub].tt) ?
+                subcatch[ksub].q[kstep][PRECIP] * subcatch[ksub].sfcf : 0.0;
+            
+            subcatch[ksub].q[kstep][snowmelt] = (kstep == 0) ?
+                0.0 : MAX(0, subcatch[ksub].q[kstep][Psnow] + subcatch[ksub].ws[kstep - 1][SNOW] - subcatch[ksub].ws[kstep][SNOW]);
+            //biort_printf(VL_NORMAL, "  snowmelt %.2f m3 m-3.\n", subcatch[ksub].q[kstep][snowmelt]);
             // In the upper zone, HBV first calculates percolation to the lower zone.
             //   percolation = MIN(perc0, SUZ0 + recharge).                         (1)
             // If there is water left in the upper zone, calculate Q0 and Q1:
@@ -118,21 +135,24 @@ void ReadHbvResults(const char dir[], int nsub, int *nsteps, int *steps[], subca
                 subcatch[ksub].q[kstep][Q2];
             subcatch[ksub].q[kstep][PERC] = (kstep == 0) ?
                 0.0 : MIN(subcatch[ksub].perc, subcatch[ksub].ws[kstep - 1][UZ] + subcatch[ksub].q[kstep][RECHG]);
+
         }
 
-        // Add residual moisture
+        // Add 1. residual moisture to LZ & UZ and 2. SM to UZ
         for (kstep = 0; kstep < *nsteps; kstep++)
         {
-            subcatch[ksub].ws[kstep][SURFACE] += subcatch[ksub].res_surface;   // 2021-05-14
+            // subcatch[ksub].ws[kstep][SURFACE] += subcatch[ksub].res_surface;   // 2021-05-14
             subcatch[ksub].ws[kstep][UZ] += subcatch[ksub].res_uz;
             subcatch[ksub].ws[kstep][LZ] += subcatch[ksub].res_lz;
+            subcatch[ksub].ws[kstep][UZ] += subcatch[ksub].ws[kstep][SM];
+            
         }
         for (kstep = 0; kstep < *nsteps; kstep++)
         {
-            if (subcatch[ksub].ws[kstep][SURFACE] > (subcatch[ksub].d_surface * subcatch[ksub].porosity_surface))
-            {
+            //if (subcatch[ksub].ws[kstep][SURFACE] > (subcatch[ksub].d_surface * subcatch[ksub].porosity_surface))
+            //{
                 //biort_printf(VL_NORMAL, "\nWater storage in SURFACE exceeds maximum water storage capacity at line %d.\n", kstep);
-            }
+            //}
             if (subcatch[ksub].ws[kstep][UZ] > (subcatch[ksub].d_uz * subcatch[ksub].porosity_uz))
             {
                 biort_printf(VL_NORMAL, "\nWater storage in UZ exceeds maximum water storage capacity at line %d.\n", kstep);
@@ -156,7 +176,8 @@ void ReadHbvResults(const char dir[], int nsub, int *nsteps, int *steps[], subca
                 {
                     for (kstep = 0; kstep < *nsteps; kstep++)
                     {
-                        subcatch[ksub].ws[(i * *nsteps)+kstep][SURFACE] = subcatch[ksub].ws[kstep][SURFACE];
+                        subcatch[ksub].ws[(i * *nsteps)+kstep][SNOW] = subcatch[ksub].ws[kstep][SNOW];
+                        //subcatch[ksub].ws[(i * *nsteps)+kstep][SURFACE] = subcatch[ksub].ws[kstep][SURFACE];
                         subcatch[ksub].ws[(i * *nsteps)+kstep][UZ] = subcatch[ksub].ws[kstep][UZ];
                         subcatch[ksub].ws[(i * *nsteps)+kstep][LZ] = subcatch[ksub].ws[kstep][LZ];
                         subcatch[ksub].q[(i * *nsteps)+kstep][PRECIP] = subcatch[ksub].q[kstep][PRECIP];
@@ -220,6 +241,25 @@ void ReadHbvParam(const char dir[], int nsub, subcatch_struct subcatch[])
                 break;
             }
         }
+        FindLine(fp, "<SubCatchmentVegetationZoneParameters>", &lno, cmdstr);
+
+        while (!feof(fp))
+        {
+            NextLine(fp, cmdstr, &lno);
+            ParseLine(cmdstr, tag, &value);
+            if (strcmp(tag,"TT") == 0)
+            {
+                subcatch[ksub].tt = value;
+                biort_printf(VL_NORMAL, "  TT is %.2lf\n", subcatch[ksub].tt);
+            }
+            else if (strcmp(tag,"SFCF") == 0)
+            {
+                subcatch[ksub].sfcf = value;
+                biort_printf(VL_NORMAL, "  SFCF is %.2lf\n", subcatch[ksub].sfcf);
+                break;
+            }
+        }
+
     }
 
     fclose(fp);
