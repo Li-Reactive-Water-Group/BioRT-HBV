@@ -20,8 +20,8 @@
 #define VERSION    "0.1.0-alpha"
 
 #define BADVAL                  -999
-#define NWS                     4           // number of water storages
-#define NQ                      6           // number of water fluxes
+#define NWS                     6           // number of water storages
+#define NQ                      9           // number of water fluxes
 
 #define STORAGE_MIN             1.0         // minimum water storage (mm)
 #define ZERO_CONC               1.0E-20     // minimum concentration
@@ -34,11 +34,16 @@
 #define Q0                      3
 #define Q1                      4
 #define Q2                      5
+#define Prain                   6
+#define Psnow                   7
+#define snowmelt                8
 
-#define SURFACE                 0          // add surface Q0 reaction, 2021-05-14
-#define UZ                      1
-#define LZ                      2
-#define STREAM                  3
+#define SNOW                    0
+#define SURFACE                 1          // add surface Q0 reaction, 2021-05-14
+#define UZ                      2
+#define LZ                      3
+#define STREAM                  4
+#define SM                      5
 
 #define MAXSPS                  20          // Maximum number of species
 #define MAXDEP                  4           // Maximum number of dependece, monod, and inhibition terms
@@ -167,19 +172,21 @@ typedef struct subcatch_struct
     double        **prcp_conc_time;         // time-series precipitation concentration (mol L-1)  2021-05-20
     double         *tmp;                    // air temperature (degree C)
     double          prcp_conc[MAXSPS];      // concentration in precipitation (mol kgH2O-1)
+    //double          d_surface;              // surface zone maximum water (passive + dynamic) storage capacity (mm)
+    double          d_uz;                   // upper zone maximum water (passive + dynamic) storage capacity (mm)
+    double          d_lz;                   // lower zone maximum water (passive + dynamic) storage capacity (mm)
     double          k1;                     // recession coefficient for upper zone (day -1)
     double          k2;                     // recession coefficient for lower zone (day -1)
     double          maxbas;                 // routing parameter
     double          perc;                   // percolation rate (mm day-1)
-    double          porosity_surface;       // surface zone porosity (m3 m-3), 2021-05-14
+    //double          porosity_surface;       // surface zone porosity (m3 m-3), 2021-05-14
     double          porosity_uz;            // upper zone porosity (m3 m-3)
     double          porosity_lz;            // lower zone porosity (m3 m-3)
-    double          res_surface;            // surface zone passive water storage (mm), 2021-05-14
+    //double          res_surface;            // surface zone passive water storage (mm), 2021-05-14
     double          res_uz;                 // upper zone passive water storage (mm)
     double          res_lz;                 // lower zone passive water storage (mm)
-    double          d_surface;              // surface zone maximum water (passive + dynamic) storage capacity (mm)
-    double          d_uz;                   // upper zone maximum water (passive + dynamic) storage capacity (mm)
-    double          d_lz;                   // lower zone maximum water (passive + dynamic) storage capacity (mm)
+    double          sfcf;                   // snow fall correction factor
+    double          tt;                     // threshold temperature (degree C)
     double          react_rate[NWS][MAXSPS];// reaction rate (mol m-2 day-1)
     chmstate_struct chms[NWS];
     chmstate_struct river_chms;
@@ -248,6 +255,6 @@ void            StreamSpeciation(int, int, const chemtbl_struct [], const ctrl_s
 void            Transpt(int, int, rttbl_struct *, const ctrl_struct *, subcatch_struct []);   // 2021-05-21
 void            Wrap(char []);
 void            Unwrap(const char [], char []);
-void            UpdatePrimConc(int, const rttbl_struct *, const ctrl_struct *, subcatch_struct []);
+void            UpdatePrimConc(int, int, const rttbl_struct *, const ctrl_struct *, subcatch_struct []);
 
 #endif

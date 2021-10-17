@@ -11,20 +11,20 @@ void Reaction(int kstep, int nsub, double stepsize, const int steps[], const che
     double          substep;
     double          depth;
     double          porosity;
-    const int       NZONES = 3;   // 2021-05-14
+    const int       NZONES = 2;   // 2021-05-14
 
     for (ksub = 0; ksub < nsub; ksub++)
     {
         ftemp = SoilTempFactor(rttbl->q10, subcatch[ksub].tmp[kstep]);
 
-        for (kzone = SURFACE; kzone < SURFACE + NZONES; kzone++)   // 2021-05-14
+        for (kzone = UZ; kzone < UZ + NZONES; kzone++)   // 2021-05-14
         {
             switch (kzone)
             {
-                case SURFACE:   // 2021-05-14
-                    depth = subcatch[ksub].d_surface;
-                    porosity = subcatch[ksub].porosity_surface;
-                    break;
+                //case SURFACE:   // 2021-05-14
+                //    depth = subcatch[ksub].d_surface;
+                //    porosity = subcatch[ksub].porosity_surface;
+                //    break;
                 case UZ:
                     depth = subcatch[ksub].d_uz;
                     porosity = subcatch[ksub].porosity_uz;
@@ -42,8 +42,12 @@ void Reaction(int kstep, int nsub, double stepsize, const int steps[], const che
 
 
             satn = subcatch[ksub].ws[kstep][kzone] / (depth * porosity);  // add porosity for saturation calculation
+            
             satn = MIN(satn, 1.0);
-
+            
+            //biort_printf(VL_NORMAL, "%d %d %s zone reaction has saturation of %.1lf s.\n",
+            //              steps[kstep],kzone, satn);
+                          
             if (satn > 1.0E-2)
             {
                 substep = ReactControl(chemtbl, kintbl, rttbl, stepsize, porosity, depth, satn, ftemp,
@@ -508,7 +512,7 @@ double ReactControl(const chemtbl_struct chemtbl[], const kintbl_struct kintbl[]
 
     substep = stepsize;
 
-    while (1.0 - step_counter / stepsize > 1.0E-10 && substep > 30.0)
+    while (1.0 - step_counter / stepsize > 1.0E-10 && substep > 1.0E-30)
     {
         flag = SolveReact(substep, chemtbl, kintbl, rttbl, satn, ftemp, chms);
 

@@ -17,8 +17,8 @@ void ReadCini(const char dir[], int nsub, const chemtbl_struct *chemtbl, rttbl_s
     ReadConc(fp, rttbl->num_stc, chemtbl, &lno, subcatch[0].prcp_conc, dummy);
 
     // Read surface concentration  2021-05-07
-    FindLine(fp, "SURFACE", &lno, cmdstr);
-    ReadConc(fp, rttbl->num_stc, chemtbl, &lno, subcatch[0].chms[SURFACE].tot_conc, subcatch[0].chms[SURFACE].ssa);
+    //FindLine(fp, "SURFACE", &lno, cmdstr);
+    //ReadConc(fp, rttbl->num_stc, chemtbl, &lno, subcatch[0].chms[SURFACE].tot_conc, subcatch[0].chms[SURFACE].ssa);
 
     // Read upper zone concentration
     FindLine(fp, "UZ", &lno, cmdstr);

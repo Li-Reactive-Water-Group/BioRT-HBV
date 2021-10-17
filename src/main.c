@@ -92,7 +92,7 @@ int main(int argc, char *argv[])
 
             // Transport changes total concentrations. Primary concentrations needs to be updated using total
             // concentrations
-            UpdatePrimConc(nsub, &rttbl, &ctrl, subcatch);
+            UpdatePrimConc(kstep, nsub, &rttbl, &ctrl, subcatch);
 
             if (ctrl.transpt == KIN_REACTION)
             {
@@ -130,7 +130,7 @@ int main(int argc, char *argv[])
 
             // Transport changes total concentrations. Primary concentrations needs to be updated using total
             // concentrations
-            UpdatePrimConc(nsub, &rttbl, &ctrl, subcatch_numexp);
+            UpdatePrimConc(kstep, nsub, &rttbl, &ctrl, subcatch_numexp);
 
             if (ctrl.transpt == KIN_REACTION)
             {
