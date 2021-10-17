@@ -35,19 +35,22 @@ void CopyInitChemSubcatch(int nsub, rttbl_struct *rttbl, const subcatch_struct s
             subcatch_numexp[ksub].chms[SNOW].prim_conc[kspc] = subcatch[ksub].chms[SNOW].prim_conc[kspc];
             subcatch_numexp[ksub].chms[UZ].prim_conc[kspc] = subcatch[ksub].chms[UZ].prim_conc[kspc];
             subcatch_numexp[ksub].chms[LZ].prim_conc[kspc] = subcatch[ksub].chms[LZ].prim_conc[kspc];
+            subcatch_numexp[ksub].chms[STREAM].prim_conc[kspc] = subcatch[ksub].chms[STREAM].prim_conc[kspc];
 
             subcatch_numexp[ksub].chms[SNOW].prim_actv[kspc] = subcatch[ksub].chms[SNOW].prim_actv[kspc];
             subcatch_numexp[ksub].chms[UZ].prim_actv[kspc] = subcatch[ksub].chms[UZ].prim_actv[kspc];
             subcatch_numexp[ksub].chms[LZ].prim_actv[kspc] = subcatch[ksub].chms[LZ].prim_actv[kspc];
+            subcatch_numexp[ksub].chms[STREAM].prim_actv[kspc] = subcatch[ksub].chms[STREAM].prim_actv[kspc];
 
             subcatch_numexp[ksub].chms[SNOW].tot_conc[kspc] = subcatch[ksub].chms[SNOW].tot_conc[kspc];
             subcatch_numexp[ksub].chms[UZ].tot_conc[kspc] = subcatch[ksub].chms[UZ].tot_conc[kspc];
             subcatch_numexp[ksub].chms[LZ].tot_conc[kspc] = subcatch[ksub].chms[LZ].tot_conc[kspc];
+            subcatch_numexp[ksub].chms[STREAM].tot_conc[kspc] = subcatch[ksub].chms[STREAM].tot_conc[kspc];
 
             subcatch_numexp[ksub].chms[SNOW].tot_mol[kspc] = subcatch[ksub].chms[SNOW].tot_mol[kspc];
             subcatch_numexp[ksub].chms[UZ].tot_mol[kspc] = subcatch[ksub].chms[UZ].tot_mol[kspc];
             subcatch_numexp[ksub].chms[LZ].tot_mol[kspc] = subcatch[ksub].chms[LZ].tot_mol[kspc];
-
+            subcatch_numexp[ksub].chms[STREAM].tot_mol[kspc] = subcatch[ksub].chms[STREAM].tot_mol[kspc];
         }
 
         for (kspc = 0; kspc < rttbl->num_ssc; kspc++)
