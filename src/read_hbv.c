@@ -177,7 +177,7 @@ void ReadHbvResults(const char dir[], int nsub, int *nsteps, int *steps[], subca
                     for (kstep = 0; kstep < *nsteps; kstep++)
                     {
                         subcatch[ksub].ws[(i * *nsteps)+kstep][SNOW] = subcatch[ksub].ws[kstep][SNOW];
-                        subcatch[ksub].ws[(i * *nsteps)+kstep][SURFACE] = subcatch[ksub].ws[kstep][SURFACE];
+                        //subcatch[ksub].ws[(i * *nsteps)+kstep][SURFACE] = subcatch[ksub].ws[kstep][SURFACE];
                         subcatch[ksub].ws[(i * *nsteps)+kstep][UZ] = subcatch[ksub].ws[kstep][UZ];
                         subcatch[ksub].ws[(i * *nsteps)+kstep][LZ] = subcatch[ksub].ws[kstep][LZ];
                         subcatch[ksub].q[(i * *nsteps)+kstep][PRECIP] = subcatch[ksub].q[kstep][PRECIP];
