@@ -105,10 +105,10 @@ void ReadHbvResults(const char dir[], int nsub, int *nsteps, int *steps[], subca
             //
             subcatch[ksub].q[kstep][Prain] = (subcatch[ksub].tmp[kstep] < subcatch[ksub].tt) ?
                 0.0 : subcatch[ksub].q[kstep][PRECIP];
-            
+
             subcatch[ksub].q[kstep][Psnow] = (subcatch[ksub].tmp[kstep] < subcatch[ksub].tt) ?
                 subcatch[ksub].q[kstep][PRECIP] * subcatch[ksub].sfcf : 0.0;
-            
+
             subcatch[ksub].q[kstep][snowmelt] = (kstep == 0) ?
                 0.0 : MAX(0, subcatch[ksub].q[kstep][Psnow] + subcatch[ksub].ws[kstep - 1][SNOW] - subcatch[ksub].ws[kstep][SNOW]);
             //biort_printf(VL_NORMAL, "  snowmelt %.2f m3 m-3.\n", subcatch[ksub].q[kstep][snowmelt]);
@@ -145,7 +145,7 @@ void ReadHbvResults(const char dir[], int nsub, int *nsteps, int *steps[], subca
             subcatch[ksub].ws[kstep][UZ] += subcatch[ksub].res_uz;
             subcatch[ksub].ws[kstep][LZ] += subcatch[ksub].res_lz;
             subcatch[ksub].ws[kstep][UZ] += subcatch[ksub].ws[kstep][SM];
-            
+
         }
         for (kstep = 0; kstep < *nsteps; kstep++)
         {
@@ -155,11 +155,13 @@ void ReadHbvResults(const char dir[], int nsub, int *nsteps, int *steps[], subca
             //}
             if (subcatch[ksub].ws[kstep][UZ] > (subcatch[ksub].d_uz * subcatch[ksub].porosity_uz))
             {
-                biort_printf(VL_NORMAL, "\nWater storage in UZ exceeds maximum water storage capacity at line %d.\n", kstep);
+                biort_printf(VL_ERROR, "\nWater storage in UZ exceeds maximum water storage capacity at line %d.\n", kstep+1);
+                exit(EXIT_FAILURE);
             }
             if (subcatch[ksub].ws[kstep][LZ] > (subcatch[ksub].d_lz * subcatch[ksub].porosity_lz))
             {
-                biort_printf(VL_NORMAL, "\nWater storage in LZ exceeds maximum water storage capacity at line %d.\n", kstep);
+                biort_printf(VL_ERROR, "\nWater storage in LZ exceeds maximum water storage capacity at line %d.\n", kstep+1);
+                exit(EXIT_FAILURE);
             }
         }
 
