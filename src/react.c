@@ -11,6 +11,7 @@ void Reaction(int kstep, int nsub, double stepsize, const int steps[], const che
     double          substep;
     double          depth;
     double          porosity;
+    double          ws;
     const int       NZONES = 2;   // 2021-05-14
 
     for (ksub = 0; ksub < nsub; ksub++)
@@ -28,10 +29,12 @@ void Reaction(int kstep, int nsub, double stepsize, const int steps[], const che
                 case UZ:
                     depth = subcatch[ksub].d_uz;
                     porosity = subcatch[ksub].porosity_uz;
+                    ws = subcatch[ksub].ws[kstep][UZ];
                     break;
                 case LZ:
                     depth = subcatch[ksub].d_lz;
                     porosity = subcatch[ksub].porosity_lz;
+                    ws = subcatch[ksub].ws[kstep][LZ];
                     break;
             }
 
@@ -42,15 +45,15 @@ void Reaction(int kstep, int nsub, double stepsize, const int steps[], const che
 
 
             satn = subcatch[ksub].ws[kstep][kzone] / (depth * porosity);  // add porosity for saturation calculation
-            
+
             satn = MIN(satn, 1.0);
-            
+
             //biort_printf(VL_NORMAL, "%d %d %s zone reaction has saturation of %.1lf s.\n",
             //              steps[kstep],kzone, satn);
-                          
+
             if (satn > 1.0E-2)
             {
-                substep = ReactControl(chemtbl, kintbl, rttbl, stepsize, porosity, depth, satn, ftemp,
+                substep = ReactControl(chemtbl, kintbl, rttbl, stepsize, porosity, depth, satn, ftemp, ws,
                     subcatch[ksub].react_rate[kzone], &subcatch[ksub].chms[kzone]);
 
                 if (substep < 0.0)
@@ -484,18 +487,18 @@ int SolveReact(double stepsize, const chemtbl_struct chemtbl[], const kintbl_str
 #endif
         }
     }
-    
+
     // fix bug, 2021-03-26
-    for (i = 0; i < rttbl->num_spc; i++)
-    {
-        chms->tot_mol[i] += (rate_spe[i] + rate_spet[i]) * stepsize * 0.5;
-    }
+    //for (i = 0; i < rttbl->num_spc; i++)
+    //{
+    //    chms->tot_mol[i] += (rate_spe[i] + rate_spet[i]) * stepsize * 0.5;
+    //}
 
     return 0;
 }
 
 double ReactControl(const chemtbl_struct chemtbl[], const kintbl_struct kintbl[], const rttbl_struct *rttbl,
-    double stepsize, double porosity, double depth, double satn, double ftemp, double react_rate[],
+    double stepsize, double porosity, double depth, double satn, double ftemp, double ws, double react_rate[],
     chmstate_struct *chms)
 {
     int             flag;
@@ -538,6 +541,11 @@ double ReactControl(const chemtbl_struct chemtbl[], const kintbl_struct kintbl[]
             // Calculate reaction rate
             react_rate[kspc] =
                 (chms->tot_conc[kspc + rttbl->num_stc - rttbl->num_min] - conc0[kspc]) * depth * porosity;
+        }
+
+        for (kspc = 0; kspc <rttbl->num_spc; kspc++)
+        {
+            chms->tot_mol[kspc] = chms->tot_conc[kspc] * ws; //update total moles of primary species based on total concentration as determined after completion of reaction
         }
 
         if (roundi(substep) != roundi(stepsize))
