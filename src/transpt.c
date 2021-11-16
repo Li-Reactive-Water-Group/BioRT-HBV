@@ -99,9 +99,12 @@ void Transpt(int step, int nsub, rttbl_struct *rttbl, const ctrl_struct *ctrl, s
             //    (subcatch[ksub].q[step][Q0] + subcatch[ksub].q[step][Q1] + subcatch[ksub].q[step][Q2] > 0.0) ?
             //    subcatch[ksub].chms[STREAM].tot_mol[kspc] /
             //    (subcatch[ksub].q[step][Q0] + subcatch[ksub].q[step][Q1] + subcatch[ksub].q[step][Q2]) : ZERO_CONC;
-            
-           
-            
+
+            subcatch[ksub].chms[STREAM].tot_conc[kspc] =
+                (subcatch[ksub].q[step][Q0] + subcatch[ksub].q[step][Q1] + subcatch[ksub].q[step][Q2] > 0.0) ?
+                (subcatch[ksub].chms[SURFACE].tot_conc[kspc] * subcatch[ksub].q[step][Q0] +  subcatch[ksub].chms[UZ].tot_conc[kspc] * subcatch[ksub].q[step][Q1] + subcatch[ksub].chms[LZ].tot_conc[kspc] * subcatch[ksub].q[step][Q2]) / (subcatch[ksub].q[step][Q0] + subcatch[ksub].q[step][Q1] + subcatch[ksub].q[step][Q2]) : ZERO_CONC;
+
+
         }
     }
 }
@@ -122,11 +125,7 @@ void UpdatePrimConc(int step, int nsub, const rttbl_struct *rttbl, const ctrl_st
                 subcatch[ksub].chms[UZ].prim_conc[kspc] = subcatch[ksub].chms[UZ].tot_conc[kspc];
                 subcatch[ksub].chms[LZ].prim_conc[kspc] = subcatch[ksub].chms[LZ].tot_conc[kspc];
             }
-            subcatch[ksub].chms[STREAM].tot_conc[kspc] =
-                (subcatch[ksub].q[step][Q0] + subcatch[ksub].q[step][Q1] + subcatch[ksub].q[step][Q2] > 0.0) ?
-                (subcatch[ksub].chms[SURFACE].prim_conc[kspc] * subcatch[ksub].q[step][Q0] +  subcatch[ksub].chms[UZ].prim_conc[kspc] * subcatch[ksub].q[step][Q1] + subcatch[ksub].chms[LZ].prim_conc[kspc] * subcatch[ksub].q[step][Q2]) / (subcatch[ksub].q[step][Q0] + subcatch[ksub].q[step][Q1] + subcatch[ksub].q[step][Q2]) : ZERO_CONC;
 
-            
             subcatch[ksub].chms[STREAM].prim_conc[kspc] = subcatch[ksub].chms[STREAM].tot_conc[kspc];
         }
     }
