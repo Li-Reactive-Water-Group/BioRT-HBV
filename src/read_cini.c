@@ -14,7 +14,7 @@ void ReadCini(const char dir[], int nsub, const chemtbl_struct *chemtbl, rttbl_s
 
     // Read precipitation concentration
     FindLine(fp, "PRECIPITATION", &lno, cmdstr);
-    ReadConc(fp, rttbl->num_stc, chemtbl, &lno, subcatch[0].prcp_conc, dummy);
+    ReadConc(fp, rttbl->num_stc, chemtbl, &lno, subcatch[0].prcp_conc, dummy, dummy, dummy, dummy);
 
     // Read surface concentration  2021-05-07
     //FindLine(fp, "SURFACE", &lno, cmdstr);
@@ -22,16 +22,16 @@ void ReadCini(const char dir[], int nsub, const chemtbl_struct *chemtbl, rttbl_s
 
     // Read upper zone concentration
     FindLine(fp, "UZ", &lno, cmdstr);
-    ReadConc(fp, rttbl->num_stc, chemtbl, &lno, subcatch[0].chms[UZ].tot_conc, subcatch[0].chms[UZ].ssa);
+    ReadConc(fp, rttbl->num_stc, chemtbl, &lno, subcatch[0].chms[UZ].tot_conc, subcatch[0].chms[UZ].ssa, subcatch[0].chms[UZ].q10, subcatch[0].chms[UZ].sw_thld, subcatch[0].chms[UZ].sw_exp);
 
     // Read lower zone concentration
     FindLine(fp, "LZ", &lno, cmdstr);
-    ReadConc(fp, rttbl->num_stc, chemtbl, &lno, subcatch[0].chms[LZ].tot_conc, subcatch[0].chms[LZ].ssa);
+    ReadConc(fp, rttbl->num_stc, chemtbl, &lno, subcatch[0].chms[LZ].tot_conc, subcatch[0].chms[LZ].ssa, subcatch[0].chms[LZ].q10, subcatch[0].chms[LZ].sw_thld, subcatch[0].chms[LZ].sw_exp);
 
     fclose(fp);
 }
 
-void ReadConc(FILE *fp, int num_stc, const chemtbl_struct chemtbl[], int *lno, double tot_conc[], double ssa[])
+void ReadConc(FILE *fp, int num_stc, const chemtbl_struct chemtbl[], int *lno, double tot_conc[], double ssa[], double q10[], double sw_thld[], double sw_exp[])
 {
     char            cmdstr[MAXSTRING];
     char            temp_str[MAXSTRING];
@@ -57,9 +57,10 @@ void ReadConc(FILE *fp, int num_stc, const chemtbl_struct chemtbl[], int *lno, d
 
         if (chemtbl[ind].itype == MINERAL)
         {
-            if (sscanf(cmdstr, "%*s %lf %*s %lf", &tot_conc[ind], &ssa[ind]) !=2)
+            if (sscanf(cmdstr, "%*s %lf %*s %lf %*s %lf %*s %lf %*s %lf ", &tot_conc[ind], &ssa[ind], &q10[ind], &sw_thld[ind], &sw_exp[ind]) !=5)
             {
                 biort_printf(VL_ERROR, "Error reading initial condition in %s at Line %d.\n", "cini.txt", *lno);
+                exit(EXIT_FAILURE);
             }
         }
         else

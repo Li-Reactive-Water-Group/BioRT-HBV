@@ -73,17 +73,17 @@ void ReadChem(const char dir[], ctrl_struct *ctrl, rttbl_struct *rttbl, chemtbl_
     ReadParam(cmdstr, "TEMPERATURE", 'd', fn, lno, &rttbl->tmp);
     biort_printf(VL_NORMAL, "  Temperature = %3.1f \n", rttbl->tmp);
 
-    NextLine(fp, cmdstr, &lno);
-    ReadParam(cmdstr, "SW_THRESHOLD", 'd', fn, lno, &rttbl->sw_thld);
-    biort_printf(VL_NORMAL, "  SW threshold = %.2f\n", rttbl->sw_thld);
+    //NextLine(fp, cmdstr, &lno);
+    //ReadParam(cmdstr, "SW_THRESHOLD", 'd', fn, lno, &rttbl->sw_thld);
+    //biort_printf(VL_NORMAL, "  SW threshold = %.2f\n", rttbl->sw_thld);
 
-    NextLine(fp, cmdstr, &lno);
-    ReadParam(cmdstr, "SW_EXP", 'd', fn, lno, &rttbl->sw_exp);
-    biort_printf(VL_NORMAL, "  SW exponent = %.2f\n", rttbl->sw_exp);
+    //NextLine(fp, cmdstr, &lno);
+    //ReadParam(cmdstr, "SW_EXP", 'd', fn, lno, &rttbl->sw_exp);
+    //biort_printf(VL_NORMAL, "  SW exponent = %.2f\n", rttbl->sw_exp);
 
-    NextLine(fp, cmdstr, &lno);
-    ReadParam(cmdstr, "Q10", 'd', fn, lno, &rttbl->q10);
-    biort_printf(VL_NORMAL, "  Q10 factor = %.2f\n", rttbl->q10);
+    //NextLine(fp, cmdstr, &lno);
+    //ReadParam(cmdstr, "Q10", 'd', fn, lno, &rttbl->q10);
+    //biort_printf(VL_NORMAL, "  Q10 factor = %.2f\n", rttbl->q10);
 
     // Count numbers of species and reactions
     FindLine(fp, "PRIMARY_SPECIES", &lno, fn);

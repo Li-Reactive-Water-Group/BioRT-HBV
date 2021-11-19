@@ -7,7 +7,7 @@ void Reaction(int kstep, int nsub, double stepsize, const int steps[], const che
     int             kzone;
     int             kspc;
     double          satn;
-    double          ftemp;
+    double          temp;
     double          substep;
     double          depth;
     double          porosity;
@@ -16,7 +16,8 @@ void Reaction(int kstep, int nsub, double stepsize, const int steps[], const che
 
     for (ksub = 0; ksub < nsub; ksub++)
     {
-        ftemp = SoilTempFactor(rttbl->q10, subcatch[ksub].tmp[kstep]);
+        //ftemp = SoilTempFactor(rttbl->q10, subcatch[ksub].tmp[kstep]);
+        temp = subcatch[ksub].tmp[kstep];
 
         for (kzone = UZ; kzone < UZ + NZONES; kzone++)   // 2021-05-14
         {
@@ -45,15 +46,15 @@ void Reaction(int kstep, int nsub, double stepsize, const int steps[], const che
 
 
             satn = subcatch[ksub].ws[kstep][kzone] / (depth * porosity);  // add porosity for saturation calculation
-
+            
             satn = MIN(satn, 1.0);
-
+            
             //biort_printf(VL_NORMAL, "%d %d %s zone reaction has saturation of %.1lf s.\n",
             //              steps[kstep],kzone, satn);
-
+                          
             if (satn > 1.0E-2)
             {
-                substep = ReactControl(chemtbl, kintbl, rttbl, stepsize, porosity, depth, satn, ftemp, ws,
+                substep = ReactControl(chemtbl, kintbl, rttbl, stepsize, porosity, depth, satn, temp, ws,
                     subcatch[ksub].react_rate[kzone], &subcatch[ksub].chms[kzone]);
 
                 if (substep < 0.0)
@@ -84,7 +85,7 @@ void Reaction(int kstep, int nsub, double stepsize, const int steps[], const che
 }
 
 int SolveReact(double stepsize, const chemtbl_struct chemtbl[], const kintbl_struct kintbl[], const rttbl_struct *rttbl,
-    double satn, double ftemp, chmstate_struct *chms)
+    double satn, double temp, double ws, chmstate_struct *chms)
 {
     int             i, j, k;
     int             kmonod, kinhib;
@@ -97,6 +98,7 @@ int SolveReact(double stepsize, const chemtbl_struct chemtbl[], const kintbl_str
     double          tmpconc[MAXSPS];
     double          tot_conc[MAXSPS];
     double          area[MAXSPS];
+    double          ftemp[MAXSPS];
     double          gamma[MAXSPS];
     double          rate_pre[MAXSPS];
     double          iap[MAXSPS];
@@ -129,17 +131,17 @@ int SolveReact(double stepsize, const chemtbl_struct chemtbl[], const kintbl_str
         area[i] = chms->ssa[i + rttbl->num_stc - rttbl->num_min] *
             chms->prim_conc[i + rttbl->num_stc - rttbl->num_min] *
             chemtbl[i + rttbl->num_stc - rttbl->num_min].molar_mass;
+        ftemp[i] = SoilTempFactor(chms->q10[i + rttbl->num_stc - rttbl->num_min], temp);
     }
 
     if (SUFEFF)
     {
         if (satn < 1.0)
         {
-            surf_ratio = (satn <= rttbl->sw_thld) ?
-                pow(satn / rttbl->sw_thld, rttbl->sw_exp) : pow((1.0 - satn) / (1.0 - rttbl->sw_thld), rttbl->sw_exp);
-
             for (i = 0; i < rttbl->num_min; i++)
             {
+                surf_ratio = (satn <= chms->sw_thld[i + rttbl->num_stc - rttbl->num_min]) ?
+                    pow(satn / chms->sw_thld[i + rttbl->num_stc - rttbl->num_min], chms->sw_exp[i + rttbl->num_stc - rttbl->num_min]) : pow((1.0 - satn) / (1.0 - chms->sw_thld[i + rttbl->num_stc - rttbl->num_min]), chms->sw_exp[i + rttbl->num_stc - rttbl->num_min]);
                 area[i] *= surf_ratio;
             }
         }
@@ -197,7 +199,7 @@ int SolveReact(double stepsize, const chemtbl_struct chemtbl[], const kintbl_str
             }
 
             // Based on CrunchTope
-            rate_pre[i] = area[min_pos] * pow(10, kintbl[i].rate) * monodterm * inhibterm * ftemp;
+            rate_pre[i] = area[min_pos] * pow(10, kintbl[i].rate) * monodterm * inhibterm * ftemp[min_pos];
         }
 
         for (j = 0; j < rttbl->num_stc; j++)
@@ -345,7 +347,7 @@ int SolveReact(double stepsize, const chemtbl_struct chemtbl[], const kintbl_str
                 }
 
                 // Based on CrunchTope
-                rate_pre[i] = area[min_pos] * pow(10, kintbl[i].rate) * monodterm * inhibterm * ftemp;
+                rate_pre[i] = area[min_pos] * pow(10, kintbl[i].rate) * monodterm * inhibterm * ftemp[min_pos];
             }
 
             for (j = 0; j < rttbl->num_stc; j++)
@@ -487,18 +489,12 @@ int SolveReact(double stepsize, const chemtbl_struct chemtbl[], const kintbl_str
 #endif
         }
     }
-
-    // fix bug, 2021-03-26
-    //for (i = 0; i < rttbl->num_spc; i++)
-    //{
-    //    chms->tot_mol[i] += (rate_spe[i] + rate_spet[i]) * stepsize * 0.5;
-    //}
-
+    
     return 0;
 }
 
 double ReactControl(const chemtbl_struct chemtbl[], const kintbl_struct kintbl[], const rttbl_struct *rttbl,
-    double stepsize, double porosity, double depth, double satn, double ftemp, double ws, double react_rate[],
+    double stepsize, double porosity, double depth, double satn, double temp, double ws, double react_rate[],
     chmstate_struct *chms)
 {
     int             flag;
@@ -517,7 +513,7 @@ double ReactControl(const chemtbl_struct chemtbl[], const kintbl_struct kintbl[]
 
     while (1.0 - step_counter / stepsize > 1.0E-10 && substep > 1.0E-30)
     {
-        flag = SolveReact(substep, chemtbl, kintbl, rttbl, satn, ftemp, chms);
+        flag = SolveReact(substep, chemtbl, kintbl, rttbl, satn, temp, ws, chms);
 
         if (flag == 0)
         {
@@ -542,12 +538,11 @@ double ReactControl(const chemtbl_struct chemtbl[], const kintbl_struct kintbl[]
             react_rate[kspc] =
                 (chms->tot_conc[kspc + rttbl->num_stc - rttbl->num_min] - conc0[kspc]) * depth * porosity;
         }
-
+        
         for (kspc = 0; kspc <rttbl->num_spc; kspc++)
         {
-            chms->tot_mol[kspc] = chms->tot_conc[kspc] * ws; //update total moles of primary species based on total concentration as determined after completion of reaction
+            chms->tot_mol[kspc] = chms->tot_conc[kspc] * ws;
         }
-
         if (roundi(substep) != roundi(stepsize))
         {
             return substep;
