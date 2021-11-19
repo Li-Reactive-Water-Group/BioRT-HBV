@@ -155,6 +155,9 @@ typedef struct chmstate_struct
     double          sec_conc[MAXSPS];       // secondary concentration (mol kgH2O-1)
     double          prim_actv[MAXSPS];      // activity of primary species
     double          ssa[MAXSPS];            // specific surface area (m2 g-1)
+    double          sw_thld[MAXSPS];        // threshold in soil moisture function (-)
+    double          sw_exp[MAXSPS];         // exponent in soil moisture function (-)
+    double          q10[MAXSPS];            // Q10 factor (-)
     double          tot_mol[MAXSPS];        // total moles (mol m-2)
 } chmstate_struct;
 
@@ -227,7 +230,7 @@ void            ReadAdsorption(const char [], int, int, chemtbl_struct [], rttbl
 void            ReadCationEchg(const char [], double, chemtbl_struct [], rttbl_struct *);
 void            ReadChem(const char [], ctrl_struct *, rttbl_struct *, chemtbl_struct [], kintbl_struct []);
 void            ReadCini(const char [], int, const chemtbl_struct *, rttbl_struct *, subcatch_struct []);
-void            ReadConc(FILE *, int, const chemtbl_struct [], int *, double [], double []);
+void            ReadConc(FILE *, int, const chemtbl_struct [], int *, double [], double [], double [], double [], double[]);
 void            ReadDHParam(const char [], int, double *);
 void            ReadHbvParam(const char [], int, subcatch_struct []);
 void            ReadHbvResults(const char [], int, int *, int **, subcatch_struct [], int);
@@ -245,7 +248,7 @@ int             roundi(double);
 //    subcatch_struct [], FILE *);//2021-09-09
 double          SoilTempFactor(double, double);
 int             SolveReact(double, const chemtbl_struct [], const kintbl_struct [], const rttbl_struct *, double,
-    double, chmstate_struct *);
+    double, double, chmstate_struct *);
 int             SolveSpeciation(const chemtbl_struct [], const ctrl_struct *, const rttbl_struct *, int, chmstate_struct *);
 void            SortChem(char [MAXSPS][MAXSTRING], const int [], int, chemtbl_struct []);
 void            Speciation(int, const chemtbl_struct [], const ctrl_struct *, const rttbl_struct *, subcatch_struct []);
