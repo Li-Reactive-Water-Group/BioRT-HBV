@@ -46,12 +46,12 @@ void Reaction(int kstep, int nsub, double stepsize, const int steps[], const che
 
 
             satn = subcatch[ksub].ws[kstep][kzone] / (depth * porosity);  // add porosity for saturation calculation
-            
+
             satn = MIN(satn, 1.0);
-            
+
             //biort_printf(VL_NORMAL, "%d %d %s zone reaction has saturation of %.1lf s.\n",
             //              steps[kstep],kzone, satn);
-                          
+
             if (satn > 1.0E-2)
             {
                 substep = ReactControl(chemtbl, kintbl, rttbl, stepsize, porosity, depth, satn, temp, ws,
@@ -489,7 +489,7 @@ int SolveReact(double stepsize, const chemtbl_struct chemtbl[], const kintbl_str
 #endif
         }
     }
-    
+
     return 0;
 }
 
@@ -534,11 +534,12 @@ double ReactControl(const chemtbl_struct chemtbl[], const kintbl_struct kintbl[]
     {
         for (kspc = 0; kspc < rttbl->num_min; kspc++)
         {
-            // Calculate reaction rate
+            // Calculate reaction rate (mole/m2-pm/day) = mol/L-pm/day * mm of depth   * (1m/1000mm) * (1000L/1m3)
             react_rate[kspc] =
-                (chms->tot_conc[kspc + rttbl->num_stc - rttbl->num_min] - conc0[kspc]) * depth * porosity;
+                (chms->tot_conc[kspc + rttbl->num_stc - rttbl->num_min] - conc0[kspc]) * depth;
+
         }
-        
+
         for (kspc = 0; kspc <rttbl->num_spc; kspc++)
         {
             chms->tot_mol[kspc] = chms->tot_conc[kspc] * ws;
