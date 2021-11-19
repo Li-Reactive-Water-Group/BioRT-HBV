@@ -7,19 +7,19 @@ PRECIPITATION
 pH          4.30
 Cl-         1.00E-5
 DOC	        1.00E-7
-SOC         1.00E-10    -ssa    5.0
+SOC         1.00E-10    -ssa    5.0     -Q10    2   -SW_threshold   0.7     -SW_exp     1.5
 X-          1.00E-10
 
 UZ
 pH          4.56
 Cl-         3.69E-5
 DOC         2.0E-5
-SOC         0.02        -ssa    5.0
+SOC         0.02        -ssa    5.0     -Q10    2   -SW_threshold   0.7     -SW_exp     1.5
 X-          5.2E-5
 
 LZ
 pH          4.56
 Cl-         3.69E-5
 DOC         2.0E-5
-SOC         0.002       -ssa    5.0
+SOC         0.002       -ssa    5.0     -Q10    2   -SW_threshold   0.7     -SW_exp     1.5
 X-          5.2E-5
