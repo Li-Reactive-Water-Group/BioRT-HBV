@@ -156,10 +156,12 @@ void ReadHbvResults(const char dir[], int nsub, int *nsteps, int *steps[], subca
             if (subcatch[ksub].ws[kstep][UZ] > (subcatch[ksub].d_uz * subcatch[ksub].porosity_uz))
             {
                 biort_printf(VL_NORMAL, "\nWater storage in UZ exceeds maximum water storage capacity at line %d.\n", kstep);
+                exit(EXIT_FAILURE);
             }
             if (subcatch[ksub].ws[kstep][LZ] > (subcatch[ksub].d_lz * subcatch[ksub].porosity_lz))
             {
                 biort_printf(VL_NORMAL, "\nWater storage in LZ exceeds maximum water storage capacity at line %d.\n", kstep);
+                exit(EXIT_FAILURE);
             }
         }
 
