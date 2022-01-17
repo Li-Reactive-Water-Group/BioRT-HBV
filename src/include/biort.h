@@ -223,7 +223,7 @@ void            ParseLine(const char [], char [], double *);
 void            PrintDailyResults(FILE *, int, int, int, const rttbl_struct *, const subcatch_struct []);
 void            PrintHeader(FILE *, int, const rttbl_struct *, const chemtbl_struct chemtbl[]);
 double          ReactControl(const chemtbl_struct [], const kintbl_struct [], const rttbl_struct *, double, double,
-    double, double, double, double, double [], chmstate_struct *);
+    double, double, double, double [], chmstate_struct *);
 void            Reaction(int, int, double, const int [], const chemtbl_struct [], const kintbl_struct [],
     const rttbl_struct *, subcatch_struct []);
 void            ReadAdsorption(const char [], int, int, chemtbl_struct [], rttbl_struct *);

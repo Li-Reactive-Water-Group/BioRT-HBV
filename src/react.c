@@ -54,7 +54,7 @@ void Reaction(int kstep, int nsub, double stepsize, const int steps[], const che
 
             if (satn > 1.0E-2)
             {
-                substep = ReactControl(chemtbl, kintbl, rttbl, stepsize, porosity, depth, satn, temp, porosity,
+                substep = ReactControl(chemtbl, kintbl, rttbl, stepsize, porosity, depth, satn, temp,
                     subcatch[ksub].react_rate[kzone], &subcatch[ksub].chms[kzone]);
 
                 if (substep < 0.0)
@@ -497,7 +497,7 @@ int SolveReact(double stepsize, const chemtbl_struct chemtbl[], const kintbl_str
 }
 
 double ReactControl(const chemtbl_struct chemtbl[], const kintbl_struct kintbl[], const rttbl_struct *rttbl,
-    double stepsize, double porosity, double depth, double satn, double temp, double porosity, double react_rate[],
+    double stepsize, double porosity, double depth, double satn, double temp, double react_rate[],
     chmstate_struct *chms)
 {
     int             flag;
