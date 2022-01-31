@@ -11,7 +11,7 @@ void Reaction(int kstep, int nsub, double stepsize, const int steps[], const che
     double          substep;
     double          depth;
     double          porosity;
-    //double          ws;
+    double          ws;
     const int       NZONES = 2;   // 2021-05-14
 
     for (ksub = 0; ksub < nsub; ksub++)
@@ -30,12 +30,12 @@ void Reaction(int kstep, int nsub, double stepsize, const int steps[], const che
                 case UZ:
                     depth = subcatch[ksub].d_uz;
                     porosity = subcatch[ksub].porosity_uz;
-                    //ws = subcatch[ksub].ws[kstep][UZ];
+                    ws = subcatch[ksub].ws[kstep][UZ];
                     break;
                 case LZ:
                     depth = subcatch[ksub].d_lz;
                     porosity = subcatch[ksub].porosity_lz;
-                    //ws = subcatch[ksub].ws[kstep][LZ];
+                    ws = subcatch[ksub].ws[kstep][LZ];
                     break;
             }
 
@@ -54,7 +54,7 @@ void Reaction(int kstep, int nsub, double stepsize, const int steps[], const che
 
             if (satn > 1.0E-2)
             {
-                substep = ReactControl(chemtbl, kintbl, rttbl, stepsize, porosity, depth, satn, temp,
+                substep = ReactControl(chemtbl, kintbl, rttbl, stepsize, porosity, depth, satn, temp, ws,
                     subcatch[ksub].react_rate[kzone], &subcatch[ksub].chms[kzone]);
 
                 if (substep < 0.0)
@@ -85,7 +85,7 @@ void Reaction(int kstep, int nsub, double stepsize, const int steps[], const che
 }
 
 int SolveReact(double stepsize, const chemtbl_struct chemtbl[], const kintbl_struct kintbl[], const rttbl_struct *rttbl,
-    double satn, double temp, double porosity, chmstate_struct *chms)
+    double satn, double temp, double ws, chmstate_struct *chms)
 {
     int             i, j, k;
     int             kmonod, kinhib;
@@ -99,7 +99,6 @@ int SolveReact(double stepsize, const chemtbl_struct chemtbl[], const kintbl_str
     double          tot_conc[MAXSPS];
     double          area[MAXSPS];
     double          ftemp[MAXSPS];
-    double          fsw[MAXSPS];
     double          gamma[MAXSPS];
     double          rate_pre[MAXSPS];
     double          iap[MAXSPS];
@@ -115,6 +114,7 @@ int SolveReact(double stepsize, const chemtbl_struct chemtbl[], const kintbl_str
     double          bdh;
     double          bdt;
     double          max_error;
+    double          surf_ratio;
     double          tot_cec;
     realtype      **jcb;
     sunindextype    p[MAXSPS];
@@ -123,12 +123,11 @@ int SolveReact(double stepsize, const chemtbl_struct chemtbl[], const kintbl_str
     const double    TMPPRB = 1.0E-2;
     const double    TMPPRB_INV = 1.0 / TMPPRB;
 
-    inv_sat = 1.0 / satn;//inv_sat(L of porous space/L of water)= 1/sat(L of water/L of porous space)
+    inv_sat = 1.0 / satn;
 
 
     for (i = 0; i < rttbl->num_min; i++)
     {
-        //area(m2/L of porous media) = ssa(m2/g of min) * mineral_conc(mol of min/L of porous media) * molar_mass(g of min/mol of min)
         area[i] = chms->ssa[i + rttbl->num_stc - rttbl->num_min] *
             chms->prim_conc[i + rttbl->num_stc - rttbl->num_min] *
             chemtbl[i + rttbl->num_stc - rttbl->num_min].molar_mass;
@@ -141,9 +140,9 @@ int SolveReact(double stepsize, const chemtbl_struct chemtbl[], const kintbl_str
         {
             for (i = 0; i < rttbl->num_min; i++)
             {
-                fsw[i] = (satn <= chms->sw_thld[i + rttbl->num_stc - rttbl->num_min]) ?
+                surf_ratio = (satn <= chms->sw_thld[i + rttbl->num_stc - rttbl->num_min]) ?
                     pow(satn / chms->sw_thld[i + rttbl->num_stc - rttbl->num_min], chms->sw_exp[i + rttbl->num_stc - rttbl->num_min]) : pow((1.0 - satn) / (1.0 - chms->sw_thld[i + rttbl->num_stc - rttbl->num_min]), chms->sw_exp[i + rttbl->num_stc - rttbl->num_min]);
-                //area[i] *= surf_ratio;
+                area[i] *= surf_ratio;
             }
         }
     }   // Lichtner's 2 third law if SUF_EFF is turned on
@@ -175,11 +174,11 @@ int SolveReact(double stepsize, const chemtbl_struct chemtbl[], const kintbl_str
             }
 
             // Calculate the predicted rate depending on the type of rate law
-            //   rate_pre: rate per reaction (mol L-1 porous media s-1)
-            //   area: m2 of min/ L of porous media
-            //   rate: mol/m2 of min/s
+            //   rate_pre: rate per reaction (mol L-1 water s-1)
+            //   area: m2 L-1 water
+            //   rate: mol m-2 s-1
             //   dependency: dimensionless
-            rate_pre[i] = area[min_pos] * pow(10, kintbl[i].rate) * dependency[i] * (1.0 - iap[i] / temp_keq) * fsw[min_pos];
+            rate_pre[i] = area[min_pos] * pow(10, kintbl[i].rate) * dependency[i] * (1.0 - iap[i] / temp_keq);
         }
         else if (kintbl[i].type == MONOD)
         {
@@ -200,7 +199,7 @@ int SolveReact(double stepsize, const chemtbl_struct chemtbl[], const kintbl_str
             }
 
             // Based on CrunchTope
-            rate_pre[i] = area[min_pos] * pow(10, kintbl[i].rate) * monodterm * inhibterm * ftemp[min_pos]* fsw[min_pos];
+            rate_pre[i] = area[min_pos] * pow(10, kintbl[i].rate) * monodterm * inhibterm * ftemp[min_pos];
         }
 
         for (j = 0; j < rttbl->num_stc; j++)
@@ -223,8 +222,7 @@ int SolveReact(double stepsize, const chemtbl_struct chemtbl[], const kintbl_str
     for (i = 0; i < rttbl->num_spc; i++)
     {
         // Aqueous species, saturation term for aqueous volume
-        // rate(mol/m2 water/s)= rate(mol/m2 pm/s)*inv_sat(L of porous space/L of water)/porosity(L of porous space/L of pm)
-        rate_spe[i] *= (chemtbl[i].itype == AQUEOUS) ? (inv_sat/porosity) : 1.0;
+        rate_spe[i] *= (chemtbl[i].itype == AQUEOUS) ? inv_sat : 1.0;
     }
 
     jcb = newDenseMat(rttbl->num_stc - rttbl->num_min, rttbl->num_stc - rttbl->num_min);
@@ -327,7 +325,7 @@ int SolveReact(double stepsize, const chemtbl_struct chemtbl[], const kintbl_str
                 // area: m2/L water
                 // rate: mol/m2/s
                 // dependency: dimensionless
-                rate_pre[i] = area[min_pos] * pow(10, kintbl[i].rate) * dependency[i] * (1.0 - (iap[i] / temp_keq)) * fsw[min_pos];
+                rate_pre[i] = area[min_pos] * pow(10, kintbl[i].rate) * dependency[i] * (1.0 - (iap[i] / temp_keq));
             }
             else if (kintbl[i].type == MONOD)
             {
@@ -349,7 +347,7 @@ int SolveReact(double stepsize, const chemtbl_struct chemtbl[], const kintbl_str
                 }
 
                 // Based on CrunchTope
-                rate_pre[i] = area[min_pos] * pow(10, kintbl[i].rate) * monodterm * inhibterm * ftemp[min_pos] * fsw[min_pos];
+                rate_pre[i] = area[min_pos] * pow(10, kintbl[i].rate) * monodterm * inhibterm * ftemp[min_pos];
             }
 
             for (j = 0; j < rttbl->num_stc; j++)
@@ -363,8 +361,7 @@ int SolveReact(double stepsize, const chemtbl_struct chemtbl[], const kintbl_str
 
         for (i = 0; i < rttbl->num_spc; i++)
         {
-            // rate(mol/m2 water/s)= rate(mol/m2 pm/s)*inv_sat(L of porous space/L of water)/porosity(L of porous space/L of pm)
-            rate_spet[i] *= (chemtbl[i].itype == AQUEOUS) ? (inv_sat/porosity) : 1.0;
+            rate_spet[i] *= (chemtbl[i].itype == AQUEOUS) ? inv_sat : 1.0;
         }
 
         for (i = 0; i < rttbl->num_stc - rttbl->num_min; i++)
@@ -497,7 +494,7 @@ int SolveReact(double stepsize, const chemtbl_struct chemtbl[], const kintbl_str
 }
 
 double ReactControl(const chemtbl_struct chemtbl[], const kintbl_struct kintbl[], const rttbl_struct *rttbl,
-    double stepsize, double porosity, double depth, double satn, double temp, double react_rate[],
+    double stepsize, double porosity, double depth, double satn, double temp, double ws, double react_rate[],
     chmstate_struct *chms)
 {
     int             flag;
@@ -516,7 +513,7 @@ double ReactControl(const chemtbl_struct chemtbl[], const kintbl_struct kintbl[]
 
     while (1.0 - step_counter / stepsize > 1.0E-10 && substep > 1.0E-30)
     {
-        flag = SolveReact(substep, chemtbl, kintbl, rttbl, satn, temp, porosity, chms);
+        flag = SolveReact(substep, chemtbl, kintbl, rttbl, satn, temp, ws, chms);
 
         if (flag == 0)
         {
@@ -545,7 +542,7 @@ double ReactControl(const chemtbl_struct chemtbl[], const kintbl_struct kintbl[]
 
         for (kspc = 0; kspc <rttbl->num_spc; kspc++)
         {
-            chms->tot_mol[kspc] = chms->tot_conc[kspc] * porosity * satn * depth; // tot_mol (moles-mm of water/L water ) =tot_conc (mol/L water) * satn * porosity * depth
+            chms->tot_mol[kspc] = chms->tot_conc[kspc] * ws;
         }
         if (roundi(substep) != roundi(stepsize))
         {
