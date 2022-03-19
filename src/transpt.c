@@ -7,10 +7,11 @@
 //   C * V - C_0 * V_0 = C_in * Q_in - C * Q_out + F.
 // Thus,
 //   C = (C_in * Qin + F + C0 * V0) / (V + Q_out).
-void Transpt(int step, int nsub, rttbl_struct *rttbl, const ctrl_struct *ctrl, subcatch_struct subcatch[])
+void Transpt(int step, int nsub, const chemtbl_struct *chemtbl, rttbl_struct *rttbl, const ctrl_struct *ctrl, subcatch_struct subcatch[])
 {
     int             ksub;
     int             kspc;
+    int             kssc;
     double          conc_temp;
 
     for (ksub = 0; ksub < nsub; ksub++)
@@ -64,7 +65,22 @@ void Transpt(int step, int nsub, rttbl_struct *rttbl, const ctrl_struct *ctrl, s
             // Q0
             subcatch[ksub].chms[UZ].tot_mol[kspc] -= conc_temp * subcatch[ksub].q[step][Q0];
             subcatch[ksub].chms[STREAM].tot_mol[kspc] = conc_temp * subcatch[ksub].q[step][Q0];
-
+            
+            if (chemtbl[kspc].mtype == MIXED_MA)
+            {
+                for (kssc = 0; kssc < rttbl->num_ssc; kssc++)
+                {
+                    if ((rttbl->conc_contrib[kspc][rttbl->num_stc+kssc] != 0) && 
+                        (chemtbl[rttbl->num_stc+kssc].itype != AQUEOUS))
+                        {
+                            subcatch[ksub].chms[UZ].tot_mol[kspc] += subcatch[ksub].chms[UZ].sec_conc[kssc] * subcatch[ksub].q[step][Q0] * rttbl->conc_contrib[kspc][rttbl->num_stc+kssc];
+                            subcatch[ksub].chms[STREAM].tot_mol[kspc] -= subcatch[ksub].chms[UZ].sec_conc[kssc] * subcatch[ksub].q[step][Q0] * rttbl->conc_contrib[kspc][rttbl->num_stc+kssc];
+                            //biort_printf(VL_NORMAL, "Working\n");
+                        }
+                    
+                }   
+            }
+            
             // Temperary concentration in UZ
             conc_temp = subcatch[ksub].chms[UZ].tot_mol[kspc] /
                 (subcatch[ksub].ws[step][UZ] + subcatch[ksub].q[step][Q1] + subcatch[ksub].q[step][PERC]);
@@ -72,11 +88,27 @@ void Transpt(int step, int nsub, rttbl_struct *rttbl, const ctrl_struct *ctrl, s
             // Q1
             subcatch[ksub].chms[UZ].tot_mol[kspc] -= conc_temp * subcatch[ksub].q[step][Q1];
             subcatch[ksub].chms[STREAM].tot_mol[kspc] += conc_temp * subcatch[ksub].q[step][Q1];
-
+            
             // Percolation
             subcatch[ksub].chms[UZ].tot_mol[kspc] -= conc_temp * subcatch[ksub].q[step][PERC];
             subcatch[ksub].chms[LZ].tot_mol[kspc] += conc_temp * subcatch[ksub].q[step][PERC];
-
+            
+            if (chemtbl[kspc].mtype == MIXED_MA)
+            {
+                for (kssc = 0; kssc < rttbl->num_ssc; kssc++)
+                {
+                    if ((rttbl->conc_contrib[kspc][rttbl->num_stc+kssc] != 0) && 
+                        (chemtbl[rttbl->num_stc+kssc].itype != AQUEOUS))
+                        {
+                            subcatch[ksub].chms[UZ].tot_mol[kspc] += subcatch[ksub].chms[UZ].sec_conc[kssc] * subcatch[ksub].q[step][Q1] * rttbl->conc_contrib[kspc][rttbl->num_stc+kssc];
+                            subcatch[ksub].chms[STREAM].tot_mol[kspc] -= subcatch[ksub].chms[UZ].sec_conc[kssc] * subcatch[ksub].q[step][Q1] * rttbl->conc_contrib[kspc][rttbl->num_stc+kssc];
+                            subcatch[ksub].chms[UZ].tot_mol[kspc] += subcatch[ksub].chms[UZ].sec_conc[kssc] * subcatch[ksub].q[step][PERC] * rttbl->conc_contrib[kspc][rttbl->num_stc+kssc];
+                            subcatch[ksub].chms[LZ].tot_mol[kspc] -= subcatch[ksub].chms[UZ].sec_conc[kssc] * subcatch[ksub].q[step][PERC] * rttbl->conc_contrib[kspc][rttbl->num_stc+kssc];
+                            //biort_printf(VL_NORMAL, "Working\n");
+                        }
+                    
+                }   
+            }
             // Temperary concentration in LZ
             conc_temp = subcatch[ksub].chms[LZ].tot_mol[kspc] /
                 (subcatch[ksub].ws[step][LZ] + subcatch[ksub].q[step][Q2]);
@@ -84,7 +116,20 @@ void Transpt(int step, int nsub, rttbl_struct *rttbl, const ctrl_struct *ctrl, s
             // Q2
             subcatch[ksub].chms[LZ].tot_mol[kspc] -= conc_temp * subcatch[ksub].q[step][Q2];
             subcatch[ksub].chms[STREAM].tot_mol[kspc] += conc_temp * subcatch[ksub].q[step][Q2];
-
+            
+            if (chemtbl[kspc].mtype == MIXED_MA)
+            {
+                for (kssc = 0; kssc < rttbl->num_ssc; kssc++)
+                {
+                    if ((rttbl->conc_contrib[kspc][rttbl->num_stc+kssc] != 0) && 
+                        (chemtbl[rttbl->num_stc+kssc].itype != AQUEOUS))
+                        {
+                            subcatch[ksub].chms[LZ].tot_mol[kspc] += subcatch[ksub].chms[LZ].sec_conc[kssc] * subcatch[ksub].q[step][Q2] * rttbl->conc_contrib[kspc][rttbl->num_stc+kssc];
+                            subcatch[ksub].chms[STREAM].tot_mol[kspc] -= subcatch[ksub].chms[LZ].sec_conc[kssc] * subcatch[ksub].q[step][Q2] * rttbl->conc_contrib[kspc][rttbl->num_stc+kssc];
+                        }
+                    
+                }   
+            }
             // UPDATE CONCENTRATIONS
             subcatch[ksub].chms[SNOW].tot_conc[kspc] =
                 (subcatch[ksub].ws[step][SNOW] == 0) ? ZERO_CONC : subcatch[ksub].chms[SNOW].tot_mol[kspc] / subcatch[ksub].ws[step][SNOW];

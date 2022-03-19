@@ -88,7 +88,7 @@ int main(int argc, char *argv[])
         for (kstep = 0; kstep < nsteps; kstep++)
         {
             // Transport and routing
-            Transpt(kstep, nsub, &rttbl, &ctrl, subcatch); // 2021-05-20
+            Transpt(kstep, nsub, chemtbl, &rttbl, &ctrl, subcatch); // 2021-05-20
 
             // Transport changes total concentrations. Primary concentrations needs to be updated using total
             // concentrations
@@ -126,7 +126,7 @@ int main(int argc, char *argv[])
         for (kstep = 0; kstep < nsteps_numexp; kstep++){
 
 
-            Transpt(kstep, nsub, &rttbl, &ctrl, subcatch_numexp); // 2021-05-20
+            Transpt(kstep, nsub, chemtbl, &rttbl, &ctrl, subcatch_numexp); // 2021-05-20
 
             // Transport changes total concentrations. Primary concentrations needs to be updated using total
             // concentrations

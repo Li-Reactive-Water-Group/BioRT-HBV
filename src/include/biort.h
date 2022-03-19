@@ -255,7 +255,7 @@ void            Speciation(int, const chemtbl_struct [], const ctrl_struct *, co
 int             SpeciesType(const char [], const char []);
 void            StreamSpeciation(int, int, const chemtbl_struct [], const ctrl_struct *, const rttbl_struct *,
     subcatch_struct []);
-void            Transpt(int, int, rttbl_struct *, const ctrl_struct *, subcatch_struct []);   // 2021-05-21
+void            Transpt(int, int, const chemtbl_struct [], rttbl_struct *, const ctrl_struct *, subcatch_struct []);   // 2021-05-21
 void            Wrap(char []);
 void            Unwrap(const char [], char []);
 void            UpdatePrimConc(int, int, const rttbl_struct *, const ctrl_struct *, subcatch_struct []);
