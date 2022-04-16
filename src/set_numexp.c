@@ -40,6 +40,9 @@ void CopyInitChemSubcatch(int nsub, rttbl_struct *rttbl, const subcatch_struct s
             
             subcatch_numexp[ksub].chms[UZ].sw_exp[kspc] = subcatch[ksub].chms[UZ].sw_exp[kspc];
             subcatch_numexp[ksub].chms[LZ].sw_exp[kspc] = subcatch[ksub].chms[LZ].sw_exp[kspc];
+            
+            subcatch_numexp[ksub].chms[UZ].n_alpha[kspc] = subcatch[ksub].chms[UZ].n_alpha[kspc];
+            subcatch_numexp[ksub].chms[LZ].n_alpha[kspc] = subcatch[ksub].chms[LZ].n_alpha[kspc];
 
             subcatch_numexp[ksub].chms[SNOW].prim_conc[kspc] = subcatch[ksub].chms[SNOW].prim_conc[kspc];
             subcatch_numexp[ksub].chms[UZ].prim_conc[kspc] = subcatch[ksub].chms[UZ].prim_conc[kspc];

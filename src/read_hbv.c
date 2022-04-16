@@ -137,6 +137,10 @@ void ReadHbvResults(const char dir[], int nsub, int *nsteps, int *steps[], subca
                 0.0 : MIN(subcatch[ksub].perc, subcatch[ksub].ws[kstep - 1][UZ] + subcatch[ksub].q[kstep][RECHG]);
 
         }
+        
+        //Change PERC value for 1st time step using water storage for last timestep
+        
+        subcatch[ksub].q[0][PERC] = MIN(subcatch[ksub].perc, subcatch[ksub].ws[kstep - 1][UZ] + subcatch[ksub].q[0][RECHG]);
 
         // Add 1. residual moisture to LZ & UZ and 2. SM to UZ
         for (kstep = 0; kstep < *nsteps; kstep++)

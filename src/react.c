@@ -11,7 +11,7 @@ void Reaction(int kstep, int nsub, double stepsize, const int steps[], const che
     double          substep;
     double          depth;
     double          porosity;
-    //double          ws;
+    double          Zw;
     const int       NZONES = 2;   // 2021-05-14
 
     for (ksub = 0; ksub < nsub; ksub++)
@@ -30,12 +30,12 @@ void Reaction(int kstep, int nsub, double stepsize, const int steps[], const che
                 case UZ:
                     depth = subcatch[ksub].d_uz;
                     porosity = subcatch[ksub].porosity_uz;
-                    //ws = subcatch[ksub].ws[kstep][UZ];
+                    Zw = depth - (subcatch[ksub].ws[kstep][UZ]/porosity);
                     break;
                 case LZ:
                     depth = subcatch[ksub].d_lz;
                     porosity = subcatch[ksub].porosity_lz;
-                    //ws = subcatch[ksub].ws[kstep][LZ];
+                    Zw = depth - (subcatch[ksub].ws[kstep][LZ]/porosity);
                     break;
             }
 
@@ -54,7 +54,7 @@ void Reaction(int kstep, int nsub, double stepsize, const int steps[], const che
 
             if (satn > 1.0E-2)
             {
-                substep = ReactControl(chemtbl, kintbl, rttbl, stepsize, porosity, depth, satn, temp,
+                substep = ReactControl(chemtbl, kintbl, rttbl, stepsize, porosity, depth, satn, temp, Zw,
                     subcatch[ksub].react_rate[kzone], &subcatch[ksub].chms[kzone]);
 
                 if (substep < 0.0)
@@ -85,7 +85,7 @@ void Reaction(int kstep, int nsub, double stepsize, const int steps[], const che
 }
 
 int SolveReact(double stepsize, const chemtbl_struct chemtbl[], const kintbl_struct kintbl[], const rttbl_struct *rttbl,
-    double satn, double temp, double porosity, chmstate_struct *chms)
+    double satn, double temp, double porosity, double Zw, chmstate_struct *chms)
 {
     int             i, j, k;
     int             kmonod, kinhib;
@@ -100,6 +100,7 @@ int SolveReact(double stepsize, const chemtbl_struct chemtbl[], const kintbl_str
     double          area[MAXSPS];
     double          ftemp[MAXSPS];
     double          fsw[MAXSPS];
+    double          fzw[MAXSPS];
     double          gamma[MAXSPS];
     double          rate_pre[MAXSPS];
     double          iap[MAXSPS];
@@ -133,6 +134,7 @@ int SolveReact(double stepsize, const chemtbl_struct chemtbl[], const kintbl_str
             chms->prim_conc[i + rttbl->num_stc - rttbl->num_min] *
             chemtbl[i + rttbl->num_stc - rttbl->num_min].molar_mass;
         ftemp[i] = SoilTempFactor(chms->q10[i + rttbl->num_stc - rttbl->num_min], temp);
+        fzw[i] = WTDepthFactor(Zw, chms->n_alpha[i + rttbl->num_stc - rttbl->num_min]); 
     }
 
     if (SUFEFF)
@@ -141,13 +143,11 @@ int SolveReact(double stepsize, const chemtbl_struct chemtbl[], const kintbl_str
         {
             for (i = 0; i < rttbl->num_min; i++)
             {
-                fsw[i] = (satn <= chms->sw_thld[i + rttbl->num_stc - rttbl->num_min]) ?
-                    pow(satn / chms->sw_thld[i + rttbl->num_stc - rttbl->num_min], chms->sw_exp[i + rttbl->num_stc - rttbl->num_min]) : pow((1.0 - satn) / (1.0 - chms->sw_thld[i + rttbl->num_stc - rttbl->num_min]), chms->sw_exp[i + rttbl->num_stc - rttbl->num_min]);
-                //area[i] *= surf_ratio;
+                fsw[i] = SoilMoistFactor(satn, chms->sw_thld[i + rttbl->num_stc - rttbl->num_min],chms->sw_exp[i + rttbl->num_stc - rttbl->num_min]); 
             }
         }
     }   // Lichtner's 2 third law if SUF_EFF is turned on
-
+    
     for (i = 0; i < rttbl->num_stc; i++)
     {
         rate_spe[i] = 0.0;
@@ -200,7 +200,7 @@ int SolveReact(double stepsize, const chemtbl_struct chemtbl[], const kintbl_str
             }
 
             // Based on CrunchTope
-            rate_pre[i] = area[min_pos] * pow(10, kintbl[i].rate) * monodterm * inhibterm * ftemp[min_pos]* fsw[min_pos];
+            rate_pre[i] = area[min_pos] * pow(10, kintbl[i].rate) * monodterm * inhibterm * ftemp[min_pos] * fsw[min_pos] * fzw[min_pos];
         }
 
         for (j = 0; j < rttbl->num_stc; j++)
@@ -349,7 +349,7 @@ int SolveReact(double stepsize, const chemtbl_struct chemtbl[], const kintbl_str
                 }
 
                 // Based on CrunchTope
-                rate_pre[i] = area[min_pos] * pow(10, kintbl[i].rate) * monodterm * inhibterm * ftemp[min_pos] * fsw[min_pos];
+                rate_pre[i] = area[min_pos] * pow(10, kintbl[i].rate) * monodterm * inhibterm * ftemp[min_pos] * fsw[min_pos] * fzw[min_pos];
             }
 
             for (j = 0; j < rttbl->num_stc; j++)
@@ -497,7 +497,7 @@ int SolveReact(double stepsize, const chemtbl_struct chemtbl[], const kintbl_str
 }
 
 double ReactControl(const chemtbl_struct chemtbl[], const kintbl_struct kintbl[], const rttbl_struct *rttbl,
-    double stepsize, double porosity, double depth, double satn, double temp, double react_rate[],
+    double stepsize, double porosity, double depth, double satn, double temp, double Zw, double react_rate[],
     chmstate_struct *chms)
 {
     int             flag;
@@ -516,7 +516,7 @@ double ReactControl(const chemtbl_struct chemtbl[], const kintbl_struct kintbl[]
 
     while (1.0 - step_counter / stepsize > 1.0E-10 && substep > 1.0E-30)
     {
-        flag = SolveReact(substep, chemtbl, kintbl, rttbl, satn, temp, porosity, chms);
+        flag = SolveReact(substep, chemtbl, kintbl, rttbl, satn, temp, porosity, Zw, chms);
 
         if (flag == 0)
         {
@@ -561,4 +561,18 @@ double ReactControl(const chemtbl_struct chemtbl[], const kintbl_struct kintbl[]
 double SoilTempFactor(double q10, double stc)
 {
     return pow(q10, (stc - 20.0) / 10.0);
+}
+
+double SoilMoistFactor(double satn, double sw_thld, double sw_exp)
+{
+    double fsw;
+    fsw     =   (satn <= sw_thld) ?
+                    pow(satn/sw_thld, sw_exp) : pow((1.0 - satn) / (1.0 - sw_thld), sw_exp);
+    return fsw;
+}
+
+double WTDepthFactor(double Zw, double n_alpha){
+    double fzw;
+    fzw     =   (n_alpha==0) ? 1 : exp(-fabs(n_alpha)*pow(Zw,n_alpha/fabs(n_alpha)));
+    return    fzw;
 }

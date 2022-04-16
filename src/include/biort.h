@@ -106,9 +106,10 @@ typedef struct rttbl_struct
     double          adh;                    // Debye Huckel parameter
     double          bdh;                    // Debye Huckel parameter
     double          bdt;                    // Debye Huckel parameter
-    double          sw_thld;                // threshold in soil moisture function (-)
-    double          sw_exp;                 // exponent in soil moisture function (-)
-    double          q10;                    // Q10 factor (-)
+    //double          sw_thld;                // threshold in soil moisture function (-)
+    //double          sw_exp;                 // exponent in soil moisture function (-)
+    //double          q10;                    // Q10 factor (-)
+    //double          n_alpha;                // n*alpha in depth function (-)
 } rttbl_struct;
 
 typedef struct chemtbl_struct
@@ -158,6 +159,7 @@ typedef struct chmstate_struct
     double          sw_thld[MAXSPS];        // threshold in soil moisture function (-)
     double          sw_exp[MAXSPS];         // exponent in soil moisture function (-)
     double          q10[MAXSPS];            // Q10 factor (-)
+    double          n_alpha[MAXSPS];        // n*alpha in depth function (-)
     double          tot_mol[MAXSPS];        // total moles (mol m-2)
 } chmstate_struct;
 
@@ -222,7 +224,7 @@ void            ParseCmdLineParam(int, char *[], char []);
 void            ParseLine(const char [], char [], double *);
 void            PrintDailyResults(FILE *, int, int, int, const rttbl_struct *, const subcatch_struct []);
 void            PrintHeader(FILE *, int, const rttbl_struct *, const chemtbl_struct chemtbl[]);
-double          ReactControl(const chemtbl_struct [], const kintbl_struct [], const rttbl_struct *, double, double,
+double          ReactControl(const chemtbl_struct [], const kintbl_struct [], const rttbl_struct *, double, double, double,
     double, double, double, double [], chmstate_struct *);
 void            Reaction(int, int, double, const int [], const chemtbl_struct [], const kintbl_struct [],
     const rttbl_struct *, subcatch_struct []);
@@ -230,7 +232,7 @@ void            ReadAdsorption(const char [], int, int, chemtbl_struct [], rttbl
 void            ReadCationEchg(const char [], double, chemtbl_struct [], rttbl_struct *);
 void            ReadChem(const char [], ctrl_struct *, rttbl_struct *, chemtbl_struct [], kintbl_struct []);
 void            ReadCini(const char [], int, const chemtbl_struct *, rttbl_struct *, subcatch_struct []);
-void            ReadConc(FILE *, int, const chemtbl_struct [], int *, double [], double [], double [], double [], double[]);
+void            ReadConc(FILE *, int, const chemtbl_struct [], int *, double [], double [], double [], double [], double[], double[]);
 void            ReadDHParam(const char [], int, double *);
 void            ReadHbvParam(const char [], int, subcatch_struct []);
 void            ReadHbvResults(const char [], int, int *, int **, subcatch_struct [], int);
@@ -247,7 +249,8 @@ int             roundi(double);
 //void            RunNumExp(int, int, const chemtbl_struct [], const kintbl_struct [], rttbl_struct *, const ctrl_struct *,
 //    subcatch_struct [], FILE *);//2021-09-09
 double          SoilTempFactor(double, double);
-int             SolveReact(double, const chemtbl_struct [], const kintbl_struct [], const rttbl_struct *, double,
+double          SoilMoistFactor(double, double, double);
+int             SolveReact(double, const chemtbl_struct [], const kintbl_struct [], const rttbl_struct *, double, double,
     double, double, chmstate_struct *);
 int             SolveSpeciation(const chemtbl_struct [], const ctrl_struct *, const rttbl_struct *, int, chmstate_struct *);
 void            SortChem(char [MAXSPS][MAXSTRING], const int [], int, chemtbl_struct []);
@@ -255,8 +258,9 @@ void            Speciation(int, const chemtbl_struct [], const ctrl_struct *, co
 int             SpeciesType(const char [], const char []);
 void            StreamSpeciation(int, int, const chemtbl_struct [], const ctrl_struct *, const rttbl_struct *,
     subcatch_struct []);
-void            Transpt(int, int, rttbl_struct *, const ctrl_struct *, subcatch_struct []);   // 2021-05-21
+void            Transpt(int, int, const chemtbl_struct [], rttbl_struct *, const ctrl_struct *, subcatch_struct []);   // 2021-05-21
 void            Wrap(char []);
+double          WTDepthFactor(double ,double );
 void            Unwrap(const char [], char []);
 void            UpdatePrimConc(int, int, const rttbl_struct *, const ctrl_struct *, subcatch_struct []);
 

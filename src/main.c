@@ -88,12 +88,16 @@ int main(int argc, char *argv[])
         for (kstep = 0; kstep < nsteps; kstep++)
         {
             // Transport and routing
-            Transpt(kstep, nsub, &rttbl, &ctrl, subcatch); // 2021-05-20
+            Transpt(kstep, nsub, chemtbl, &rttbl, &ctrl, subcatch); // 2021-05-20
 
             // Transport changes total concentrations. Primary concentrations needs to be updated using total
             // concentrations
             UpdatePrimConc(kstep, nsub, &rttbl, &ctrl, subcatch);
+            
+            StreamSpeciation(kstep, nsub, chemtbl, &ctrl, &rttbl, subcatch);
 
+            PrintDailyResults(fp, ctrl.transpt, steps[kstep], nsub, &rttbl, subcatch);
+            
             if (ctrl.transpt == KIN_REACTION)
             {
                 // In reaction mode, simulate reaction for soil, and speciation for stream
@@ -104,9 +108,7 @@ int main(int argc, char *argv[])
                 Speciation(nsub, chemtbl, &ctrl, &rttbl, subcatch);
             }
 
-            StreamSpeciation(kstep, nsub, chemtbl, &ctrl, &rttbl, subcatch);
-
-            PrintDailyResults(fp, ctrl.transpt, steps[kstep], nsub, &rttbl, subcatch);
+            
         }
     }
 
@@ -117,6 +119,7 @@ int main(int argc, char *argv[])
     if (ctrl.precipchem_numexp == 1){
         CopyInitChemSubcatch(nsub, &rttbl, subcatch, subcatch_numexp);
 
+        //sprintf(fn, "output/%s_results_numexp.txt", dir);
         sprintf(fn, "output/%s_results_numexp_%s.txt", dir, timestr);
         fp = fopen(fn, "w");
         PrintHeader(fp, ctrl.transpt, &rttbl, chemtbl);
@@ -126,11 +129,15 @@ int main(int argc, char *argv[])
         for (kstep = 0; kstep < nsteps_numexp; kstep++){
 
 
-            Transpt(kstep, nsub, &rttbl, &ctrl, subcatch_numexp); // 2021-05-20
+            Transpt(kstep, nsub, chemtbl, &rttbl, &ctrl, subcatch_numexp); // 2021-05-20
 
             // Transport changes total concentrations. Primary concentrations needs to be updated using total
             // concentrations
             UpdatePrimConc(kstep, nsub, &rttbl, &ctrl, subcatch_numexp);
+            
+            StreamSpeciation(kstep, nsub, chemtbl, &ctrl, &rttbl, subcatch_numexp);
+
+            PrintDailyResults(fp, ctrl.transpt, steps_numexp[kstep], nsub, &rttbl, subcatch_numexp);
 
             if (ctrl.transpt == KIN_REACTION)
             {
@@ -142,9 +149,6 @@ int main(int argc, char *argv[])
                 Speciation(nsub, chemtbl, &ctrl, &rttbl, subcatch_numexp);
             }
 
-            StreamSpeciation(kstep, nsub, chemtbl, &ctrl, &rttbl, subcatch_numexp);
-
-            PrintDailyResults(fp, ctrl.transpt, steps_numexp[kstep], nsub, &rttbl, subcatch_numexp);
         }
 
         biort_printf(VL_NORMAL, "\nHBV-BioRT %s numerical experiment succeeded.\n", dir);
