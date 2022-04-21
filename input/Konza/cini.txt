@@ -14,7 +14,7 @@ UZ
 pH          4.56
 Cl-         3.69E-5
 DOC         2.0E-5
-SOC         0.02        -ssa    5.0     -Q10    2   -SW_threshold   0.7     -SW_exp     1.5   -n_alpha    0.2
+SOC         0.02        -ssa    5.0     -Q10    2   -SW_threshold   0.7     -SW_exp     1.5   -n_alpha    0.002
 X-          5.2E-5
 
 LZ
