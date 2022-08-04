@@ -134,7 +134,7 @@ int SolveReact(double stepsize, const chemtbl_struct chemtbl[], const kintbl_str
             chms->prim_conc[i + rttbl->num_stc - rttbl->num_min] *
             chemtbl[i + rttbl->num_stc - rttbl->num_min].molar_mass;
         ftemp[i] = SoilTempFactor(chms->q10[i + rttbl->num_stc - rttbl->num_min], temp);
-        fzw[i] = WTDepthFactor(Zw, chms->n_alpha[i + rttbl->num_stc - rttbl->num_min]); 
+        fzw[i] = WTDepthFactor(Zw, chms->n_alpha[i + rttbl->num_stc - rttbl->num_min]);
     }
 
     if (SUFEFF)
@@ -143,11 +143,11 @@ int SolveReact(double stepsize, const chemtbl_struct chemtbl[], const kintbl_str
         {
             for (i = 0; i < rttbl->num_min; i++)
             {
-                fsw[i] = SoilMoistFactor(satn, chms->sw_thld[i + rttbl->num_stc - rttbl->num_min],chms->sw_exp[i + rttbl->num_stc - rttbl->num_min]); 
+                fsw[i] = SoilMoistFactor(satn, chms->sw_thld[i + rttbl->num_stc - rttbl->num_min],chms->sw_exp[i + rttbl->num_stc - rttbl->num_min]);
             }
         }
     }   // Lichtner's 2 third law if SUF_EFF is turned on
-    
+
     for (i = 0; i < rttbl->num_stc; i++)
     {
         rate_spe[i] = 0.0;
@@ -179,7 +179,7 @@ int SolveReact(double stepsize, const chemtbl_struct chemtbl[], const kintbl_str
             //   area: m2 of min/ L of porous media
             //   rate: mol/m2 of min/s
             //   dependency: dimensionless
-            rate_pre[i] = area[min_pos] * pow(10, kintbl[i].rate) * dependency[i] * (1.0 - iap[i] / temp_keq) * fsw[min_pos];
+            rate_pre[i] = area[min_pos] * pow(10, kintbl[i].rate) * dependency[i] * (1.0 - iap[i] / temp_keq) * ftemp[min_pos] * fsw[min_pos] * fzw[min_pos];
         }
         else if (kintbl[i].type == MONOD)
         {
@@ -327,7 +327,7 @@ int SolveReact(double stepsize, const chemtbl_struct chemtbl[], const kintbl_str
                 // area: m2/L water
                 // rate: mol/m2/s
                 // dependency: dimensionless
-                rate_pre[i] = area[min_pos] * pow(10, kintbl[i].rate) * dependency[i] * (1.0 - (iap[i] / temp_keq)) * fsw[min_pos];
+                rate_pre[i] = area[min_pos] * pow(10, kintbl[i].rate) * dependency[i] * (1.0 - (iap[i] / temp_keq)) * ftemp[min_pos] * fsw[min_pos] * fzw[min_pos];
             }
             else if (kintbl[i].type == MONOD)
             {
