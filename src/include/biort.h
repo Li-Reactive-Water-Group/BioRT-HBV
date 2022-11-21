@@ -177,17 +177,17 @@ typedef struct subcatch_struct
     double        **prcp_conc_time;         // time-series precipitation concentration (mol L-1)  2021-05-20
     double         *tmp;                    // air temperature (degree C)
     double          prcp_conc[MAXSPS];      // concentration in precipitation (mol kgH2O-1)
-    //double          d_surface;              // surface zone maximum water (passive + dynamic) storage capacity (mm)
+    double          d_surface;              // surface zone maximum water (passive + dynamic) storage capacity (mm)
     double          d_uz;                   // upper zone maximum water (passive + dynamic) storage capacity (mm)
     double          d_lz;                   // lower zone maximum water (passive + dynamic) storage capacity (mm)
     double          k1;                     // recession coefficient for upper zone (day -1)
     double          k2;                     // recession coefficient for lower zone (day -1)
     double          maxbas;                 // routing parameter
     double          perc;                   // percolation rate (mm day-1)
-    //double          porosity_surface;       // surface zone porosity (m3 m-3), 2021-05-14
+    double          porosity_surface;       // surface zone porosity (m3 m-3), 2021-05-14
     double          porosity_uz;            // upper zone porosity (m3 m-3)
     double          porosity_lz;            // lower zone porosity (m3 m-3)
-    //double          res_surface;            // surface zone passive water storage (mm), 2021-05-14
+    double          res_surface;            // surface zone passive water storage (mm), 2021-05-14
     double          res_uz;                 // upper zone passive water storage (mm)
     double          res_lz;                 // lower zone passive water storage (mm)
     double          sfcf;                   // snow fall correction factor
