@@ -10,6 +10,13 @@ DOC	        1.00E-7
 SOC         1.00E-10    -ssa    5.0     -Q10    2   -SW_threshold   0.7     -SW_exp     1.5   -n_alpha    0
 X-          1.00E-10
 
+SURFACE
+pH          4.30
+Cl-         1.00E-5
+DOC	        1.00E-7
+SOC         1.00E-10    -ssa    5.0     -Q10    2   -SW_threshold   0.7     -SW_exp     1.5   -n_alpha    0
+X-          1.00E-10
+
 UZ
 pH          4.56
 Cl-         3.69E-5

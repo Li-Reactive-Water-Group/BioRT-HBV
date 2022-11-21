@@ -12,21 +12,21 @@ void Reaction(int kstep, int nsub, double stepsize, const int steps[], const che
     double          depth;
     double          porosity;
     double          Zw;
-    const int       NZONES = 2;   // 2021-05-14
+    const int       NZONES = 3;   // 2021-05-14
 
     for (ksub = 0; ksub < nsub; ksub++)
     {
         //ftemp = SoilTempFactor(rttbl->q10, subcatch[ksub].tmp[kstep]);
         temp = subcatch[ksub].tmp[kstep];
 
-        for (kzone = UZ; kzone < UZ + NZONES; kzone++)   // 2021-05-14
+        for (kzone = SURFACE; kzone < UZ + NZONES; kzone++)   // 2021-05-14
         {
             switch (kzone)
             {
-                //case SURFACE:   // 2021-05-14
-                //    depth = subcatch[ksub].d_surface;
-                //    porosity = subcatch[ksub].porosity_surface;
-                //    break;
+                case SURFACE:   // 2021-05-14
+                    depth = subcatch[ksub].d_surface;
+                    porosity = subcatch[ksub].porosity_surface;
+                    break;
                 case UZ:
                     depth = subcatch[ksub].d_uz;
                     porosity = subcatch[ksub].porosity_uz;
