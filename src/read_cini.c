@@ -7,6 +7,7 @@ void ReadCini(const char dir[], int nsub, const chemtbl_struct *chemtbl, rttbl_s
     char            cmdstr[MAXSTRING];
     FILE           *fp;
     int             lno = 0;
+    int             i;
     double          dummy[MAXSPS];
 
     sprintf(fn, "input/%s/cini.txt", dir);
@@ -27,7 +28,15 @@ void ReadCini(const char dir[], int nsub, const chemtbl_struct *chemtbl, rttbl_s
     // Read lower zone concentration
     FindLine(fp, "LZ", &lno, cmdstr);
     ReadConc(fp, rttbl->num_stc, chemtbl, &lno, subcatch[0].chms[LZ].tot_conc, subcatch[0].chms[LZ].ssa, subcatch[0].chms[LZ].k_cini, subcatch[0].chms[LZ].q10, subcatch[0].chms[LZ].sw_thld, subcatch[0].chms[LZ].sw_exp, subcatch[0].chms[LZ].n_alpha);
-
+    
+    //To check if UZ and LZ has same k or rate for each mineral
+    for (i = 0; i < rttbl->num_min; i++){
+        if (subcatch[0].chms[LZ].k_cini[i + rttbl->num_stc - rttbl->num_min]!=subcatch[0].chms[UZ].k_cini[i + rttbl->num_stc - rttbl->num_min]){
+            biort_printf(VL_ERROR, "k for minerals in cini should be same in both UZ and LZ \n");
+            exit(EXIT_FAILURE);
+        }
+    }
+    
     fclose(fp);
 }
 
