@@ -219,7 +219,7 @@ void            InitChem(const char [], int, const calib_struct *, const ctrl_st
     kintbl_struct [], rttbl_struct *, subcatch_struct []);
 void            InitChemState(double, double, const chemtbl_struct [], const rttbl_struct *, const ctrl_struct *,
     chmstate_struct *);
-void            Lookup(FILE *, const calib_struct *, chemtbl_struct [], kintbl_struct [], rttbl_struct *);
+void            Lookup(FILE *, const calib_struct *, chemtbl_struct [], kintbl_struct [], rttbl_struct *, subcatch_struct []);
 int             MatchWrappedKey(const char [], const char []);
 void            ParseCmdLineParam(int, char *[], char []);
 void            ParseLine(const char [], char [], double *);
