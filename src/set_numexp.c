@@ -31,16 +31,19 @@ void CopyInitChemSubcatch(int nsub, rttbl_struct *rttbl, const subcatch_struct s
             subcatch_numexp[ksub].chms[SNOW].ssa[kspc] = subcatch[ksub].chms[SNOW].ssa[kspc];
             subcatch_numexp[ksub].chms[UZ].ssa[kspc] = subcatch[ksub].chms[UZ].ssa[kspc];
             subcatch_numexp[ksub].chms[LZ].ssa[kspc] = subcatch[ksub].chms[LZ].ssa[kspc];
-            
+
+            subcatch_numexp[ksub].chms[UZ].k_cini[kspc] = subcatch[ksub].chms[UZ].k_cini[kspc];
+            subcatch_numexp[ksub].chms[LZ].k_cini[kspc] = subcatch[ksub].chms[LZ].k_cini[kspc];
+
             subcatch_numexp[ksub].chms[UZ].q10[kspc] = subcatch[ksub].chms[UZ].q10[kspc];
             subcatch_numexp[ksub].chms[LZ].q10[kspc] = subcatch[ksub].chms[LZ].q10[kspc];
-            
+
             subcatch_numexp[ksub].chms[UZ].sw_thld[kspc] = subcatch[ksub].chms[UZ].sw_thld[kspc];
             subcatch_numexp[ksub].chms[LZ].sw_thld[kspc] = subcatch[ksub].chms[LZ].sw_thld[kspc];
-            
+
             subcatch_numexp[ksub].chms[UZ].sw_exp[kspc] = subcatch[ksub].chms[UZ].sw_exp[kspc];
             subcatch_numexp[ksub].chms[LZ].sw_exp[kspc] = subcatch[ksub].chms[LZ].sw_exp[kspc];
-            
+
             subcatch_numexp[ksub].chms[UZ].n_alpha[kspc] = subcatch[ksub].chms[UZ].n_alpha[kspc];
             subcatch_numexp[ksub].chms[LZ].n_alpha[kspc] = subcatch[ksub].chms[LZ].n_alpha[kspc];
 
