@@ -57,7 +57,7 @@ void ReadConc(FILE *fp, int num_stc, const chemtbl_struct chemtbl[], int *lno, d
 
         if (chemtbl[ind].itype == MINERAL)
         {
-            if (sscanf(cmdstr, "%*s %lf %*s %lf %*s %lf %*s %lf %*s %lf %*s %lf ", &tot_conc[ind], &ssa[ind], &k_cini[ind], &q10[ind], &sw_thld[ind], &sw_exp[ind], &n_alpha[ind]) !=6)
+            if (sscanf(cmdstr, "%*s %lf %*s %lf %*s %lf %*s %lf %*s %lf %*s %lf %*s %lf ", &tot_conc[ind], &ssa[ind], &k_cini[ind], &q10[ind], &sw_thld[ind], &sw_exp[ind], &n_alpha[ind]) !=7)
             {
                 biort_printf(VL_ERROR, "Error reading initial condition in %s at Line %d.\n", "cini.txt", *lno);
                 exit(EXIT_FAILURE);
