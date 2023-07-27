@@ -13,7 +13,7 @@ void InitChem(const char dir[], int nsub, const calib_struct *calib, const ctrl_
     sprintf(fn, "input/%s/cdbs.txt", dir);
     fp = fopen(fn, "r");
 
-    Lookup(fp, calib, chemtbl, kintbl, rttbl);
+    Lookup(fp, calib, chemtbl, kintbl, rttbl, subcatch);
     fclose(fp);
 
     for (ksub = 0; ksub < nsub; ksub++)

@@ -7,6 +7,7 @@ void ReadCini(const char dir[], int nsub, const chemtbl_struct *chemtbl, rttbl_s
     char            cmdstr[MAXSTRING];
     FILE           *fp;
     int             lno = 0;
+    int             i;
     double          dummy[MAXSPS];
 
     sprintf(fn, "input/%s/cini.txt", dir);
@@ -14,7 +15,7 @@ void ReadCini(const char dir[], int nsub, const chemtbl_struct *chemtbl, rttbl_s
 
     // Read precipitation concentration
     FindLine(fp, "PRECIPITATION", &lno, cmdstr);
-    ReadConc(fp, rttbl->num_stc, chemtbl, &lno, subcatch[0].prcp_conc, dummy, dummy, dummy, dummy, dummy);
+    ReadConc(fp, rttbl->num_stc, chemtbl, &lno, subcatch[0].prcp_conc, dummy, dummy, dummy, dummy, dummy, dummy);
 
     // Read surface concentration  2021-05-07
     //FindLine(fp, "SURFACE", &lno, cmdstr);
@@ -22,16 +23,24 @@ void ReadCini(const char dir[], int nsub, const chemtbl_struct *chemtbl, rttbl_s
 
     // Read upper zone concentration
     FindLine(fp, "UZ", &lno, cmdstr);
-    ReadConc(fp, rttbl->num_stc, chemtbl, &lno, subcatch[0].chms[UZ].tot_conc, subcatch[0].chms[UZ].ssa, subcatch[0].chms[UZ].q10, subcatch[0].chms[UZ].sw_thld, subcatch[0].chms[UZ].sw_exp, subcatch[0].chms[UZ].n_alpha);
+    ReadConc(fp, rttbl->num_stc, chemtbl, &lno, subcatch[0].chms[UZ].tot_conc, subcatch[0].chms[UZ].ssa, subcatch[0].chms[UZ].k_cini, subcatch[0].chms[UZ].q10, subcatch[0].chms[UZ].sw_thld, subcatch[0].chms[UZ].sw_exp, subcatch[0].chms[UZ].n_alpha);
 
     // Read lower zone concentration
     FindLine(fp, "LZ", &lno, cmdstr);
-    ReadConc(fp, rttbl->num_stc, chemtbl, &lno, subcatch[0].chms[LZ].tot_conc, subcatch[0].chms[LZ].ssa, subcatch[0].chms[LZ].q10, subcatch[0].chms[LZ].sw_thld, subcatch[0].chms[LZ].sw_exp, subcatch[0].chms[LZ].n_alpha);
-
+    ReadConc(fp, rttbl->num_stc, chemtbl, &lno, subcatch[0].chms[LZ].tot_conc, subcatch[0].chms[LZ].ssa, subcatch[0].chms[LZ].k_cini, subcatch[0].chms[LZ].q10, subcatch[0].chms[LZ].sw_thld, subcatch[0].chms[LZ].sw_exp, subcatch[0].chms[LZ].n_alpha);
+    
+    //To check if UZ and LZ has same k or rate for each mineral
+    for (i = 0; i < rttbl->num_min; i++){
+        if (subcatch[0].chms[LZ].k_cini[i + rttbl->num_stc - rttbl->num_min]!=subcatch[0].chms[UZ].k_cini[i + rttbl->num_stc - rttbl->num_min]){
+            biort_printf(VL_ERROR, "k for minerals in cini should be same in both UZ and LZ \n");
+            exit(EXIT_FAILURE);
+        }
+    }
+    
     fclose(fp);
 }
 
-void ReadConc(FILE *fp, int num_stc, const chemtbl_struct chemtbl[], int *lno, double tot_conc[], double ssa[], double q10[], double sw_thld[], double sw_exp[], double n_alpha[])
+void ReadConc(FILE *fp, int num_stc, const chemtbl_struct chemtbl[], int *lno, double tot_conc[], double ssa[], double k_cini[], double q10[], double sw_thld[], double sw_exp[], double n_alpha[])
 {
     char            cmdstr[MAXSTRING];
     char            temp_str[MAXSTRING];
@@ -57,7 +66,7 @@ void ReadConc(FILE *fp, int num_stc, const chemtbl_struct chemtbl[], int *lno, d
 
         if (chemtbl[ind].itype == MINERAL)
         {
-            if (sscanf(cmdstr, "%*s %lf %*s %lf %*s %lf %*s %lf %*s %lf %*s %lf ", &tot_conc[ind], &ssa[ind], &q10[ind], &sw_thld[ind], &sw_exp[ind], &n_alpha[ind]) !=6)
+            if (sscanf(cmdstr, "%*s %lf %*s %lf %*s %lf %*s %lf %*s %lf %*s %lf %*s %lf ", &tot_conc[ind], &ssa[ind], &k_cini[ind], &q10[ind], &sw_thld[ind], &sw_exp[ind], &n_alpha[ind]) !=7)
             {
                 biort_printf(VL_ERROR, "Error reading initial condition in %s at Line %d.\n", "cini.txt", *lno);
                 exit(EXIT_FAILURE);

@@ -156,6 +156,7 @@ typedef struct chmstate_struct
     double          sec_conc[MAXSPS];       // secondary concentration (mol kgH2O-1)
     double          prim_actv[MAXSPS];      // activity of primary species
     double          ssa[MAXSPS];            // specific surface area (m2 g-1)
+    double          k_cini[MAXSPS];         // k specified in cini file (unit dependent on reaction)
     double          sw_thld[MAXSPS];        // threshold in soil moisture function (-)
     double          sw_exp[MAXSPS];         // exponent in soil moisture function (-)
     double          q10[MAXSPS];            // Q10 factor (-)
@@ -218,7 +219,7 @@ void            InitChem(const char [], int, const calib_struct *, const ctrl_st
     kintbl_struct [], rttbl_struct *, subcatch_struct []);
 void            InitChemState(double, double, const chemtbl_struct [], const rttbl_struct *, const ctrl_struct *,
     chmstate_struct *);
-void            Lookup(FILE *, const calib_struct *, chemtbl_struct [], kintbl_struct [], rttbl_struct *);
+void            Lookup(FILE *, const calib_struct *, chemtbl_struct [], kintbl_struct [], rttbl_struct *, subcatch_struct []);
 int             MatchWrappedKey(const char [], const char []);
 void            ParseCmdLineParam(int, char *[], char []);
 void            ParseLine(const char [], char [], double *);
@@ -232,7 +233,7 @@ void            ReadAdsorption(const char [], int, int, chemtbl_struct [], rttbl
 void            ReadCationEchg(const char [], double, chemtbl_struct [], rttbl_struct *);
 void            ReadChem(const char [], ctrl_struct *, rttbl_struct *, chemtbl_struct [], kintbl_struct []);
 void            ReadCini(const char [], int, const chemtbl_struct *, rttbl_struct *, subcatch_struct []);
-void            ReadConc(FILE *, int, const chemtbl_struct [], int *, double [], double [], double [], double [], double[], double[]);
+void            ReadConc(FILE *, int, const chemtbl_struct [], int *, double [], double [], double [], double [], double[], double[], double[]);
 void            ReadDHParam(const char [], int, double *);
 void            ReadHbvParam(const char [], int, subcatch_struct []);
 void            ReadHbvResults(const char [], int, int *, int **, subcatch_struct [], int);
