@@ -1,0 +1,6 @@
+POROSITY_UZ             0.5     # upper zone porosity (m3 m-3)
+POROSITY_LZ             0.07    # lower zone porosity (m3 m-3)
+WS_PASSIVE_UZ           15       # upper zone immobile water storage (mm)
+WS_PASSIVE_LZ           230      # lower zone immobile water storage (mm)
+DEPTH_UZ                1500     # depth of upper zone (mm)
+DEPTH_LZ                120000     # depth of lower zone (mm)
