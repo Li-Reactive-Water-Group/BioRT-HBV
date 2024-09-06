@@ -8,13 +8,18 @@ TEMPERATURE     25      # assumed temperature for thermal decoupled mode
 PRIMARY_SPECIES         # list of all primary species
 pH
 Cl-
-DOC
-SOC
-X-
+NO3
+N(plant)
+N2(soil)
+soilN(s)
+plantN(s)
+soilDN(s)
 
 SECONDARY_SPECIES       # list of secondary species
-OH-
-XDOC
 
-MINERAL_KINETICS        # list of minerals
-SOC            -label     test
+
+
+MINERAL_KINETICS                # list of minerals
+soilN(s)        -label      default
+plantN(s)       -label      default
+soilDN(s)       -label      default

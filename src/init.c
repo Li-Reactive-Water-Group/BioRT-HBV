@@ -13,7 +13,7 @@ void InitChem(const char dir[], int nsub, const calib_struct *calib, const ctrl_
     sprintf(fn, "input/%s/cdbs.txt", dir);
     fp = fopen(fn, "r");
 
-    Lookup(fp, calib, chemtbl, kintbl, rttbl);
+    Lookup(fp, calib, chemtbl, kintbl, rttbl, subcatch);
     fclose(fp);
 
     for (ksub = 0; ksub < nsub; ksub++)
@@ -21,18 +21,21 @@ void InitChem(const char dir[], int nsub, const calib_struct *calib, const ctrl_
         for (kspc = 0; kspc < rttbl->num_stc; kspc++)
         {
             // Apply calibration
+            //subcatch[ksub].chms[SNOW].ssa[kspc] *= (chemtbl[kspc].itype == MINERAL) ? calib->ssa : 1.0;   // 2021-05-07
             subcatch[ksub].chms[UZ].ssa[kspc] *= (chemtbl[kspc].itype == MINERAL) ? calib->ssa : 1.0;
             subcatch[ksub].chms[LZ].ssa[kspc] *= (chemtbl[kspc].itype == MINERAL) ? calib->ssa : 1.0;
 
             // Snow and soil moisture zone should have the same concentrations as the upper zone at the beginning
-            subcatch[ksub].chms[SNSM].tot_conc[kspc] = subcatch[ksub].chms[UZ].tot_conc[kspc];
-            subcatch[ksub].chms[SNSM].prim_conc[kspc] = subcatch[ksub].chms[SNSM].tot_conc[kspc];
-            subcatch[ksub].chms[SNSM].ssa[kspc] = subcatch[ksub].chms[UZ].ssa[kspc];
-            subcatch[ksub].chms[SNSM].tot_mol[kspc] =
-                subcatch[ksub].chms[SNSM].tot_conc[kspc] * subcatch[ksub].ws[0][SNSM];
+            subcatch[ksub].chms[SNOW].tot_conc[kspc] = subcatch[ksub].chms[UZ].tot_conc[kspc];
+            subcatch[ksub].chms[SNOW].prim_conc[kspc] = subcatch[ksub].chms[SNOW].tot_conc[kspc];
+            subcatch[ksub].chms[SNOW].ssa[kspc] = subcatch[ksub].chms[UZ].ssa[kspc];
+            subcatch[ksub].chms[SNOW].tot_mol[kspc] =
+                subcatch[ksub].chms[SNOW].tot_conc[kspc] * subcatch[ksub].ws[0][SNOW];
         }
 
         // Initialize upper and lower zone concentrations taking into account speciation
+        InitChemState(subcatch[ksub].porosity_surface, subcatch[ksub].ws[0][SURFACE], chemtbl, rttbl, ctrl,    // 2021-05-07
+            &subcatch[ksub].chms[SURFACE]);
         InitChemState(subcatch[ksub].porosity_uz, subcatch[ksub].ws[0][UZ], chemtbl, rttbl, ctrl,
             &subcatch[ksub].chms[UZ]);
         InitChemState(subcatch[ksub].porosity_lz, subcatch[ksub].ws[0][LZ], chemtbl, rttbl, ctrl,
@@ -55,9 +58,10 @@ void InitChemState(double smcmax, double vol, const chemtbl_struct chemtbl[], co
         else if (chemtbl[kspc].itype == MINERAL)
         {
             // Update the concentration of mineral using molar volume
-            chms->tot_conc[kspc] *= (ctrl->rel_min == 0) ?
-                1000.0 / chemtbl[kspc].molar_vol / smcmax :     // Absolute mineral volume fraction
-                (1.0 - smcmax) * 1000.0 / chemtbl[kspc].molar_vol / smcmax;     // Relative mineral volume fraction
+            //concentration (mole of mineral/L of porous media) = Absolute mineral volume fraction (cm3 of mineral/cm3 of porous media)*
+          //1000 (cm3/l)/molar volume (cm3 of mineral/mole of mineral)
+
+            chms->tot_conc[kspc] *= 1000.0 / chemtbl[kspc].molar_vol ;     // Absolute mineral volume fraction
             chms->prim_actv[kspc] = 1.0;
             chms->prim_conc[kspc] = chms->tot_conc[kspc];
         }

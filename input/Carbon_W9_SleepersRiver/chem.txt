@@ -8,13 +8,28 @@ TEMPERATURE     25      # assumed temperature for thermal decoupled mode
 PRIMARY_SPECIES         # list of all primary species
 pH
 Cl-
+HCO3-
+Ca++
 DOC
-SOC
 X-
-
+SOC(s)
+SOC-lz(s)
+Calcite(s)
+Calcite-lz(s)
+CO2(*g)
+ 
 SECONDARY_SPECIES       # list of secondary species
 OH-
+CO3--
+CO2(aq)
+#CaOH+
+#CaHCO3+
+#CaCO3(aq)
 XDOC
 
-MINERAL_KINETICS        # list of minerals
-SOC            -label     test
+MINERAL_KINETICS                # list of minerals
+SOC(s)		-label 	test
+SOC-lz(s)	-label	test
+Calcite(s)	-label 	default
+Calcite-lz(s)	-label	default
+CO2(*g)		-label 	default

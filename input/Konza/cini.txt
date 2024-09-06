@@ -5,33 +5,21 @@
 
 PRECIPITATION
 pH          4.30
-Cl-         1.93E-5
-DOC	        3.00E-7
-C5H7O2N     1.00E-10
-H4SiO4      1.00E-6
-Quartz      1.00E-10    -ssa    1.48
-SOC         1.00E-10    -ssa    5.0
-C5H7O2N(s)  1.00E-10    -ssa    5.0
+Cl-         1.00E-5
+DOC	        1.00E-7
+SOC         1.00E-10    -ssa    5.0     -logk  -13.6   -Q10    2   -SW_threshold   0.7     -SW_exp     1.5   -n_alpha    0
 X-          1.00E-10
 
 UZ
 pH          4.56
 Cl-         3.69E-5
-DOC         20.0E-6
-C5H7O2N     1.00E-10
-H4SiO4      1.00E-4
-Quartz      0.6199  -ssa    1.48
-SOC         0.02    -ssa    5.0
-C5H7O2N(s)  0.0004  -ssa    5.0
+DOC         2.0E-5
+SOC         0.02        -ssa    5.0     -logk  -13.6   -Q10    2   -SW_threshold   0.7     -SW_exp     1.5   -n_alpha    0.002
 X-          5.2E-5
 
 LZ
 pH          4.56
 Cl-         3.69E-5
-DOC         20.0E-6
-C5H7O2N     1.00E-10
-H4SiO4      1.00E-4
-Quartz      0.06199     -ssa    1.48
-SOC         0.002       -ssa    5.0
-C5H7O2N(s)  0.00004     -ssa    5.0
+DOC         2.0E-5
+SOC         0.002       -ssa    5.0     -logk  -13.6   -Q10    2   -SW_threshold   0.7     -SW_exp     1.5   -n_alpha    0
 X-          5.2E-5

@@ -1,33 +1,113 @@
 #include "biort.h"
 
-void Reaction(int kstep, int nsub, double stepsize, const int steps[], const chemtbl_struct chemtbl[],
+
+void SurfaceReaction(int kstep, int nsub,int ctrl_sfreaction, double stepsize, const double steps[], const chemtbl_struct chemtbl[],
+    const kintbl_struct kintbl[], const rttbl_struct *rttbl, subcatch_struct subcatch[])
+{
+    int             ksub;
+    int             kspc;
+    double          satn;
+    double          temp;
+    double          substep;
+    double          depth;
+    double          porosity;
+    double          Zw;
+    
+    
+    for (ksub = 0; ksub < nsub; ksub++)
+    {
+        if (subcatch[ksub].ws[kstep][SURFACE] > 0.0 & ctrl_sfreaction == 1)
+        {
+            
+            for (kspc = 0; kspc < rttbl->num_spc; kspc++)
+            {
+                subcatch[ksub].chms[STREAM].tot_mol[kspc] -= subcatch[ksub].chms[SURFACE].tot_conc[kspc] * subcatch[ksub].q[kstep][Q0];
+                subcatch[ksub].chms[SURFACE].tot_mol[kspc] = subcatch[ksub].chms[SURFACE].tot_conc[kspc] * subcatch[ksub].q[kstep][Q0];
+                
+            }
+            
+            temp = subcatch[ksub].tmp[kstep];
+            porosity=subcatch[ksub].porosity_surface;
+            depth=subcatch[ksub].d_surface;//subcatch[ksub].ws[kstep][SURFACE];
+            satn=1;
+            Zw=0;
+            
+            for (kspc = 0; kspc < MAXSPS; kspc++)
+            {
+                subcatch[ksub].react_rate[SURFACE][kspc] = BADVAL;   // Set reaction rate to -999
+            }
+            
+            substep = ReactControl(chemtbl, kintbl, rttbl, stepsize, porosity, depth, satn, temp, Zw,
+                    subcatch[ksub].react_rate[SURFACE], &subcatch[ksub].chms[SURFACE]);
+            
+            if (substep < 0.0)
+            {
+               biort_printf(VL_NORMAL, "%f %s zone reaction failed with a substep of %.1lf s.\n",
+                       steps[kstep], "SURFACE", -substep);
+            }
+            if (substep > 0.0)
+            {
+                biort_printf(VL_VERBOSE, "%f %s zone reaction passed with a minimum step of %.1lf s.\n",
+                        steps[kstep], "SURFACE", substep);
+            }
+            
+            for (kspc = 0; kspc < rttbl->num_spc; kspc++)
+            {
+                subcatch[ksub].chms[STREAM].tot_mol[kspc] += subcatch[ksub].chms[SURFACE].tot_conc[kspc] * subcatch[ksub].q[kstep][Q0];
+                subcatch[ksub].chms[SURFACE].tot_mol[kspc] = 0.0;
+                subcatch[ksub].chms[STREAM].tot_conc[kspc] =
+                    (subcatch[ksub].q[kstep][Q0] + subcatch[ksub].q[kstep][Q1] + subcatch[ksub].q[kstep][Q2] > 0.0) ?
+                    subcatch[ksub].chms[STREAM].tot_mol[kspc] /
+                    (subcatch[ksub].q[kstep][Q0] + subcatch[ksub].q[kstep][Q1] + subcatch[ksub].q[kstep][Q2]) : ZERO_CONC;
+            }
+        } else
+        {
+            for (kspc = 0; kspc < MAXSPS; kspc++)
+            {
+                subcatch[ksub].react_rate[SURFACE][kspc] = ZERO_CONC;   // Set reaction rate to 0
+            }
+        }
+    }
+        
+
+}
+
+void Reaction(int kstep, int nsub, double stepsize, const double steps[], const chemtbl_struct chemtbl[],
     const kintbl_struct kintbl[], const rttbl_struct *rttbl, subcatch_struct subcatch[])
 {
     int             ksub;
     int             kzone;
     int             kspc;
     double          satn;
-    double          ftemp;
+    double          temp;
     double          substep;
     double          depth;
     double          porosity;
-    const int       NZONES = 2;
+    double          Zw;
+    const int       NZONES = 2;   // 2021-05-14
 
     for (ksub = 0; ksub < nsub; ksub++)
     {
-        ftemp = SoilTempFactor(rttbl->q10, subcatch[ksub].tmp[kstep]);
+        //ftemp = SoilTempFactor(rttbl->q10, subcatch[ksub].tmp[kstep]);
+        temp = subcatch[ksub].tmp[kstep];
 
-        for (kzone = UZ; kzone < UZ + NZONES; kzone++)
+        for (kzone = UZ; kzone < UZ + NZONES; kzone++)   // 2021-05-14
         {
             switch (kzone)
             {
+                //case SURFACE:   // 2021-05-14
+                //    depth = subcatch[ksub].d_surface;
+                //    porosity = subcatch[ksub].porosity_surface;
+                //    break;
                 case UZ:
                     depth = subcatch[ksub].d_uz;
                     porosity = subcatch[ksub].porosity_uz;
+                    Zw = depth - (subcatch[ksub].ws[kstep][UZ]/porosity);
                     break;
                 case LZ:
                     depth = subcatch[ksub].d_lz;
                     porosity = subcatch[ksub].porosity_lz;
+                    Zw = depth - (subcatch[ksub].ws[kstep][LZ]/porosity);
                     break;
             }
 
@@ -38,22 +118,38 @@ void Reaction(int kstep, int nsub, double stepsize, const int steps[], const che
 
 
             satn = subcatch[ksub].ws[kstep][kzone] / (depth * porosity);  // add porosity for saturation calculation
+
             satn = MIN(satn, 1.0);
+
+            //biort_printf(VL_NORMAL, "%d %d %s zone reaction has saturation of %.1lf s.\n",
+            //              steps[kstep],kzone, satn);
 
             if (satn > 1.0E-2)
             {
-                substep = ReactControl(chemtbl, kintbl, rttbl, stepsize, porosity, depth, satn, ftemp,
+                substep = ReactControl(chemtbl, kintbl, rttbl, stepsize, porosity, depth, satn, temp, Zw,
                     subcatch[ksub].react_rate[kzone], &subcatch[ksub].chms[kzone]);
 
                 if (substep < 0.0)
                 {
-                    biort_printf(VL_NORMAL, "%d %s zone reaction failed with a substep of %.1lf s.\n",
-                        steps[kstep], (kzone == UZ) ? "Upper" : "Lower", -substep);
+                   if (kzone == SURFACE)   // 2021-05-14
+                    {
+                        biort_printf(VL_NORMAL, "%d %s zone reaction failed with a substep of %.1lf s.\n",
+                          steps[kstep], "SURFACE", -substep);
+                    } else {
+                        biort_printf(VL_NORMAL, "%d %s zone reaction failed with a substep of %.1lf s.\n",
+                          steps[kstep], (kzone == UZ) ? "Upper" : "Lower", -substep);
+                    }
                 }
                 if (substep > 0.0)
                 {
-                    biort_printf(VL_VERBOSE, "%d %s zone reaction passed with a minimum step of %.1lf s.\n",
+                    if (kzone == SURFACE)   // 2021-05-14
+                    {
+                      biort_printf(VL_VERBOSE, "%d %s zone reaction passed with a minimum step of %.1lf s.\n",
+                        steps[kstep], "SURFACE", substep);
+                    } else {
+                      biort_printf(VL_VERBOSE, "%d %s zone reaction passed with a minimum step of %.1lf s.\n",
                         steps[kstep], (kzone == UZ) ? "Upper" : "Lower", substep);
+                    }
                 }
             }
         }
@@ -61,7 +157,7 @@ void Reaction(int kstep, int nsub, double stepsize, const int steps[], const che
 }
 
 int SolveReact(double stepsize, const chemtbl_struct chemtbl[], const kintbl_struct kintbl[], const rttbl_struct *rttbl,
-    double satn, double ftemp, chmstate_struct *chms)
+    double satn, double temp, double porosity, double Zw, chmstate_struct *chms)
 {
     int             i, j, k;
     int             kmonod, kinhib;
@@ -74,6 +170,9 @@ int SolveReact(double stepsize, const chemtbl_struct chemtbl[], const kintbl_str
     double          tmpconc[MAXSPS];
     double          tot_conc[MAXSPS];
     double          area[MAXSPS];
+    double          ftemp[MAXSPS];
+    double          fsw[MAXSPS];
+    double          fzw[MAXSPS];
     double          gamma[MAXSPS];
     double          rate_pre[MAXSPS];
     double          iap[MAXSPS];
@@ -89,7 +188,6 @@ int SolveReact(double stepsize, const chemtbl_struct chemtbl[], const kintbl_str
     double          bdh;
     double          bdt;
     double          max_error;
-    double          surf_ratio;
     double          tot_cec;
     realtype      **jcb;
     sunindextype    p[MAXSPS];
@@ -98,25 +196,33 @@ int SolveReact(double stepsize, const chemtbl_struct chemtbl[], const kintbl_str
     const double    TMPPRB = 1.0E-2;
     const double    TMPPRB_INV = 1.0 / TMPPRB;
 
-    inv_sat = 1.0 / satn;
+    inv_sat = 1.0 / satn;//inv_sat(L of porous space/L of water)= 1/sat(L of water/L of porous space)
+
 
     for (i = 0; i < rttbl->num_min; i++)
     {
+        //area(m2/L of porous media) = ssa(m2/g of min) * mineral_conc(mol of min/L of porous media) * molar_mass(g of min/mol of min)
         area[i] = chms->ssa[i + rttbl->num_stc - rttbl->num_min] *
             chms->prim_conc[i + rttbl->num_stc - rttbl->num_min] *
             chemtbl[i + rttbl->num_stc - rttbl->num_min].molar_mass;
+        ftemp[i] = SoilTempFactor(chms->q10[i + rttbl->num_stc - rttbl->num_min], temp);
+        fzw[i] = WTDepthFactor(Zw, chms->n_alpha[i + rttbl->num_stc - rttbl->num_min]);
     }
 
     if (SUFEFF)
     {
         if (satn < 1.0)
         {
-            surf_ratio = (satn <= rttbl->sw_thld) ?
-                pow(satn / rttbl->sw_thld, rttbl->sw_exp) : pow((1.0 - satn) / (1.0 - rttbl->sw_thld), rttbl->sw_exp);
-
             for (i = 0; i < rttbl->num_min; i++)
             {
-                area[i] *= surf_ratio;
+                fsw[i] = SoilMoistFactor(satn, chms->sw_thld[i + rttbl->num_stc - rttbl->num_min],chms->sw_exp[i + rttbl->num_stc - rttbl->num_min]);
+            }
+        }
+        if (satn == 1.0)
+        {
+            for (i = 0; i < rttbl->num_min; i++)
+            {
+                fsw[i]= 1.0;
             }
         }
     }   // Lichtner's 2 third law if SUF_EFF is turned on
@@ -148,11 +254,11 @@ int SolveReact(double stepsize, const chemtbl_struct chemtbl[], const kintbl_str
             }
 
             // Calculate the predicted rate depending on the type of rate law
-            //   rate_pre: rate per reaction (mol L-1 water s-1)
-            //   area: m2 L-1 water
-            //   rate: mol m-2 s-1
+            //   rate_pre: rate per reaction (mol L-1 porous media s-1)
+            //   area: m2 of min/ L of porous media
+            //   rate: mol/m2 of min/s
             //   dependency: dimensionless
-            rate_pre[i] = area[min_pos] * pow(10, kintbl[i].rate) * dependency[i] * (1.0 - iap[i] / temp_keq);
+            rate_pre[i] = area[min_pos] * pow(10, kintbl[i].rate) * dependency[i] * (1.0 - iap[i] / temp_keq) * ftemp[min_pos] * fsw[min_pos] * fzw[min_pos];
         }
         else if (kintbl[i].type == MONOD)
         {
@@ -173,7 +279,7 @@ int SolveReact(double stepsize, const chemtbl_struct chemtbl[], const kintbl_str
             }
 
             // Based on CrunchTope
-            rate_pre[i] = area[min_pos] * pow(10, kintbl[i].rate) * monodterm * inhibterm * ftemp;
+            rate_pre[i] = area[min_pos] * pow(10, kintbl[i].rate) * monodterm * inhibterm * ftemp[min_pos] * fsw[min_pos] * fzw[min_pos];
         }
 
         for (j = 0; j < rttbl->num_stc; j++)
@@ -196,7 +302,8 @@ int SolveReact(double stepsize, const chemtbl_struct chemtbl[], const kintbl_str
     for (i = 0; i < rttbl->num_spc; i++)
     {
         // Aqueous species, saturation term for aqueous volume
-        rate_spe[i] *= (chemtbl[i].itype == AQUEOUS) ? inv_sat : 1.0;
+        // rate(mol/m2 water/s)= rate(mol/m2 pm/s)*inv_sat(L of porous space/L of water)/porosity(L of porous space/L of pm)
+        rate_spe[i] *= (chemtbl[i].itype == AQUEOUS) ? (inv_sat/porosity) : 1.0;
     }
 
     jcb = newDenseMat(rttbl->num_stc - rttbl->num_min, rttbl->num_stc - rttbl->num_min);
@@ -299,7 +406,7 @@ int SolveReact(double stepsize, const chemtbl_struct chemtbl[], const kintbl_str
                 // area: m2/L water
                 // rate: mol/m2/s
                 // dependency: dimensionless
-                rate_pre[i] = area[min_pos] * pow(10, kintbl[i].rate) * dependency[i] * (1.0 - (iap[i] / temp_keq));
+                rate_pre[i] = area[min_pos] * pow(10, kintbl[i].rate) * dependency[i] * (1.0 - (iap[i] / temp_keq)) * ftemp[min_pos] * fsw[min_pos] * fzw[min_pos];
             }
             else if (kintbl[i].type == MONOD)
             {
@@ -321,7 +428,7 @@ int SolveReact(double stepsize, const chemtbl_struct chemtbl[], const kintbl_str
                 }
 
                 // Based on CrunchTope
-                rate_pre[i] = area[min_pos] * pow(10, kintbl[i].rate) * monodterm * inhibterm * ftemp;
+                rate_pre[i] = area[min_pos] * pow(10, kintbl[i].rate) * monodterm * inhibterm * ftemp[min_pos] * fsw[min_pos] * fzw[min_pos];
             }
 
             for (j = 0; j < rttbl->num_stc; j++)
@@ -335,7 +442,8 @@ int SolveReact(double stepsize, const chemtbl_struct chemtbl[], const kintbl_str
 
         for (i = 0; i < rttbl->num_spc; i++)
         {
-            rate_spet[i] *= (chemtbl[i].itype == AQUEOUS) ? inv_sat : 1.0;
+            // rate(mol/m2 water/s)= rate(mol/m2 pm/s)*inv_sat(L of porous space/L of water)/porosity(L of porous space/L of pm)
+            rate_spet[i] *= (chemtbl[i].itype == AQUEOUS) ? (inv_sat/porosity) : 1.0;
         }
 
         for (i = 0; i < rttbl->num_stc - rttbl->num_min; i++)
@@ -463,18 +571,12 @@ int SolveReact(double stepsize, const chemtbl_struct chemtbl[], const kintbl_str
 #endif
         }
     }
-    
-    // fix bug, 2021-03-26
-    for (i = 0; i < rttbl->num_spc; i++)
-    {
-        chms->tot_mol[i] += (rate_spe[i] + rate_spet[i]) * stepsize * 0.5;
-    }
 
     return 0;
 }
 
 double ReactControl(const chemtbl_struct chemtbl[], const kintbl_struct kintbl[], const rttbl_struct *rttbl,
-    double stepsize, double porosity, double depth, double satn, double ftemp, double react_rate[],
+    double stepsize, double porosity, double depth, double satn, double temp, double Zw, double react_rate[],
     chmstate_struct *chms)
 {
     int             flag;
@@ -491,9 +593,9 @@ double ReactControl(const chemtbl_struct chemtbl[], const kintbl_struct kintbl[]
 
     substep = stepsize;
 
-    while (1.0 - step_counter / stepsize > 1.0E-10 && substep > 30.0)
+    while (1.0 - step_counter / stepsize > 1.0E-10 && substep > 1.0E-30)
     {
-        flag = SolveReact(substep, chemtbl, kintbl, rttbl, satn, ftemp, chms);
+        flag = SolveReact(substep, chemtbl, kintbl, rttbl, satn, temp, porosity, Zw, chms);
 
         if (flag == 0)
         {
@@ -514,11 +616,16 @@ double ReactControl(const chemtbl_struct chemtbl[], const kintbl_struct kintbl[]
     {
         for (kspc = 0; kspc < rttbl->num_min; kspc++)
         {
-            // Calculate reaction rate
+            // Calculate reaction rate (mole/m2-pm/day) = mol/L-pm/day * mm of depth   * (1m/1000mm) * (1000L/1m3)
             react_rate[kspc] =
-                (chms->tot_conc[kspc + rttbl->num_stc - rttbl->num_min] - conc0[kspc]) * depth * porosity;
+                (chms->tot_conc[kspc + rttbl->num_stc - rttbl->num_min] - conc0[kspc]) * depth;
+
         }
 
+        for (kspc = 0; kspc <rttbl->num_spc; kspc++)
+        {
+            chms->tot_mol[kspc] = chms->tot_conc[kspc] * porosity * satn * depth; // tot_mol (moles-mm of water/L water ) =tot_conc (mol/L water) * satn * porosity * depth
+        }
         if (roundi(substep) != roundi(stepsize))
         {
             return substep;
@@ -533,4 +640,18 @@ double ReactControl(const chemtbl_struct chemtbl[], const kintbl_struct kintbl[]
 double SoilTempFactor(double q10, double stc)
 {
     return pow(q10, (stc - 20.0) / 10.0);
+}
+
+double SoilMoistFactor(double satn, double sw_thld, double sw_exp)
+{
+    double fsw;
+    fsw     =   (satn <= sw_thld) ?
+                    pow(satn/sw_thld, sw_exp) : pow((1.0 - satn) / (1.0 - sw_thld), sw_exp);
+    return fsw;
+}
+
+double WTDepthFactor(double Zw, double n_alpha){
+    double fzw;
+    fzw     =   (n_alpha==0) ? 1 : exp(-fabs(n_alpha)*pow(Zw,n_alpha/fabs(n_alpha)));
+    return    fzw;
 }
