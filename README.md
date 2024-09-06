@@ -1,51 +1,51 @@
-# HBV-BioRT
+# BioRT-HBV
 
-HBV-BioRT is a reactive transport module that works with the semi-distributed rainfall-runoff model [HBV Light](https://www.geo.uzh.ch/en/units/h2k/Services/HBV-Model.html).
-HBV-BioRT takes HBV Light simulated hydrologic states and fluxes to drive reactive transport processes.
+BioRT-HBV is a reactive transport module that works with the semi-distributed rainfall-runoff model [HBV Light](https://www.geo.uzh.ch/en/units/h2k/Services/HBV-Model.html).
+BioRT-HBV takes HBV Light simulated hydrologic states and fluxes to drive reactive transport processes.
 The reaction processes are the same as in [BioRT-Flux-PIHM](https://github.com/PSUmodeling/MM-PIHM).
 
-HBV-BioRT is open source software licensed under the MIT License.
+BioRT-HBV is open source software licensed under the MIT License.
 All bug reports and feature requests should be submitted using the Issues page.
 
 ## Usage
 
 The following guide applies to UNIX (include MacOS) systems.
 
-### Installing HBV-BioRT
+### Installing BioRT-HBV
 
-After downloading the HBV-BioRT source code, go into the `HBV-BioRT` directory.
+After downloading the BioRT-HBV source code, go into the `BioRT-HBV` directory.
 Use the command
 
 ```shell
 make all
 ```
 
-to install CVODE library (required by HBV-BioRT) and compile HBV-BioRT executable.
+to install CVODE library (required by BioRT-HBV) and compile BioRT-HBV executable.
 
-If you already have CVODE v2.9.0 installed, you can edit the Makefile and point `CVODE_PATH` to your CVODE directory, and use
+If you already have CVODE v2.9.0 installed, you can edit the Makefile and point `CVODE_PATH` to your `CVODE` directory, and use
 
 ```shell
 make biort
 ```
 
-to compile HBV-BioRT.
+to compile BioRT-HBV.
 
-When installation succeeds, you should see a `biort` executable in your `HBV-BioRT` directory.
+When installation succeeds, you should see a `biort` executable in your `BioRT-HBV` directory.
 
 ### Preparing input files
 
-The HBV-BioRT model requires six input files, including HBV Light model input and output files.
+The BioRT-HBV model requires six input files, including HBV Light model input and output files.
 
 #### Input files from HBV Light
 
-Before running the HBV-BioRT model, users should first run the HBV Light model for their watersheds of interest.
+Before running the BioRT-HBV model, users should first run the HBV Light model for their watersheds of interest.
 The parameters used for the HBV Light simulation should be saved.
-After HBV Light simulations, create a sub-directory in the `HBV-BioRT` `input` directory.
+After HBV Light simulations, create a sub-directory in the `BioRT-HBV` `input` directory.
 White spaces should be avoided when naming the sub-directory.
 Then put the saved parameter file and `Results.txt` to the created sub-directory.
 The parameter file should be renamed to `Parameter.xml`.
 
-Four additional files, `cdbs.txt`, `chem.txt`, `cini.txt`, and `soil.txt` are required for the HBV-BioRT model.
+Four additional files, `cdbs.txt`, `chem.txt`, `cini.txt`, and `soil.txt` are required for the BioRT-HBV model.
 
 #### Chemical database file
 
@@ -86,6 +86,9 @@ Field temperature in degree celsius.
 Threshold and exponent parameters in soil moisture control function.
 Set `SW_THRESHOLD` to 1 to use increase behavior.
 
+`Q10`:
+*Q*<sub>10</sub> parameter for reactions.
+
 The `PRIMARY_SPECIES` block lists all primary species to be simulated.
 The `SECONDARY_SPECIES` block lists all secondary species the users would like to track.
 The `MINERAL_KINETICS` block lists all kinetic mineral reactions.
@@ -109,16 +112,16 @@ Porosity of upper and lower zones (m<sup>3</sup>&nbsp;m<sup>-3</sup>);
 
 `RES_UZ` and `RES_LZ`:
 Residual water storages in upper and lower zones (mm).
-This storage is the lowest allowed storages in HBV-BioRT simulations.
+This storage is the lowest allowed storages in BioRT-HBV simulations.
 The residual storages are added to simulated storages at every time step.
 
 `D_UZ` and `D_LZ`:
 Depths of upper and lower zones (mm).
 The depths are used for the model to calculate degrees of saturation.
 
-### Running HBV-BioRT
+### Running BioRT-HBV
 
-Now you can run HBV-BioRT models using:
+Now you can run BioRT-HBV models using:
 
 ```shell
 $ ./biort [-vV] <input directory>
@@ -133,18 +136,24 @@ No simulation will be performed when using the `-V` parameter.
 
 ### Output file
 
-After running the simulation, an output file containing the concentrations of all species at each time step is generated in your `hbv-biort` directory named `<input directory>_results.txt`.
+After running the simulation, an output file containing the concentrations of all species and reaction rates of minerals at each time step is generated in your `BioRT-HBV/output` directory named `<input directory>_results_<simulation_time>.txt`.
 
-The headerline shows the names of all species, followed by a suffix indicating locations.
+The header line shows the names of all species, followed by a suffix indicating locations (and rates).
 
 `_inf`:
-Infiltration concentrations.
+Infiltration concentrations (mol L<sup>-1</sup>).
 
 `_UZ`:
-Upper zone concentrations.
+Upper zone concentrations (mol L<sup>-1</sup>).
 
 `_LZ`:
-Lower zone concentrations.
+Lower zone concentrations (mol L<sup>-1</sup>).
 
 `_riv`:
-Stream concentrations.
+Stream concentrations (mol L<sup>-1</sup>).
+
+`_rate_UZ`:
+Upper zone mineral reaction rates (mol m<sup>-2</sup> day<sup>-1</sup>)
+
+`_rate_LZ`:
+Lower zone mineral reaction rates (mol m<sup>-2</sup> day<sup>-1</sup>)

@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <math.h>
 #include <string.h>
 #include <time.h>
@@ -16,11 +17,11 @@
 
 #include "custom_io.h"
 
-#define VERSION    "0.0.0-alpha"
+#define VERSION    "0.1.0-alpha"
 
 #define BADVAL                  -999
-#define NWS                     4           // number of water storages
-#define NQ                      6           // number of water fluxes
+#define NWS                     6           // number of water storages
+#define NQ                      9           // number of water fluxes
 
 #define STORAGE_MIN             1.0         // minimum water storage (mm)
 #define ZERO_CONC               1.0E-20     // minimum concentration
@@ -33,11 +34,16 @@
 #define Q0                      3
 #define Q1                      4
 #define Q2                      5
+#define Prain                   6
+#define Psnow                   7
+#define snowmelt                8
 
-#define SNSM                    0
-#define UZ                      1
-#define LZ                      2
-#define STREAM                  3
+#define SNOW                    0
+#define SURFACE                 1          // add surface Q0 reaction, 2021-05-14
+#define UZ                      2
+#define LZ                      3
+#define STREAM                  4
+#define SM                      5
 
 #define MAXSPS                  20          // Maximum number of species
 #define MAXDEP                  4           // Maximum number of dependece, monod, and inhibition terms
@@ -73,9 +79,13 @@ typedef struct ctrl_struct
     int             recycle;                // number of times to recycle forcing
     int             read_restart;           // flag to read rt restart file
     int             actv_mode;              // activity coefficient mode: 0 = unity coefficient, 1 = DH equation
-    int             rel_min;                // relative mineral flag: 1 = total solid volume, 0 = total pore volume
     int             transpt;                // transport only flag: 0 = simulate kinetic reaction, 1 = transport only
-    double         *steps;                  // model steps
+    int             sfreaction;             // surface reaction mode: 0 = no surface reactions simulated, 1 = surface reactions simulated   2023-09-11
+    int             precipchem;             // precipitation chemistry mode: 0 = constant precipitation chemistry, 1 = time-series precipitation chemistry   2021-05-20
+    int             precipchem_numexp;      // Numerical experiment mode: 0 = same precipitation chemistry during warm-up and simulation
+                                            // 1 = different precipitation chemistry during warm-up and simulation useful for numerical experiment  2021-09-09
+    double          step_size;               // step size at which processes are simulated in seconds                                         
+    double         *steps;                  // model steps  2023-09-11
 } ctrl_struct;
 
 typedef struct rttbl_struct
@@ -89,7 +99,6 @@ typedef struct rttbl_struct
     int             num_cex;                // number of cation exchange
     int             num_mkr;                // number of mineral kinetic reactions
     int             num_akr;                // number of aqueous kinetic reactions
-    double          cementation;            // cementation factor that represents connectivity of pores
     double          tmp;                    // temperature of the moment
     double          dep_mtx[MAXSPS][MAXSPS];// dependency of secondary species on primary species
     double          dep_kin[MAXSPS][MAXSPS];// dependency of kinetic species on primary species
@@ -99,8 +108,10 @@ typedef struct rttbl_struct
     double          adh;                    // Debye Huckel parameter
     double          bdh;                    // Debye Huckel parameter
     double          bdt;                    // Debye Huckel parameter
-    double          sw_thld;                // threshold in soil moisture function (-)
-    double          sw_exp;                 // exponent in soil moisture function (-)
+    //double          sw_thld;                // threshold in soil moisture function (-)
+    //double          sw_exp;                 // exponent in soil moisture function (-)
+    //double          q10;                    // Q10 factor (-)
+    //double          n_alpha;                // n*alpha in depth function (-)
 } rttbl_struct;
 
 typedef struct chemtbl_struct
@@ -147,6 +158,11 @@ typedef struct chmstate_struct
     double          sec_conc[MAXSPS];       // secondary concentration (mol kgH2O-1)
     double          prim_actv[MAXSPS];      // activity of primary species
     double          ssa[MAXSPS];            // specific surface area (m2 g-1)
+    double          k_cini[MAXSPS];         // k specified in cini file (unit dependent on reaction)
+    double          sw_thld[MAXSPS];        // threshold in soil moisture function (-)
+    double          sw_exp[MAXSPS];         // exponent in soil moisture function (-)
+    double          q10[MAXSPS];            // Q10 factor (-)
+    double          n_alpha[MAXSPS];        // n*alpha in depth function (-)
     double          tot_mol[MAXSPS];        // total moles (mol m-2)
 } chmstate_struct;
 
@@ -161,17 +177,25 @@ typedef struct subcatch_struct
 {
     double        **ws;                     // water storages (mm)
     double        **q;                      // water fluxes (mm day-1)
+    double        **prcp_conc_time;         // time-series precipitation concentration (mol L-1)  2021-05-20
+    double         *tmp;                    // air temperature (degree C)
     double          prcp_conc[MAXSPS];      // concentration in precipitation (mol kgH2O-1)
+    double          d_surface;              // surface zone maximum water (passive + dynamic) storage capacity (mm)
+    double          d_uz;                   // upper zone maximum water (passive + dynamic) storage capacity (mm)
+    double          d_lz;                   // lower zone maximum water (passive + dynamic) storage capacity (mm)
     double          k1;                     // recession coefficient for upper zone (day -1)
     double          k2;                     // recession coefficient for lower zone (day -1)
     double          maxbas;                 // routing parameter
     double          perc;                   // percolation rate (mm day-1)
+    double          porosity_surface;       // surface zone porosity (m3 m-3), 2021-05-14
     double          porosity_uz;            // upper zone porosity (m3 m-3)
     double          porosity_lz;            // lower zone porosity (m3 m-3)
-    double          res_uz;                 // upper zone residual moisture (mm)
-    double          res_lz;                 // lower zone residual moisture (mm)
-    double          d_uz;                   // upper zone depth (m)
-    double          d_lz;                   // lower zone depth (m)
+    double          res_surface;            // surface zone passive water storage (mm), 2021-05-14
+    double          res_uz;                 // upper zone passive water storage (mm)
+    double          res_lz;                 // lower zone passive water storage (mm)
+    double          sfcf;                   // snow fall correction factor
+    double          tt;                     // threshold temperature (degree C)
+    double          react_rate[NWS][MAXSPS];// reaction rate (mol m-2 day-1)
     chmstate_struct chms[NWS];
     chmstate_struct river_chms;
 } subcatch_struct;
@@ -181,7 +205,14 @@ typedef struct subcatch_struct
 
 #define fopen                   _custom_fopen
 #define biort_printf(...)       _custom_printf(verbose_mode, __VA_ARGS__)
+#if defined(_WIN32) || defined(_WIN64)
+# define mkdir(path)            _mkdir((path))
+#else
+# define mkdir(path)            mkdir(path, 0755)
+#endif
 
+void            CopyConstSubcatchProp(int, const subcatch_struct [], subcatch_struct []);
+void            CopyInitChemSubcatch(int, rttbl_struct *, const subcatch_struct [], subcatch_struct []);
 int             CountLeapYears(int, int);
 int             FindChem(const char [], int, const chemtbl_struct[]);
 void            FreeStruct(int, int, int *[], subcatch_struct []);
@@ -190,24 +221,25 @@ void            InitChem(const char [], int, const calib_struct *, const ctrl_st
     kintbl_struct [], rttbl_struct *, subcatch_struct []);
 void            InitChemState(double, double, const chemtbl_struct [], const rttbl_struct *, const ctrl_struct *,
     chmstate_struct *);
-void            Lookup(FILE *, const calib_struct *, chemtbl_struct [], kintbl_struct [], rttbl_struct *);
+void            Lookup(FILE *, const calib_struct *, chemtbl_struct [], kintbl_struct [], rttbl_struct *, subcatch_struct []);
 int             MatchWrappedKey(const char [], const char []);
 void            ParseCmdLineParam(int, char *[], char []);
 void            ParseLine(const char [], char [], double *);
-void            PrintDailyResults(FILE *, int, int, const rttbl_struct *, const subcatch_struct []);
-void            PrintHeader(FILE *, const rttbl_struct *, const chemtbl_struct chemtbl[]);
-void            ReactControl(const chemtbl_struct [], const kintbl_struct [], const rttbl_struct *, double, double,
-    chmstate_struct *);
-void            Reaction(int, int, double, const chemtbl_struct [], const kintbl_struct [], const rttbl_struct *,
-    subcatch_struct []);
+void            PrintDailyResults(FILE *, int, double, int, const rttbl_struct *, const subcatch_struct []);
+void            PrintHeader(FILE *, int, const rttbl_struct *, const chemtbl_struct chemtbl[]);
+double          ReactControl(const chemtbl_struct [], const kintbl_struct [], const rttbl_struct *, double, double, double,
+    double, double, double, double [], chmstate_struct *);
+void            Reaction(int, int, double, const double [], const chemtbl_struct [], const kintbl_struct [],
+    const rttbl_struct *, subcatch_struct []);
 void            ReadAdsorption(const char [], int, int, chemtbl_struct [], rttbl_struct *);
 void            ReadCationEchg(const char [], double, chemtbl_struct [], rttbl_struct *);
 void            ReadChem(const char [], ctrl_struct *, rttbl_struct *, chemtbl_struct [], kintbl_struct []);
 void            ReadCini(const char [], int, const chemtbl_struct *, rttbl_struct *, subcatch_struct []);
-void            ReadConc(FILE *, int, const chemtbl_struct [], int *, double [], double []);
+void            ReadConc(FILE *, int, const chemtbl_struct [], int *, double [], double [], double [], double [], double[], double[], double[]);
 void            ReadDHParam(const char [], int, double *);
 void            ReadHbvParam(const char [], int, subcatch_struct []);
-void            ReadHbvResults(const char [], int, int *, int **, subcatch_struct []);
+void            ReadHbvResults(const char [], int, double, int *, double **, subcatch_struct [], int);
+void            ReadPrecipChem(const char [], int, double, int *, double **, subcatch_struct [], int, const chemtbl_struct [], int);
 void            ReadMinerals(const char [], int, int, double [MAXSPS][MAXSPS], double [], chemtbl_struct [],
     rttbl_struct *);
 void            ReadMinKin(FILE *, int, double, int *, char [], chemtbl_struct [], kintbl_struct *);
@@ -217,17 +249,24 @@ void            ReadSecondary(const char [], int, int, chemtbl_struct [], rttbl_
 void            ReadSoil(const char [], int, subcatch_struct []);
 void            ReadTempPoints(const char [], double, int *, int *);
 int             roundi(double);
-int             SolveReact(double, const chemtbl_struct [], const kintbl_struct [], const rttbl_struct *, double,
-    chmstate_struct *);
+//void            RunNumExp(int, int, const chemtbl_struct [], const kintbl_struct [], rttbl_struct *, const ctrl_struct *,
+//    subcatch_struct [], FILE *);//2021-09-09
+double          SoilTempFactor(double, double);
+double          SoilMoistFactor(double, double, double);
+int             SolveReact(double, const chemtbl_struct [], const kintbl_struct [], const rttbl_struct *, double, double,
+    double, double, chmstate_struct *);
 int             SolveSpeciation(const chemtbl_struct [], const ctrl_struct *, const rttbl_struct *, int, chmstate_struct *);
 void            SortChem(char [MAXSPS][MAXSTRING], const int [], int, chemtbl_struct []);
 void            Speciation(int, const chemtbl_struct [], const ctrl_struct *, const rttbl_struct *, subcatch_struct []);
 int             SpeciesType(const char [], const char []);
 void            StreamSpeciation(int, int, const chemtbl_struct [], const ctrl_struct *, const rttbl_struct *,
     subcatch_struct []);
-void            Transpt(int, int, rttbl_struct *, subcatch_struct []);
+void            SurfaceReaction(int, int, int, double, const double [], const chemtbl_struct [], const kintbl_struct [],
+    const rttbl_struct *, subcatch_struct []);
+void            Transpt(int, int, const chemtbl_struct [], rttbl_struct *, const ctrl_struct *, subcatch_struct []);   // 2021-05-21
 void            Wrap(char []);
+double          WTDepthFactor(double ,double );
 void            Unwrap(const char [], char []);
-void            UpdatePrimConc(int, const rttbl_struct *, const ctrl_struct *, subcatch_struct []);
+void            UpdatePrimConc(int, int, const rttbl_struct *, const ctrl_struct *, subcatch_struct []);
 
 #endif

@@ -27,20 +27,6 @@ void ReadChem(const char dir[], ctrl_struct *ctrl, rttbl_struct *rttbl, chemtbl_
     biort_printf(VL_NORMAL, "  Activity correction is set to %d. \n", ctrl->actv_mode);
 
     NextLine(fp, cmdstr, &lno);
-    ReadParam(cmdstr, "RELMIN", 'i', fn, lno, &ctrl->rel_min);
-    switch (ctrl->rel_min)
-    {
-        case 0:
-            biort_printf(VL_NORMAL, "  Using absolute mineral volume fraction. \n");
-            break;
-        case 1:
-            biort_printf(VL_NORMAL, "  Using relative mineral volume fraction. \n");
-            break;
-        default:
-            break;
-    }
-
-    NextLine(fp, cmdstr, &lno);
     ReadParam(cmdstr, "TRANSPORT_ONLY", 'i', fn, lno, &ctrl->transpt);
     switch (ctrl->transpt)
     {
@@ -54,22 +40,68 @@ void ReadChem(const char dir[], ctrl_struct *ctrl, rttbl_struct *rttbl, chemtbl_
         default:
             break;
     }
-
+    
     NextLine(fp, cmdstr, &lno);
-    ReadParam(cmdstr, "CEMENTATION", 'd', fn, lno, &rttbl->cementation);
-    biort_printf(VL_NORMAL, "  Cementation factor = %2.1f \n", rttbl->cementation);
+    ReadParam(cmdstr, "SF_REACTION", 'i', fn, lno, &ctrl->sfreaction);
+    switch (ctrl->sfreaction)
+    {
+        case 0:
+            biort_printf(VL_NORMAL, "  Surface reactions disabled.\n");
+            break;
+        case 1:
+            biort_printf(VL_NORMAL, "  Surface reactions enabled. \n");
+            break;
+            // under construction.
+        default:
+            break;
+    }
+    
+    NextLine(fp, cmdstr, &lno);  // 2021-05-20
+    ReadParam(cmdstr, "PRECIPCHEM", 'i', fn, lno, &ctrl->precipchem);
+    switch (ctrl->precipchem)
+    {
+        case 0:
+            biort_printf(VL_NORMAL, "  Using constant precipitation chemistry in cini.txt. \n");
+            break;
+        case 1:
+            biort_printf(VL_NORMAL, "  Using time-series precipitation chemistry in precipchem.txt. \n");
+            break;
+        default:
+            break;
+    }
+
+    NextLine(fp, cmdstr, &lno);  // 2021-09-09
+    ReadParam(cmdstr, "NUMEXP", 'i', fn, lno, &ctrl->precipchem_numexp);
+    switch (ctrl->precipchem_numexp)
+    {
+        case 0:
+            biort_printf(VL_NORMAL, "  Using same precipitation chemistry during warmup and simulation run. \n");
+            break;
+        case 1:
+            biort_printf(VL_NORMAL, "  Using different precipitation chemistry during warmup and simulation run. \n");
+            break;
+        default:
+            break;
+    }
 
     NextLine(fp, cmdstr, &lno);
     ReadParam(cmdstr, "TEMPERATURE", 'd', fn, lno, &rttbl->tmp);
     biort_printf(VL_NORMAL, "  Temperature = %3.1f \n", rttbl->tmp);
 
     NextLine(fp, cmdstr, &lno);
-    ReadParam(cmdstr, "SW_THRESHOLD", 'd', fn, lno, &rttbl->sw_thld);
-    biort_printf(VL_NORMAL, "  SW threshold = %.2f\n", rttbl->sw_thld);
+    ReadParam(cmdstr, "STEP_SIZE", 'd', fn, lno, &ctrl->step_size);
+    biort_printf(VL_NORMAL, "  Time Step = %.2f\n", ctrl->step_size);
+    //NextLine(fp, cmdstr, &lno);
+    //ReadParam(cmdstr, "SW_THRESHOLD", 'd', fn, lno, &rttbl->sw_thld);
+    //biort_printf(VL_NORMAL, "  SW threshold = %.2f\n", rttbl->sw_thld);
 
-    NextLine(fp, cmdstr, &lno);
-    ReadParam(cmdstr, "SW_EXP", 'd', fn, lno, &rttbl->sw_exp);
-    biort_printf(VL_NORMAL, "  SW exponent = %.2f\n", rttbl->sw_exp);
+    //NextLine(fp, cmdstr, &lno);
+    //ReadParam(cmdstr, "SW_EXP", 'd', fn, lno, &rttbl->sw_exp);
+    //biort_printf(VL_NORMAL, "  SW exponent = %.2f\n", rttbl->sw_exp);
+
+    //NextLine(fp, cmdstr, &lno);
+    //ReadParam(cmdstr, "Q10", 'd', fn, lno, &rttbl->q10);
+    //biort_printf(VL_NORMAL, "  Q10 factor = %.2f\n", rttbl->q10);
 
     // Count numbers of species and reactions
     FindLine(fp, "PRIMARY_SPECIES", &lno, fn);

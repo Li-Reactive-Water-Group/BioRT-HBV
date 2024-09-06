@@ -1,6 +1,6 @@
 #include "biort.h"
 
-void Lookup(FILE *fp, const calib_struct *calib, chemtbl_struct chemtbl[], kintbl_struct kintbl[], rttbl_struct *rttbl)
+void Lookup(FILE *fp, const calib_struct *calib, chemtbl_struct chemtbl[], kintbl_struct kintbl[], rttbl_struct *rttbl, subcatch_struct subcatch[])
 {
     char            cmdstr[MAXSTRING];
     int             i, j, k;
@@ -171,7 +171,7 @@ void Lookup(FILE *fp, const calib_struct *calib, chemtbl_struct chemtbl[], kintb
 
         while (strcmp(cmdstr, "End of mineral kinetics\r\n") != 0 && strcmp(cmdstr, "End of mineral kinetics\n") != 0)
         {
-            ReadMinKin(fp, rttbl->num_stc, calib->rate, &lno, cmdstr, chemtbl, &kintbl[i]);
+            ReadMinKin(fp, rttbl->num_stc, subcatch[0].chms[UZ].k_cini[i + rttbl->num_stc - rttbl->num_min], &lno, cmdstr, chemtbl, &kintbl[i]);
             NextLine(fp, cmdstr, &lno);
         }
 
@@ -454,6 +454,7 @@ void ReadMinerals(const char cmdstr[], int npoints, int keq_position, double pot
     int             ndep;
     double          dep;
     double          mvol;
+    double          keq_sec = 0.0;   // fix by Kayal, 2021-05-26
     char            chemn[MAXSTRING];
 
     sscanf(cmdstr + bytes_consumed, "'%[^']' %lf %d%n", chemn, &mvol, &ndep, &bytes_now);
@@ -492,7 +493,8 @@ void ReadMinerals(const char cmdstr[], int npoints, int keq_position, double pot
                             {
                                 pot_dep[i][l] += dep * rttbl->dep_mtx[k - rttbl->num_stc][l];
                             }
-                            keq_kin_all[i] += dep * rttbl->keq[k - rttbl->num_stc];
+                            //keq_kin_all[i] += dep * rttbl->keq[k - rttbl->num_stc];
+                            keq_sec += dep * rttbl->keq[k - rttbl->num_stc];  // fix by for adjusting Keq when reaction is written in terms of secondary species in database, 2021-05-26
                         }
 
                         break;
@@ -506,6 +508,11 @@ void ReadMinerals(const char cmdstr[], int npoints, int keq_position, double pot
                 {
                     sscanf(cmdstr + bytes_consumed, "%lf%n", &keq_kin_all[i], &bytes_now);
                     bytes_consumed += bytes_now;
+                    if (keq_sec != 0)   // fix for adjusting Keq when reaction is written in terms of secondary species in database, 2021-05-26
+                    {
+                        keq_kin_all[i] += keq_sec;
+                    }
+                    keq_sec = 0;
                 }
                 else
                 {
@@ -697,18 +704,22 @@ void ReadMinKin(FILE *fp, int num_stc, double calval, int *lno, char cmdstr[], c
             // Read rate
             NextLine(fp, cmdstr, lno);
             sscanf(cmdstr, "%s = %lf", optstr, &kintbl->rate);
-            if (strcmp(optstr, "rate(25C)") == 0)
-            {
-                biort_printf(VL_NORMAL, " Rate is %f\n", kintbl->rate);
+            //if (strcmp(optstr, "rate(25C)") == 0)
+            //{
+            //    biort_printf(VL_NORMAL, " Rate is %f\n", kintbl->rate);
 
-                kintbl->rate += calval;
-                biort_printf(VL_NORMAL, " After calibration: Rate is %f, calib->Rate = %f \n", kintbl->rate, calval);
-            }
-            else
-            {
-                biort_printf(VL_ERROR, "Error: Cannot find mineral kinetics rate in .cdbs near Line %d.\n", *lno);
-                exit(EXIT_FAILURE);
-            }
+            //    kintbl->rate += calval;
+            //    biort_printf(VL_NORMAL, " After calibration: Rate is %f, calib->Rate = %f \n", kintbl->rate, calval);
+            //}
+            //else
+            //{
+            //    biort_printf(VL_ERROR, "Error: Cannot find mineral kinetics rate in .cdbs near Line %d.\n", *lno);
+            //    exit(EXIT_FAILURE);
+            //}
+            
+            //Read rate from cini file
+            kintbl->rate = calval;
+            biort_printf(VL_NORMAL, " Rate is %f\n", kintbl->rate);
 
             // Read activation
             NextLine(fp, cmdstr, lno);

@@ -42,7 +42,7 @@
 # Input, output
 /input/*
 !/input/Konza
-/*_results.txt
+/output/*
 
 # Winmerge backups
 *.bak
