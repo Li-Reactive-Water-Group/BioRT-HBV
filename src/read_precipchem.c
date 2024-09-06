@@ -1,6 +1,6 @@
 #include "biort.h"
 
-void ReadPrecipChem(const char dir[], int nsub, int *nsteps, int *steps[], subcatch_struct subcatch[], int num_stc, const chemtbl_struct chemtbl[],int mode)
+void ReadPrecipChem(const char dir[], int nsub,  double stepsize, int *nsteps, double *steps[], subcatch_struct subcatch[], int num_stc, const chemtbl_struct chemtbl[],int mode)
 {
     FILE           *fp;
     char            fn[MAXSTRING];
@@ -13,6 +13,10 @@ void ReadPrecipChem(const char dir[], int nsub, int *nsteps, int *steps[], subca
     int             pH_convert = 0;
     int             ind;
     int             ntime;
+    int             date;
+    int             hour;
+    int             min;
+    int             sec;
 
     ntime = *nsteps;
 
@@ -39,7 +43,7 @@ void ReadPrecipChem(const char dir[], int nsub, int *nsteps, int *steps[], subca
         biort_printf(VL_ERROR,"\nNumber of time steps in \"Numexp_precipchem.txt\" should be same as in \"Numexp_Results.txt\" file.\n");
         exit(EXIT_FAILURE);
     }
-    *steps = (int *)malloc(*nsteps * sizeof(int));
+    *steps = (double *)malloc(*nsteps * sizeof(double));
 
     for (ksub = 0; ksub < nsub; ksub++)
     {
@@ -83,7 +87,15 @@ void ReadPrecipChem(const char dir[], int nsub, int *nsteps, int *steps[], subca
 
             if (ksub == 0)
             {
-                fscanf(fp, "%d", &((*steps)[kstep]));    // Read model steps
+                if (stepsize < 86400)
+                {
+                    fscanf(fp, "%d %d:%d:%d",&date, &hour, &min, &sec);
+                    ((*steps)[kstep])=date+((hour*3600+min*60+sec)/86400.0);
+                }
+                else
+                {
+                    fscanf(fp, "%lf", &((*steps)[kstep]));    // Read model steps
+                }
             }
             else
             {
@@ -102,6 +114,10 @@ void ReadPrecipChem(const char dir[], int nsub, int *nsteps, int *steps[], subca
                 else
                 {
                     fscanf(fp, "%lf", &subcatch[ksub].prcp_conc_time[kstep][kspc]);
+                }
+                if (subcatch[ksub].prcp_conc_time[kstep][kspc] < 0){
+                    biort_printf(VL_ERROR, "Negative values in precipchem file. Please correct the file.\n");
+                    exit(EXIT_FAILURE);
                 }
             }
 

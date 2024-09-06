@@ -24,7 +24,7 @@ void PrintHeader(FILE *fp, int transpt, const rttbl_struct *rttbl, const chemtbl
         {
             Unwrap(chemtbl[kspc].name, chemn);
 
-            sprintf(tempstr, "%s_SURFACE", chemn);
+            sprintf(tempstr, "%s_SF", chemn);
             fprintf(fp, "\t%-15s", tempstr);
 
         }
@@ -33,7 +33,7 @@ void PrintHeader(FILE *fp, int transpt, const rttbl_struct *rttbl, const chemtbl
         {
             Unwrap(chemtbl[kspc].name, chemn);
 
-            sprintf(tempstr, "%s_UZ", chemn);
+            sprintf(tempstr, "%s_SZ", chemn);
             fprintf(fp, "\t%-15s", tempstr);
 
         }
@@ -42,7 +42,7 @@ void PrintHeader(FILE *fp, int transpt, const rttbl_struct *rttbl, const chemtbl
         {
             Unwrap(chemtbl[kspc].name, chemn);
 
-            sprintf(tempstr, "%s_LZ", chemn);
+            sprintf(tempstr, "%s_DZ", chemn);
             fprintf(fp, "\t%-15s", tempstr);
 
         }
@@ -60,23 +60,23 @@ void PrintHeader(FILE *fp, int transpt, const rttbl_struct *rttbl, const chemtbl
         {
             Unwrap(chemtbl[kspc + rttbl->num_stc - rttbl->num_min].name, chemn);
 
-            sprintf(tempstr, "%s_rate_UZ", chemn);
+            sprintf(tempstr, "%s_rate_SF", chemn);
             fprintf(fp, "\t%-23s", tempstr);
         }
 
-        //for (kspc = 0; kspc < rttbl->num_min; kspc++)
-        //{
-            //Unwrap(chemtbl[kspc + rttbl->num_stc - rttbl->num_min].name, chemn);
+         for (kspc = 0; kspc < rttbl->num_min; kspc++)  // 2021-05-14
+        {
+            Unwrap(chemtbl[kspc + rttbl->num_stc - rttbl->num_min].name, chemn);
 
-            //sprintf(tempstr, "%s_rate_UZ", chemn);
-            //fprintf(fp, "\t%-23s", tempstr);
-        //}
+            sprintf(tempstr, "%s_rate_SZ", chemn);
+            fprintf(fp, "\t%-23s", tempstr);
+        }
 
         for (kspc = 0; kspc < rttbl->num_min; kspc++)
         {
             Unwrap(chemtbl[kspc + rttbl->num_stc - rttbl->num_min].name, chemn);
 
-            sprintf(tempstr, "%s_rate_LZ", chemn);
+            sprintf(tempstr, "%s_rate_DZ", chemn);
             fprintf(fp, "\t%-23s", tempstr);
         }
     }
@@ -95,7 +95,7 @@ void PrintHeader(FILE *fp, int transpt, const rttbl_struct *rttbl, const chemtbl
         {
             Unwrap(chemtbl[kspc].name, chemn);
 
-            sprintf(tempstr, "%s_SURFACE", chemn);
+            sprintf(tempstr, "%s_SF", chemn);
             fprintf(fp, "\t%-15s", tempstr);
 
         }
@@ -103,7 +103,7 @@ void PrintHeader(FILE *fp, int transpt, const rttbl_struct *rttbl, const chemtbl
         {
             Unwrap(chemtbl[kspc].name, chemn);
 
-            sprintf(tempstr, "%s_UZ", chemn);
+            sprintf(tempstr, "%s_SZ", chemn);
             fprintf(fp, "\t%-15s", tempstr);
 
         }
@@ -111,7 +111,7 @@ void PrintHeader(FILE *fp, int transpt, const rttbl_struct *rttbl, const chemtbl
         {
             Unwrap(chemtbl[kspc].name, chemn);
 
-            sprintf(tempstr, "%s_LZ", chemn);
+            sprintf(tempstr, "%s_DZ", chemn);
             fprintf(fp, "\t%-15s", tempstr);
 
         }
@@ -127,7 +127,7 @@ void PrintHeader(FILE *fp, int transpt, const rttbl_struct *rttbl, const chemtbl
     fprintf(fp, "\n");
 
     // UNITS
-    fprintf(fp, "%-15s",  "YYYYMMDD");
+    fprintf(fp, "%-15s",  "YYYYMMDD hh:mm:ss");
 
     if (transpt == KIN_REACTION)
     {
@@ -139,9 +139,9 @@ void PrintHeader(FILE *fp, int transpt, const rttbl_struct *rttbl, const chemtbl
         {
             fprintf(fp, "\t%-15s", "mol/L");
         }
-        for (kspc = 0; kspc < 2 * rttbl->num_min; kspc++)  // UZ + LZ
+        for (kspc = 0; kspc < 3 * rttbl->num_min; kspc++)  // SURFACE + UZ + LZ
         {
-            fprintf(fp, "\t%-23s", "mol/m2/day");
+            fprintf(fp, "\t%-23s", "mol/m2/delta-t");
         }
     }
     else    // In transport mode, only print primary species
@@ -156,15 +156,19 @@ void PrintHeader(FILE *fp, int transpt, const rttbl_struct *rttbl, const chemtbl
     fflush(fp);
 }
 
-void PrintDailyResults(FILE *fp, int transpt, int step, int nsub, const rttbl_struct *rttbl,
+void PrintDailyResults(FILE *fp, int transpt, double step, int nsub, const rttbl_struct *rttbl,
     const subcatch_struct subcatch[])
 {
     int             kspc;
     int             ksub;
+    int          sec;
 
+    sec = round((step-(int)step)*86400.0);
+    
     // Soil concentration file header
-    fprintf(fp, "%-15d",  step);
-
+    fprintf(fp, "%-8d %02d:%02d:%02d",  (int)step, sec/3600,(sec%3600)/60,(sec%3600)%60);
+    //fprintf(fp,"%d", (int)step);
+    
     for (ksub = 0; ksub < nsub; ksub++)
     {
 
@@ -203,10 +207,10 @@ void PrintDailyResults(FILE *fp, int transpt, int step, int nsub, const rttbl_st
             {
                 fprintf(fp, "\t%-15lg", subcatch[ksub].chms[STREAM].sec_conc[kspc]);
             }
-            //for (kspc = 0; kspc < rttbl->num_min; kspc++)  // 2021-05-14
-            //{
-            //    fprintf(fp, "\t%-23lg", subcatch[ksub].react_rate[SURFACE][kspc]);
-            //}
+            for (kspc = 0; kspc < rttbl->num_min; kspc++)  // 2021-05-14
+            {
+                fprintf(fp, "\t%-23lg", subcatch[ksub].react_rate[SURFACE][kspc]);
+            }
             for (kspc = 0; kspc < rttbl->num_min; kspc++)
             {
                 fprintf(fp, "\t%-23lg", subcatch[ksub].react_rate[UZ][kspc]);

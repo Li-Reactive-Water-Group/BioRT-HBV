@@ -1,6 +1,6 @@
 #include "biort.h"
 
-void ReadHbvResults(const char dir[], int nsub, int *nsteps, int *steps[], subcatch_struct subcatch[], int mode)
+void ReadHbvResults(const char dir[], int nsub,  double stepsize, int *nsteps, double *steps[], subcatch_struct subcatch[], int mode)//double stepsize,
 {
     FILE           *fp;
     char            fn[MAXSTRING];
@@ -11,6 +11,10 @@ void ReadHbvResults(const char dir[], int nsub, int *nsteps, int *steps[], subca
     int             i;
     int             len_numexp=1;
     int             numexp_file_flag=0;
+    int             date;
+    int             hour;
+    int             min;
+    int             sec;
 
     if (mode==0)
     {
@@ -42,7 +46,7 @@ void ReadHbvResults(const char dir[], int nsub, int *nsteps, int *steps[], subca
 
     rewind(fp);
 
-    *steps = (int *)malloc(*nsteps * sizeof(int));
+    *steps = (double *)malloc(*nsteps * sizeof(double));
 
     if (mode == 1 & numexp_file_flag == 0)
     {
@@ -76,7 +80,17 @@ void ReadHbvResults(const char dir[], int nsub, int *nsteps, int *steps[], subca
 
             if (ksub == 0)
             {
-                fscanf(fp, "%d", &((*steps)[kstep]));    // Read model steps
+                if (stepsize < 86400)
+                {
+                    fscanf(fp, "%d %d:%d:%d",&date, &hour, &min, &sec);
+                    ((*steps)[kstep])=date+((hour*3600+min*60+sec)/86400.0);
+                }
+                else 
+                {
+                    fscanf(fp, "%lf", &((*steps)[kstep]));
+                    //((*steps)[kstep])=date;// Read model steps
+                }
+                
             }
             else
             {
@@ -128,7 +142,7 @@ void ReadHbvResults(const char dir[], int nsub, int *nsteps, int *steps[], subca
             //
             // HBV Light outputs SUZ and SLZ with low precision (one decimal digit), and does not output percolation
             // rate. Therefore, SUZ, SLZ, and percolation rate are calculated using Equations (1), (4), and (8).
-
+            subcatch[ksub].ws[kstep][SURFACE] = subcatch[ksub].q[kstep][Q0];
             subcatch[ksub].ws[kstep][UZ] = subcatch[ksub].q[kstep][Q1] / subcatch[ksub].k1 -
                 (subcatch[ksub].q[kstep][Q0] + subcatch[ksub].q[kstep][Q1]);
             subcatch[ksub].ws[kstep][LZ] = subcatch[ksub].q[kstep][Q2] / subcatch[ksub].k2 -
@@ -145,11 +159,11 @@ void ReadHbvResults(const char dir[], int nsub, int *nsteps, int *steps[], subca
         // Add 1. residual moisture to LZ & UZ and 2. SM to UZ
         for (kstep = 0; kstep < *nsteps; kstep++)
         {
-            // subcatch[ksub].ws[kstep][SURFACE] += subcatch[ksub].res_surface;   // 2021-05-14
+            //subcatch[ksub].ws[kstep][SURFACE] += subcatch[ksub].res_surface;   // 2021-05-14
             subcatch[ksub].ws[kstep][UZ] += subcatch[ksub].res_uz;
             subcatch[ksub].ws[kstep][LZ] += subcatch[ksub].res_lz;
             subcatch[ksub].ws[kstep][UZ] += subcatch[ksub].ws[kstep][SM];
-            
+
         }
         for (kstep = 0; kstep < *nsteps; kstep++)
         {

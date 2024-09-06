@@ -18,17 +18,17 @@ void ReadCini(const char dir[], int nsub, const chemtbl_struct *chemtbl, rttbl_s
     ReadConc(fp, rttbl->num_stc, chemtbl, &lno, subcatch[0].prcp_conc, dummy, dummy, dummy, dummy, dummy, dummy);
 
     // Read surface concentration  2021-05-07
-    //FindLine(fp, "SURFACE", &lno, cmdstr);
-    //ReadConc(fp, rttbl->num_stc, chemtbl, &lno, subcatch[0].chms[SURFACE].tot_conc, subcatch[0].chms[SURFACE].ssa);
+    FindLine(fp, "SF", &lno, cmdstr);
+    ReadConc(fp, rttbl->num_stc, chemtbl, &lno, subcatch[0].chms[SURFACE].tot_conc, subcatch[0].chms[SURFACE].ssa,subcatch[0].chms[SURFACE].k_cini, subcatch[0].chms[SURFACE].q10, subcatch[0].chms[SURFACE].sw_thld, subcatch[0].chms[SURFACE].sw_exp, subcatch[0].chms[SURFACE].n_alpha);
 
     // Read upper zone concentration
-    FindLine(fp, "UZ", &lno, cmdstr);
+    FindLine(fp, "SZ", &lno, cmdstr);
     ReadConc(fp, rttbl->num_stc, chemtbl, &lno, subcatch[0].chms[UZ].tot_conc, subcatch[0].chms[UZ].ssa, subcatch[0].chms[UZ].k_cini, subcatch[0].chms[UZ].q10, subcatch[0].chms[UZ].sw_thld, subcatch[0].chms[UZ].sw_exp, subcatch[0].chms[UZ].n_alpha);
 
     // Read lower zone concentration
-    FindLine(fp, "LZ", &lno, cmdstr);
+    FindLine(fp, "DZ", &lno, cmdstr);
     ReadConc(fp, rttbl->num_stc, chemtbl, &lno, subcatch[0].chms[LZ].tot_conc, subcatch[0].chms[LZ].ssa, subcatch[0].chms[LZ].k_cini, subcatch[0].chms[LZ].q10, subcatch[0].chms[LZ].sw_thld, subcatch[0].chms[LZ].sw_exp, subcatch[0].chms[LZ].n_alpha);
-    
+
     //To check if UZ and LZ has same k or rate for each mineral
     for (i = 0; i < rttbl->num_min; i++){
         if (subcatch[0].chms[LZ].k_cini[i + rttbl->num_stc - rttbl->num_min]!=subcatch[0].chms[UZ].k_cini[i + rttbl->num_stc - rttbl->num_min]){
@@ -36,7 +36,7 @@ void ReadCini(const char dir[], int nsub, const chemtbl_struct *chemtbl, rttbl_s
             exit(EXIT_FAILURE);
         }
     }
-    
+
     fclose(fp);
 }
 

@@ -80,10 +80,12 @@ typedef struct ctrl_struct
     int             read_restart;           // flag to read rt restart file
     int             actv_mode;              // activity coefficient mode: 0 = unity coefficient, 1 = DH equation
     int             transpt;                // transport only flag: 0 = simulate kinetic reaction, 1 = transport only
+    int             sfreaction;             // surface reaction mode: 0 = no surface reactions simulated, 1 = surface reactions simulated   2023-09-11
     int             precipchem;             // precipitation chemistry mode: 0 = constant precipitation chemistry, 1 = time-series precipitation chemistry   2021-05-20
     int             precipchem_numexp;      // Numerical experiment mode: 0 = same precipitation chemistry during warm-up and simulation
                                             // 1 = different precipitation chemistry during warm-up and simulation useful for numerical experiment  2021-09-09
-    double         *steps;                  // model steps
+    double          step_size;               // step size at which processes are simulated in seconds                                         
+    double         *steps;                  // model steps  2023-09-11
 } ctrl_struct;
 
 typedef struct rttbl_struct
@@ -178,17 +180,17 @@ typedef struct subcatch_struct
     double        **prcp_conc_time;         // time-series precipitation concentration (mol L-1)  2021-05-20
     double         *tmp;                    // air temperature (degree C)
     double          prcp_conc[MAXSPS];      // concentration in precipitation (mol kgH2O-1)
-    //double          d_surface;              // surface zone maximum water (passive + dynamic) storage capacity (mm)
+    double          d_surface;              // surface zone maximum water (passive + dynamic) storage capacity (mm)
     double          d_uz;                   // upper zone maximum water (passive + dynamic) storage capacity (mm)
     double          d_lz;                   // lower zone maximum water (passive + dynamic) storage capacity (mm)
     double          k1;                     // recession coefficient for upper zone (day -1)
     double          k2;                     // recession coefficient for lower zone (day -1)
     double          maxbas;                 // routing parameter
     double          perc;                   // percolation rate (mm day-1)
-    //double          porosity_surface;       // surface zone porosity (m3 m-3), 2021-05-14
+    double          porosity_surface;       // surface zone porosity (m3 m-3), 2021-05-14
     double          porosity_uz;            // upper zone porosity (m3 m-3)
     double          porosity_lz;            // lower zone porosity (m3 m-3)
-    //double          res_surface;            // surface zone passive water storage (mm), 2021-05-14
+    double          res_surface;            // surface zone passive water storage (mm), 2021-05-14
     double          res_uz;                 // upper zone passive water storage (mm)
     double          res_lz;                 // lower zone passive water storage (mm)
     double          sfcf;                   // snow fall correction factor
@@ -223,11 +225,11 @@ void            Lookup(FILE *, const calib_struct *, chemtbl_struct [], kintbl_s
 int             MatchWrappedKey(const char [], const char []);
 void            ParseCmdLineParam(int, char *[], char []);
 void            ParseLine(const char [], char [], double *);
-void            PrintDailyResults(FILE *, int, int, int, const rttbl_struct *, const subcatch_struct []);
+void            PrintDailyResults(FILE *, int, double, int, const rttbl_struct *, const subcatch_struct []);
 void            PrintHeader(FILE *, int, const rttbl_struct *, const chemtbl_struct chemtbl[]);
 double          ReactControl(const chemtbl_struct [], const kintbl_struct [], const rttbl_struct *, double, double, double,
     double, double, double, double [], chmstate_struct *);
-void            Reaction(int, int, double, const int [], const chemtbl_struct [], const kintbl_struct [],
+void            Reaction(int, int, double, const double [], const chemtbl_struct [], const kintbl_struct [],
     const rttbl_struct *, subcatch_struct []);
 void            ReadAdsorption(const char [], int, int, chemtbl_struct [], rttbl_struct *);
 void            ReadCationEchg(const char [], double, chemtbl_struct [], rttbl_struct *);
@@ -236,8 +238,8 @@ void            ReadCini(const char [], int, const chemtbl_struct *, rttbl_struc
 void            ReadConc(FILE *, int, const chemtbl_struct [], int *, double [], double [], double [], double [], double[], double[], double[]);
 void            ReadDHParam(const char [], int, double *);
 void            ReadHbvParam(const char [], int, subcatch_struct []);
-void            ReadHbvResults(const char [], int, int *, int **, subcatch_struct [], int);
-void            ReadPrecipChem(const char [], int, int *, int **, subcatch_struct [], int, const chemtbl_struct [], int);
+void            ReadHbvResults(const char [], int, double, int *, double **, subcatch_struct [], int);
+void            ReadPrecipChem(const char [], int, double, int *, double **, subcatch_struct [], int, const chemtbl_struct [], int);
 void            ReadMinerals(const char [], int, int, double [MAXSPS][MAXSPS], double [], chemtbl_struct [],
     rttbl_struct *);
 void            ReadMinKin(FILE *, int, double, int *, char [], chemtbl_struct [], kintbl_struct *);
@@ -259,6 +261,8 @@ void            Speciation(int, const chemtbl_struct [], const ctrl_struct *, co
 int             SpeciesType(const char [], const char []);
 void            StreamSpeciation(int, int, const chemtbl_struct [], const ctrl_struct *, const rttbl_struct *,
     subcatch_struct []);
+void            SurfaceReaction(int, int, int, double, const double [], const chemtbl_struct [], const kintbl_struct [],
+    const rttbl_struct *, subcatch_struct []);
 void            Transpt(int, int, const chemtbl_struct [], rttbl_struct *, const ctrl_struct *, subcatch_struct []);   // 2021-05-21
 void            Wrap(char []);
 double          WTDepthFactor(double ,double );

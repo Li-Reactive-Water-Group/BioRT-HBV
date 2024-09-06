@@ -1,6 +1,78 @@
 #include "biort.h"
 
-void Reaction(int kstep, int nsub, double stepsize, const int steps[], const chemtbl_struct chemtbl[],
+
+void SurfaceReaction(int kstep, int nsub,int ctrl_sfreaction, double stepsize, const double steps[], const chemtbl_struct chemtbl[],
+    const kintbl_struct kintbl[], const rttbl_struct *rttbl, subcatch_struct subcatch[])
+{
+    int             ksub;
+    int             kspc;
+    double          satn;
+    double          temp;
+    double          substep;
+    double          depth;
+    double          porosity;
+    double          Zw;
+    
+    
+    for (ksub = 0; ksub < nsub; ksub++)
+    {
+        if (subcatch[ksub].ws[kstep][SURFACE] > 0.0 & ctrl_sfreaction == 1)
+        {
+            
+            for (kspc = 0; kspc < rttbl->num_spc; kspc++)
+            {
+                subcatch[ksub].chms[STREAM].tot_mol[kspc] -= subcatch[ksub].chms[SURFACE].tot_conc[kspc] * subcatch[ksub].q[kstep][Q0];
+                subcatch[ksub].chms[SURFACE].tot_mol[kspc] = subcatch[ksub].chms[SURFACE].tot_conc[kspc] * subcatch[ksub].q[kstep][Q0];
+                
+            }
+            
+            temp = subcatch[ksub].tmp[kstep];
+            porosity=subcatch[ksub].porosity_surface;
+            depth=subcatch[ksub].d_surface;//subcatch[ksub].ws[kstep][SURFACE];
+            satn=1;
+            Zw=0;
+            
+            for (kspc = 0; kspc < MAXSPS; kspc++)
+            {
+                subcatch[ksub].react_rate[SURFACE][kspc] = BADVAL;   // Set reaction rate to -999
+            }
+            
+            substep = ReactControl(chemtbl, kintbl, rttbl, stepsize, porosity, depth, satn, temp, Zw,
+                    subcatch[ksub].react_rate[SURFACE], &subcatch[ksub].chms[SURFACE]);
+            
+            if (substep < 0.0)
+            {
+               biort_printf(VL_NORMAL, "%f %s zone reaction failed with a substep of %.1lf s.\n",
+                       steps[kstep], "SURFACE", -substep);
+            }
+            if (substep > 0.0)
+            {
+                biort_printf(VL_VERBOSE, "%f %s zone reaction passed with a minimum step of %.1lf s.\n",
+                        steps[kstep], "SURFACE", substep);
+            }
+            
+            for (kspc = 0; kspc < rttbl->num_spc; kspc++)
+            {
+                subcatch[ksub].chms[STREAM].tot_mol[kspc] += subcatch[ksub].chms[SURFACE].tot_conc[kspc] * subcatch[ksub].q[kstep][Q0];
+                subcatch[ksub].chms[SURFACE].tot_mol[kspc] = 0.0;
+                subcatch[ksub].chms[STREAM].tot_conc[kspc] =
+                    (subcatch[ksub].q[kstep][Q0] + subcatch[ksub].q[kstep][Q1] + subcatch[ksub].q[kstep][Q2] > 0.0) ?
+                    subcatch[ksub].chms[STREAM].tot_mol[kspc] /
+                    (subcatch[ksub].q[kstep][Q0] + subcatch[ksub].q[kstep][Q1] + subcatch[ksub].q[kstep][Q2]) : ZERO_CONC;
+            }
+        } else
+        {
+            for (kspc = 0; kspc < MAXSPS; kspc++)
+            {
+                subcatch[ksub].react_rate[SURFACE][kspc] = ZERO_CONC;   // Set reaction rate to 0
+            }
+        }
+    }
+        
+
+}
+
+void Reaction(int kstep, int nsub, double stepsize, const double steps[], const chemtbl_struct chemtbl[],
     const kintbl_struct kintbl[], const rttbl_struct *rttbl, subcatch_struct subcatch[])
 {
     int             ksub;
@@ -144,6 +216,13 @@ int SolveReact(double stepsize, const chemtbl_struct chemtbl[], const kintbl_str
             for (i = 0; i < rttbl->num_min; i++)
             {
                 fsw[i] = SoilMoistFactor(satn, chms->sw_thld[i + rttbl->num_stc - rttbl->num_min],chms->sw_exp[i + rttbl->num_stc - rttbl->num_min]);
+            }
+        }
+        if (satn == 1.0)
+        {
+            for (i = 0; i < rttbl->num_min; i++)
+            {
+                fsw[i]= 1.0;
             }
         }
     }   // Lichtner's 2 third law if SUF_EFF is turned on

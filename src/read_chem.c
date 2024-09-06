@@ -40,7 +40,22 @@ void ReadChem(const char dir[], ctrl_struct *ctrl, rttbl_struct *rttbl, chemtbl_
         default:
             break;
     }
-
+    
+    NextLine(fp, cmdstr, &lno);
+    ReadParam(cmdstr, "SF_REACTION", 'i', fn, lno, &ctrl->sfreaction);
+    switch (ctrl->sfreaction)
+    {
+        case 0:
+            biort_printf(VL_NORMAL, "  Surface reactions disabled.\n");
+            break;
+        case 1:
+            biort_printf(VL_NORMAL, "  Surface reactions enabled. \n");
+            break;
+            // under construction.
+        default:
+            break;
+    }
+    
     NextLine(fp, cmdstr, &lno);  // 2021-05-20
     ReadParam(cmdstr, "PRECIPCHEM", 'i', fn, lno, &ctrl->precipchem);
     switch (ctrl->precipchem)
@@ -73,6 +88,9 @@ void ReadChem(const char dir[], ctrl_struct *ctrl, rttbl_struct *rttbl, chemtbl_
     ReadParam(cmdstr, "TEMPERATURE", 'd', fn, lno, &rttbl->tmp);
     biort_printf(VL_NORMAL, "  Temperature = %3.1f \n", rttbl->tmp);
 
+    NextLine(fp, cmdstr, &lno);
+    ReadParam(cmdstr, "STEP_SIZE", 'd', fn, lno, &ctrl->step_size);
+    biort_printf(VL_NORMAL, "  Time Step = %.2f\n", ctrl->step_size);
     //NextLine(fp, cmdstr, &lno);
     //ReadParam(cmdstr, "SW_THRESHOLD", 'd', fn, lno, &rttbl->sw_thld);
     //biort_printf(VL_NORMAL, "  SW threshold = %.2f\n", rttbl->sw_thld);
