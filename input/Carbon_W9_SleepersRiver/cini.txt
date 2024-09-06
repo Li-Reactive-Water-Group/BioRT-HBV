@@ -16,8 +16,20 @@ Calcite(s) 	    1E-10 		-ssa 0.001	-logk   -9.19   -Q10    1.0   -SW_threshold  
 Calcite-lz(s) 	1E-10 		-ssa 0.001	-logk   -9.19   -Q10    1.0   -SW_threshold   0.7     -SW_exp     0	    -n_alpha    0
 CO2(*g)		    1E-6		-ssa 0.01	-logk   -13.1   -Q10	1.0   -SW_threshold   0.7     -SW_exp     0	    -n_alpha    0
 
+SF
+pH      	    4.53
+Cl-     	    4.01E-06
+HCO3-	 	    1E-10
+Ca++	 	    3.81E-6
+DOC		        1.07E-4
+X-		        1E-10
+SOC(s)		    1E-10 		-ssa 0.001	-logk   -10.2   -Q10    1.0   -SW_threshold   0.7     -SW_exp     0 	-n_alpha    0
+SOC-lz(s)   	1E-10 		-ssa 0.001  -logk   -9.2    -Q10    1.0   -SW_threshold   0.7     -SW_exp     0	    -n_alpha    0
+Calcite(s) 	    1E-10 		-ssa 0.001	-logk   -9.19   -Q10    1.0   -SW_threshold   0.7     -SW_exp     0	    -n_alpha    0
+Calcite-lz(s) 	1E-10 		-ssa 0.001	-logk   -9.19   -Q10    1.0   -SW_threshold   0.7     -SW_exp     0	    -n_alpha    0
+CO2(*g)		    1E-6		-ssa 0.01	-logk   -13.1   -Q10	1.0   -SW_threshold   0.7     -SW_exp     0	    -n_alpha    0
 
-UZ
+SZ
 pH      	    6.76
 Cl-     	    1.08E-5
 HCO3-	 	    2.84E-4
@@ -30,7 +42,7 @@ Calcite(s)  	5E-4 		-ssa 1.0	-logk   -9.19   -Q10    1.0   -SW_threshold   1.0  
 Calcite-lz(s) 	1E-10 		-ssa 0.001	-logk   -9.19   -Q10    1.0   -SW_threshold   0.7     -SW_exp     0	    -n_alpha    0
 CO2(*g)		    1E-4		-ssa 0.01	-logk   -13.1   -Q10	3.0   -SW_threshold   0.7     -SW_exp     2	    -n_alpha    0
 
-LZ
+DZ
 pH      	    7.91
 Cl-     	    1.62E-5 
 HCO3-	 	    1.90E-3

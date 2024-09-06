@@ -13,7 +13,17 @@ soilN(s)    1E-10   -ssa 0.0001	-logk   -15.0   -Q10    1   -SW_threshold   1   
 plantN(s)   1E-10   -ssa 0.0001	-logk   -13.4   -Q10    1   -SW_threshold   0.7     -SW_exp     0	-n_alpha    0
 soilDN(s)   1E-10   -ssa 0.0001	-logk   -12.8   -Q10    1   -SW_threshold   0.7     -SW_exp     0	-n_alpha    0
 
-UZ
+SF
+pH      	4.76
+Cl-     	4.77E-06
+NO3         1.0E-5
+N(plant)    1E-10
+N2(soil)    1E-7
+soilN(s)    1E-10   -ssa 0.0001	-logk   -15.0   -Q10    1   -SW_threshold   1       -SW_exp     0	-n_alpha    0
+plantN(s)   1E-10   -ssa 0.0001	-logk   -13.4   -Q10    1   -SW_threshold   0.7     -SW_exp     0	-n_alpha    0
+soilDN(s)   1E-10   -ssa 0.0001	-logk   -12.8   -Q10    1   -SW_threshold   0.7     -SW_exp     0	-n_alpha    0
+
+SZ
 pH      	6.56
 Cl-     	4.77E-06
 NO3         1.56E-4
@@ -24,7 +34,7 @@ plantN(s)   0.01    -ssa 3.0	-logk   -13.4   -Q10    1.5   -SW_threshold   1    
 soilDN(s)   0.002   -ssa 1E-6	-logk   -12.8   -Q10    1   -SW_threshold   1     -SW_exp     0	-n_alpha    0
 
 
-LZ
+DZ
 pH      	7.80
 Cl-     	4.77E-06
 NO3         8.0E-6
