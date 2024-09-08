@@ -3,7 +3,12 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#ifdef _WIN32
+#include <windows.h>
+#define F_OK 0
+#else
 #include <unistd.h>
+#endif
 #include <math.h>
 #include <string.h>
 #include <time.h>
@@ -215,7 +220,7 @@ void            CopyConstSubcatchProp(int, const subcatch_struct [], subcatch_st
 void            CopyInitChemSubcatch(int, rttbl_struct *, const subcatch_struct [], subcatch_struct []);
 int             CountLeapYears(int, int);
 int             FindChem(const char [], int, const chemtbl_struct[]);
-void            FreeStruct(int, int, int *[], subcatch_struct []);
+void            FreeStruct(int, int, double *[], subcatch_struct []);
 int             GetDifference(int, int);
 void            InitChem(const char [], int, const calib_struct *, const ctrl_struct *, chemtbl_struct [],
     kintbl_struct [], rttbl_struct *, subcatch_struct []);

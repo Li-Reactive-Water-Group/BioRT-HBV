@@ -309,7 +309,7 @@ ENDIF()
 # ---------------------------------------------------------------
 
 OPTION(BUILD_STATIC_LIBS "Build static libraries" ON)
-OPTION(BUILD_SHARED_LIBS "Build shared libraries" ON)
+OPTION(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 
 # Prepare substitution variable SUNDIALS_EXPORT for sundials_config.h
 # When building shared SUNDIALS libraries under Windows, use
@@ -487,11 +487,11 @@ OPTION(Trilinos_ENABLE "Enable Trilinos support" OFF)
 # ---------------------------------------------------------------
 
 # Enable C examples (on by default)
-OPTION(EXAMPLES_ENABLE_C "Build SUNDIALS C examples" ON)
+OPTION(EXAMPLES_ENABLE_C "Build SUNDIALS C examples" OFF)
 
 # C++ examples (off by default, unless Trilinos is enabled)
 SET(DOCSTR "Build C++ examples")
-OPTION(EXAMPLES_ENABLE_CXX "${DOCSTR}" ${Trilinos_ENABLE})
+OPTION(EXAMPLES_ENABLE_CXX "${DOCSTR}" OFF)
 
 # F77 examples (on by default) are an option only if the Fortran
 # interface is enabled
@@ -547,15 +547,15 @@ ELSE()
 ENDIF()
 
 # If any of the above examples are enabled set EXAMPLES_ENABLED to TRUE
-IF(EXAMPLES_ENABLE_C OR
-    EXAMPLES_ENABLE_F77 OR
-    EXAMPLES_ENABLE_CXX OR
-    EXAMPLES_ENABLE_F90 OR
-    EXAMPLES_ENABLE_CUDA)
-  SET(EXAMPLES_ENABLED TRUE)
-ELSE()
-  SET(EXAMPLES_ENABLED FALSE)
-ENDIF()
+# IF(EXAMPLES_ENABLE_C OR
+#     EXAMPLES_ENABLE_F77 OR
+#     EXAMPLES_ENABLE_CXX OR
+#     EXAMPLES_ENABLE_F90 OR
+#     EXAMPLES_ENABLE_CUDA)
+#   SET(EXAMPLES_ENABLED TRUE)
+# ELSE()
+# ENDIF()
+SET(EXAMPLES_ENABLED FALSE)
 
 # ---------------------------------------------------------------
 # Install examples?

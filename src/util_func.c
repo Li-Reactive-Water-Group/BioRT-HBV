@@ -30,7 +30,7 @@ void Unwrap(const char wrapped_str[], char str[])
     str[j] = '\0';
 }
 
-void FreeStruct(int nsub, int nsteps, int *steps[], subcatch_struct subcatch[])
+void FreeStruct(int nsub, int nsteps, double *steps[], subcatch_struct subcatch[])
 {
     int             ksub;
     int             kstep;
