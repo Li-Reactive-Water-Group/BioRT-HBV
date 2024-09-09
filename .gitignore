@@ -62,3 +62,5 @@ advisor
 
 # Build directory
 build/
+build.sh
+build.bat
