@@ -59,3 +59,8 @@ advisor
 
 # Mac OS
 .DS_Store
+
+# Build directory
+build/
+build.sh
+build.bat

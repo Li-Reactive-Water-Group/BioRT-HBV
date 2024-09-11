@@ -13,6 +13,7 @@ The following guide applies to UNIX (include MacOS) systems.
 
 ### Installing BioRT-HBV
 
+#### Linux/MacOS
 After downloading the BioRT-HBV source code, go into the `BioRT-HBV` directory.
 Use the command
 
@@ -31,6 +32,17 @@ make biort
 to compile BioRT-HBV.
 
 When installation succeeds, you should see a `biort` executable in your `BioRT-HBV` directory.
+
+#### Windows
+To build BioRT-HBV for Windows, ensure that you have a C compiler and CMake installed on your local machine. Then in a Powershell terminal, run:
+```shell
+mkdir build
+cd build
+cmake .. 
+cmake --build . --config Release
+```
+
+If successfully compiled, the executable `biort.exe` should be in the parent directory.
 
 ### Preparing input files
 
