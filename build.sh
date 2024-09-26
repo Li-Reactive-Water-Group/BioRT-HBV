@@ -1,4 +1,4 @@
 mkdir build
 cd build
 cmake ..
-cmake --build . -j14
+cmake --build . -j4
