@@ -136,7 +136,7 @@ int main(int argc, char *argv[])
             Transpt(kstep, nsub, chemtbl, &rttbl, &ctrl, subcatch_numexp); // 2021-05-20
 
             //if there is Q0 flow, and reaction in surface is activated
-            SurfaceReaction(kstep, nsub, ctrl.sfreaction, ctrl.step_size, steps, chemtbl, kintbl, &rttbl, subcatch);
+            SurfaceReaction(kstep, nsub, ctrl.sfreaction, ctrl.step_size, steps, chemtbl, kintbl, &rttbl, subcatch_numexp);
             
             // Transport changes total concentrations. Primary concentrations needs to be updated using total
             // concentrations

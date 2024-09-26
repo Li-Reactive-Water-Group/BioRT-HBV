@@ -52,6 +52,10 @@ cmake --build . --config Release
 
 If successfully compiled, the executable `biort.exe` should be in the parent directory.
 
+###windows - without compiling
+To directly run the BioRT-HBV model on your system, unzip "Biort_HBV_v1_windows_exe.zip". There will be "biort.exe" file and "input" folder inside "Biort_HBV_v1_windows_exe" folder. 
+Navigate to the folder "Biort_HBV_v1_windows_exe" on your command prompt and you can run the model using the command "biort xxx", where xxx is a subfolder of "input" folder containing the input files for the study site user wants to model.
+
 ### Preparing input files
 
 The BioRT-HBV model requires six input files, including HBV Light model input and output files.

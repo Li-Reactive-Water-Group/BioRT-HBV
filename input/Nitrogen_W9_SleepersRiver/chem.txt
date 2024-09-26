@@ -10,9 +10,9 @@ STEP_SIZE       86400   # Time step in seconds (example: 86400 for 1 day interva
 PRIMARY_SPECIES         # list of all primary species
 pH
 Cl-
-NO3
+NO3-
 N(plant)
-N2(soil)
+N2O(soil)
 soilN(s)
 plantN(s)
 soilDN(s)
