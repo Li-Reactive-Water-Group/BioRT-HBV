@@ -11,9 +11,10 @@ All bug reports and feature requests should be submitted using the Issues page.
 
 The following guide applies to UNIX (include MacOS) systems.
 
-### Installing BioRT-HBV
+### Compiling BioRT-HBV
 
 #### Linux/MacOS
+##### Using GNU Make
 After downloading the BioRT-HBV source code, go into the `BioRT-HBV` directory.
 Use the command
 
@@ -33,16 +34,23 @@ to compile BioRT-HBV.
 
 When installation succeeds, you should see a `biort` executable in your `BioRT-HBV` directory.
 
+##### Usign 
+
 #### Windows
 ##### Using Cygwin
-To compile BioRT-HBV for Windows using Cygwin, ensure that you have installed CMake and Make through Cygwin. Then, in a Cygwin terminal in the source directory, run:
+To compile BioRT-HBV for Windows using Cygwin, ensure that you have installed CMake and Make through Cygwin. Then, in a Cygwin terminal in the source directory, run the following commands in the source code directory to build using CMake:
 
 ```bash
-sh build.sh
+mkdir build
+cd build
+cmake ..
+cmake --build . -j4
 ```
 
-##### Using Powershell (not Cygwin)
-To build BioRT-HBV for Windows, ensure that you have a C compiler and CMake installed on your local machine. Then in a Powershell terminal, run:
+If compilation was successful, the file `biort.exe` should be in the `BioRT-HBV` directory, and the model is then ready to use.
+
+##### Using a Microsoft Visual Compiler (not Cygwin)
+To build BioRT-HBV for Windows, ensure that you have a C compiler and CMake installed on your local machine through Visual Studio. Then in a Powershell terminal, run:
 ```shell
 mkdir build
 cd build
@@ -50,9 +58,9 @@ cmake ..
 cmake --build . --config Release
 ```
 
-If successfully compiled, the executable `biort.exe` should be in the parent directory.
+If successfully compiled, the executable `biort.exe` should be in the `BioRT-HBV` directory.
 
-###windows - without compiling
+### Windows - without compiling
 To directly run the BioRT-HBV model on your system, unzip "Biort_HBV_v1_windows_exe.zip". There will be "biort.exe" file and "input" folder inside "Biort_HBV_v1_windows_exe" folder. 
 Navigate to the folder "Biort_HBV_v1_windows_exe" on your command prompt and you can run the model using the command "biort xxx", where xxx is a subfolder of "input" folder containing the input files for the study site user wants to model.
 
