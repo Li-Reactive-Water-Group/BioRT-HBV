@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.26)
 
-project(biort)
+project(biort LANGUAGES C)
 
 
 add_executable(
