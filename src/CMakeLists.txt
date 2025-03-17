@@ -60,7 +60,19 @@ target_link_libraries(
 )
 endif()
 
-if(WIN32)
+# if(WIN32)
+#     target_link_directories(biort PUBLIC
+#         ${BioRT_SOURCE_DIR}/build/cvode/src/cvode/Release
+#         ${BioRT_SOURCE_DIR}/build/cvode/src/nvector/serial/Release
+#     )
+# else()
+#     target_link_directories(biort PUBLIC
+#         ${BioRT_SOURCE_DIR}/build/cvode/src/cvode
+#         ${BioRT_SOURCE_DIR}/build/cvode/src/nvector/serial
+#     )
+# endif()
+
+if(CMAKE_C_COMPILER STREQUAL "MSVC")
     target_link_directories(biort PUBLIC
         ${BioRT_SOURCE_DIR}/build/cvode/src/cvode/Release
         ${BioRT_SOURCE_DIR}/build/cvode/src/nvector/serial/Release

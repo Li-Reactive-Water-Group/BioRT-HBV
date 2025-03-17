@@ -34,11 +34,11 @@ to compile BioRT-HBV.
 
 When installation succeeds, you should see a `biort` executable in your `BioRT-HBV` directory.
 
-##### Usign 
+##### Using CMake
 
 #### Windows
-##### Using Cygwin
-To compile BioRT-HBV for Windows using Cygwin, ensure that you have installed CMake and Make through Cygwin. Then, in a Cygwin terminal in the source directory, run the following commands in the source code directory to build using CMake:
+##### Using Cygwin or MSys2
+To compile BioRT-HBV for Windows using Cygwin or MSys2, ensure that you have installed a C compiler (like GCC), CMake and Make through Cygwin/MSys2. Then, in a Cygwin/MSys2 terminal in the source directory, run the following commands in the source code directory to build using CMake:
 
 ```bash
 mkdir build
